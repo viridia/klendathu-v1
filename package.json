@@ -1,0 +1,22 @@
+{
+  "name": "klendathu",
+  "version": "0.0.1",
+  "description": "Flexible bug tracking and agile task management application.",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server",
+    "start-container": "docker run --rm -it -u app -p 49160:8080 --name klendathu -v $(pwd):/usr/src/app viridia/klendathu",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "bug",
+    "tracking",
+    "express",
+    "react"
+  ],
+  "author": "Talin <viridia@gmail.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}
