@@ -4,7 +4,9 @@
   "description": "Flexible bug tracking and agile task management application.",
   "main": "server/index.js",
   "scripts": {
-    "start": "node server",
+    "start": "node server/index.js",
+    "start": "pm2 --node-args=\"--harmony\" server/index.js",
+    "build-container": "docker build -t viridia/klendathu .",
     "start-container": "docker run --rm -it -u app -p 49160:8080 --name klendathu -v $(pwd):/usr/src/app viridia/klendathu",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
