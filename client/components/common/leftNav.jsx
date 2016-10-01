@@ -26,25 +26,32 @@ NavItem.propTypes = {
 
 export default class LeftNav extends React.Component {
   render() {
-    return (<div className="kdt left-nav">
+    const { project } = this.props.params;
+    return (<nav className="kdt left-nav">
       <NavItem icon={<AppsIcon />} title="Dashboard" onlyActiveOnIndex path="/" />
       <NavItem
           icon={<ListIcon />}
           title="All Issues"
-          path="/issues"
+          path={`/issues/${project}`}
           query={{ owner: undefined }} />
       <NavItem
           icon={<PersonIcon />}
           title="My Open Issues"
-          path="/issues"
+          path={`/issues/${project}`}
           query={{ owner: 'me', status: 'open' }} />
       <NavItem icon={<LocalOfferIcon />} title="Labels" path="/labels" />
       <ul>
-        <li><Link to="/label/">release-blockers</Link></li>
-        <li><Link to="/label/">feature-set-1</Link></li>
+        <li><Link to={`/label/${project}`}>release-blockers</Link></li>
+        <li><Link to={`/label/${project}`}>feature-set-1</Link></li>
       </ul>
-      <NavItem icon={<BookmarkIcon />} title="Saved Queries" path="/queries" />
-      <NavItem icon={<SettingsIcon />} title="Project Settings" path="/project" />
-    </div>);
+      <NavItem icon={<BookmarkIcon />} title="Saved Queries" path={`/queries/${project}`} />
+      <NavItem icon={<SettingsIcon />} title="Project Settings" path={`/project/${project}`} />
+    </nav>);
   }
 }
+
+LeftNav.propTypes = {
+  params: React.PropTypes.shape({
+    project: React.PropTypes.string.isRequired,
+  }),
+};
