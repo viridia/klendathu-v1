@@ -1,0 +1,44 @@
+{
+  "extends": "airbnb",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true
+    }
+  },
+  "env": {
+    "browser": true
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "moduleDirectory": ["node_modules", "media" ]
+      },
+      "import/external-module-folders": [
+        "node_modules",
+        "media"
+      ]
+    }
+  },
+  "rules": {
+    "arrow-body-style": "off",
+    "arrow-parens": "off",
+    "class-methods-use-this": "off",
+    "func-names": "off",
+    "import/extensions": ["error", { "jsx": "always", "svg": "always" }],
+    "new-cap": ["error", { "capIsNewExceptionPattern": "^Immutable\\.." }],
+    "no-console": "off",
+    "no-else-return": "off",
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "no-param-reassign": ["error", { "props": false }],
+    "no-prototype-builtins": "off",
+    "object-shorthand": ["error", "methods"],
+    "prefer-arrow-callback": "off",
+    "react/jsx-indent-props": ["error", 4],
+    "react/prefer-stateless-function": "off",
+    "react/no-multi-comp": "off",
+    "react/jsx-closing-bracket-location": ["error", {
+      "selfClosing": "after-props",
+      "nonEmpty": "after-props"
+    }]
+  }
+}

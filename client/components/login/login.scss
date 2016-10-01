@@ -1,0 +1,49 @@
+@import '../defines/colors.scss';
+
+.login-content {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  align-items: center;
+  flex: 1;
+}
+
+.login.card {
+  display: flex;
+  padding: 8px;
+
+  > .login-form {
+    > .button-row {
+      display: flex;
+      justify-content: space-between;
+      > button {
+        margin-left: 8px;
+      }
+    }
+  }
+
+  .divider {
+    margin: 12px;
+    width: 1;
+    background-color: $cardBorder;
+  }
+
+  .providers {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+
+    > button {
+      margin-bottom: 8px;
+    }
+  }
+}
+
+.login-spacer-before {
+  flex: 1;
+}
+
+.login-spacer-after {
+  flex: 5;
+}

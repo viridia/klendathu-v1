@@ -1,0 +1,25 @@
+@import '../defines/colors.scss';
+@import '../defines/fonts.scss';
+
+.kdt.header {
+  display: flex;
+  align-items: center;
+  background-color: $b6;
+  padding: 5px 8px;
+
+  > .title {
+    font-family: $titleFont;
+    font-size: 16pt;
+    color: $b0  ;
+  }
+
+  > .subtitle {
+    color: $b1;
+    flex: 1;
+  }
+
+  .header-link {
+    color: $b1;
+    margin-left: 8px;
+  }
+}

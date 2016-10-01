@@ -1,0 +1,29 @@
+@import './defines/colors.scss';
+@import './defines/fonts.scss';
+
+body {
+  display: flex;
+  align-items: stretch;
+  font-family: $bodyFont;
+  background-color: $contentBg;
+  margin: 0;
+}
+
+#react-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.kdt.page {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 1;
+
+  > .content {
+    display: flex;
+    align-items: stretch;
+    flex: 1;
+  }
+}

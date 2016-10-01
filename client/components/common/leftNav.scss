@@ -1,0 +1,36 @@
+@import '../defines/colors.scss';
+
+.kdt.left-nav {
+  display: flex;
+  flex-direction: column;
+  background-color: $leftNavBg;
+  color: $leftNavFg;
+  border-right: 1px solid darken($leftNavBg, 10%);
+  padding: 8px;
+  min-width: 12em;
+
+  > .item {
+    display: flex;
+    align-items: center;
+    margin: 3px;
+    text-decoration: none;
+    color: $leftNavFg;
+
+    &.active {
+      font-weight: bold;
+    }
+
+    .svg-icon {
+      margin-right: 6px;
+      > svg {
+        width: 20px;
+        height: 20px;
+        fill: $leftNavFg;
+      }
+    }
+  }
+
+  > ul > li > a {
+    color: $leftNavFg;
+  }
+}

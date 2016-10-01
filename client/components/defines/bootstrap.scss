@@ -1,0 +1,55 @@
+@import 'colors.scss';
+
+// Default button
+$btn-default-color: #482848;
+$btn-default-bg: #D794E2;
+$btn-default-border: #BB79C5;
+
+// Primary button
+$btn-primary-color: #f3e5f5;
+$btn-primary-bg: #ab47bc;
+$btn-primary-border: darken(#ab47bc, 10%);
+
+// Change appearance of tabs
+$nav-tabs-active-link-hover-border-color: $cardBorder;
+$nav-tabs-active-link-hover-bg: $cardBg;
+$nav-link-hover-bg: #f6ecf8;
+
+// Include bootstrap styles that we are using.
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_mixins.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_variables.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_utilities.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_buttons.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_button-groups.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_close.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_dropdowns.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_forms.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_grid.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_labels.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_modals.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_navbar.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_navs.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_normalize.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_panels.scss';
+
+.nav.nav-tabs {
+  margin-top: 4px;
+}
+
+.nav.nav-tabs > li > a {
+  text-decoration: none;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  .svg-icon {
+    position: relative;
+    > svg {
+      width: 19px;
+      height: 19px;
+      fill: $b0;
+      margin-right: 4px;
+    }
+  }
+}

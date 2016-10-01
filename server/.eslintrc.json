@@ -4,9 +4,10 @@
     // Our existing code uses anonymous functions a lot, so disable these rules.
     "func-names": "off",
     "new-cap": ["error", { "capIsNewExceptionPattern": "^Sequelize\\.." }],
-    // Disabled because lint rule appears to be slightly buggy.
+    "no-param-reassign": ["error", { "props": false }],
     "arrow-body-style": "off",
     "arrow-parens": "off",
-    "no-else-return": "off"
+    "no-else-return": "off",
+    "no-underscore-dangle": "off"
   }
 }
