@@ -3,20 +3,10 @@ const bcrypt = require('bcrypt');
 const { Strategy: LocalStrategy } = require('passport-local');
 const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
+const serializers = require('./serializers');
 
 module.exports = function (app, apiRouter) {
   const users = app.db.collection('users');
-
-  // Only those fields needed by the client.
-  function userProfile(user) {
-    return {
-      id: user._id,
-      fullname: user.fullname,
-      username: user.username,
-      photo: user.photo,
-      verified: user.verified,
-    };
-  }
 
   // Initialize passport on /api route only.
   apiRouter.use(passport.initialize());
@@ -67,7 +57,8 @@ module.exports = function (app, apiRouter) {
   // Returns profile of current logged-in user
   apiRouter.get('/profile', (req, res) => {
     if (req.user) {
-      return res.send(userProfile(req.user));
+      // TODO: Get project information and other useful things.
+      return res.send(serializers.profile(req.user));
     } else {
       logger.info('/profile: not logged in.');
       return res.status(401).send({});
@@ -80,7 +71,8 @@ module.exports = function (app, apiRouter) {
       if (err) { return next(err); }
       if (!user) { return res.send(info); }
       return req.logIn(user, () => {
-        return res.send(userProfile(user));
+        return res.end();
+        // return res.send(serializers.profile(user));
       });
     })(req, res, next);
   });
@@ -126,7 +118,8 @@ module.exports = function (app, apiRouter) {
               }).then(u => {
                 logger.info('User creation successful:', username);
                 return req.logIn(u, () => {
-                  return res.json(userProfile(u));
+                  return res.end();
+                  // return res.json(serializers.profile(u));
                 });
               }, reason => {
                 logger.error('User creation error:', reason);

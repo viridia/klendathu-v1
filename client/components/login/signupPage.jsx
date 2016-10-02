@@ -95,7 +95,7 @@ export default class SignUpPage extends React.Component {
   render() {
     const { next } = this.props.location.query;
     return (<div className="kdt page">
-      <Header location={this.props.location} />
+      <Header location={this.props.location} params={this.props.params} />
       <div className="login-content">
         <div className="login-spacer-before" />
         <div className="login card">
@@ -173,4 +173,5 @@ SignUpPage.propTypes = {
   location: React.PropTypes.shape({
     query: React.PropTypes.string.isRequired,
   }).isRequired,
+  params: React.PropTypes.shape({}),
 };

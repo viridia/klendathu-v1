@@ -1,7 +1,6 @@
 import { createAction, createReducer } from 'redux-act';
 import Immutable from 'immutable';
 import axios from 'axios';
-import { updateIfChanged } from './helpers';
 
 export const requestProjects = createAction('REQUEST_PROJECTS');
 export const receiveProjects = createAction('RECEIVE_PROJECTS');
@@ -43,12 +42,7 @@ export default createReducer({
   },
   [receiveProjects]: (state, projects) => {
     return {
-      byId: state.byId.withMutations(map => {
-        projects.forEach(proj => {
-          const obj = updateIfChanged(map.get(proj.name, {}), proj);
-          map.set(proj.name, obj);
-        });
-      }),
+      byId: new Immutable.Map(projects.map(proj => [proj.name, proj])),
       idList: projects.map(p => p.name),
       loaded: true,
     };

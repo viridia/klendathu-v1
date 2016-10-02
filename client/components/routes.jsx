@@ -15,13 +15,17 @@ import SignUpPage from './login/signupPage.jsx';
 import LeftNav from './common/leftNav.jsx';
 import store from '../store/store';
 import { fetchProfile } from '../store/profile';
+import { fetchProjects } from '../store/projects';
 
 // Make sure we have a user profile before we enter the main part of the app.
 function checkAuth(nextState, replace, callback) {
   const state = store.getState();
   if (state.profile.id === null) {
+    // TODO: Combine into a single request.
     store.dispatch(fetchProfile()).then(_resp => {
-      callback();
+      return store.dispatch(fetchProjects()).then(_resp2 => {
+        callback();
+      });
     }, reason => {
       replace({ pathname: '/login', query: { next: nextState.location.pathname } });
       console.error('Error fetching user profile:', reason);

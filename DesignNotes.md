@@ -2,6 +2,29 @@ Need: create project.
 
 collections:
   issues
+    -- cc
+    -- reporter
+    -- owner / assigned
+    -- subject
+    -- description
+    -- comments
+    -- attachments
+    -- state / status
+    -- resolution
+    -- public
+    -- linked issues
+    -- labels
+    -- tags
+    -- (opt) severity
+    -- (opt) priority
+    -- (opt) product
+    -- (opt) hardware
+    -- (opt) version
+    -- (opt) operating system
+    -- (opt) browser
+    -- (opt) target milestone
+    -- (opt) votes / likes
+    -- (opt) fixed in version
   workflows
   templates
   labels

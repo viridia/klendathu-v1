@@ -62,6 +62,7 @@
     "passport-local": "^1.0.0",
     "react": "^15.3.2",
     "react-bootstrap": "^0.30.3",
+    "react-bootstrap-typeahead": "^0.9.4",
     "react-dom": "^15.3.2",
     "react-immutable-proptypes": "^2.1.0",
     "react-redux": "^4.4.5",

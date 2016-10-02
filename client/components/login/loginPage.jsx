@@ -63,7 +63,7 @@ class LoginPage extends React.Component {
     const canSubmit = this.state.userName.length > 1 && this.state.password.length > 1;
     const { next } = this.props.location.query;
     return (<div className="kdt page">
-      <Header location={this.props.location} />
+      <Header location={this.props.location} params={this.props.params} />
       <div className="login-content">
         <div className="login-spacer-before" />
         <div className="login card">
@@ -118,6 +118,7 @@ LoginPage.propTypes = {
     }).isRequired,
   }).isRequired,
   login: React.PropTypes.func.isRequired,
+  params: React.PropTypes.shape({}),
 };
 
 export default connect(

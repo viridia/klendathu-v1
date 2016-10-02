@@ -17,7 +17,7 @@
   }
 }
 
-.kdt.issue-list {
+.kdt.issue-list, .kdt.issue-compose {
   flex: 1;
   overflow-y: auto;
 }
@@ -28,6 +28,14 @@
   background: lighten($b0, 5%);
   border: 1px solid $cardBorder;
   box-shadow: 0px 2px 3px 0 rgba(0,0,0,0.14);
+
+  > header {
+    box-shadow: 0px 2px 2px 0 rgba(0,0,0,0.14);
+    background-color: $cardHeaderBg;
+    padding: 5px 7px;
+    font-weight: bold;
+    border-bottom: 1px solid darken($b1, 5%);
+  }
 
   > .heading {
     background-color: $cardHeaderBg;
@@ -46,7 +54,7 @@
 
   .no-issues {
     padding: 8px;
-      text-align: center;
+    text-align: center;
     font-style: italic;
   }
 
@@ -100,5 +108,109 @@
         color: $b9;
       }
     }
+  }
+}
+
+.create-issue {
+  display: flex;
+
+  > .left {
+    flex: 1;
+    margin-right: 4px;
+  }
+
+  > .right {
+    border: 1px solid $b1;
+    width: 30%;
+    margin: 4px;
+    padding: 8px;
+  }
+}
+
+.create-issue-table {
+  width: 100%;
+
+  th, td {
+    vertical-align: top;
+    padding: 4px;
+    white-space: nowrap;
+  }
+
+  th {
+    text-align: right;
+    line-height: 1.8em;
+  }
+
+  td {
+    width: 80%;
+  }
+
+  textarea {
+    resize: none;
+  }
+
+  .issue-type {
+    margin-top: 6px;
+  }
+
+  .description {
+    height: 10em;
+  }
+
+  .reporter,
+  .assign-to {
+    width: 50%;
+  }
+
+  .ac-single {
+    width: 15em;
+  }
+
+  .ac-multi-group {
+    display: flex;
+    width: 15em;
+  }
+
+  .ac-multi {
+    flex: 1;
+    margin-right: 4px;
+  }
+
+  .upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    height: 5em;
+    border-radius: 4px;
+    color: #777;
+  }
+
+  .linked-group {
+    display: flex;
+    > .linked-issue {
+      margin: 0 4px;
+      flex: 1;
+    }
+  }
+
+  .add-comment-group {
+    display: flex;
+    align-items: flex-start;
+    > .add-comment {
+      flex: 1;
+      margin-right: 4px;
+      height: 8em;
+    }
+  }
+}
+
+.submit-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px;
+  > button {
+    margin-left: 8px;
   }
 }

@@ -1,4 +1,5 @@
 const logger = require('../common/logger');
+const serializers = require('./serializers');
 
 module.exports = function (app, apiRouter) {
   const projects = app.db.collection('projects');
@@ -23,15 +24,7 @@ module.exports = function (app, apiRouter) {
           return res.status(500).json({ err: 'internal', details: error });
         }
         return res.json({
-          projects: rows.map(p => ({
-            name: p.name,
-            title: p.title,
-            description: p.description,
-            owningUser: p.owningUser,
-            owningOrg: p.owningOrg,
-            created: p.created,
-            updated: p.updated,
-          })),
+          projects: rows.map(serializers.project),
         });
       });
     }

@@ -3,7 +3,7 @@
 
 // Default button
 $btn-default-color: #482848;
-$btn-default-bg: #D794E2;
+$btn-default-bg: lighten(#D794E2, 10%);
 $btn-default-border: #BB79C5;
 
 // Primary button
@@ -47,13 +47,26 @@ $nav-link-hover-bg: #f6ecf8;
   font-family: $bodyFont;
   font-size: 100%;
   text-decoration: none;
+  &.btn-sm {
+    font-size: 80%;
+  }
   .svg-icon {
     position: relative;
     > svg {
       width: 19px;
       height: 19px;
-      fill: $b0;
       margin-right: 4px;
     }
   }
+  .caret {
+    margin-left: 6px;
+  }
+}
+
+.btn-primary .svg-icon > svg {
+  fill: $b0;
+}
+
+a[role=menuitem] {
+  text-decoration: none;
 }
