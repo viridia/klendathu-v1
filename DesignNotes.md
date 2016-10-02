@@ -1,5 +1,3 @@
-Need: create project.
-
 collections:
   issues
     -- cc
@@ -106,18 +104,6 @@ states: [
       owner: "{verifier||reporter}"
     }
   },
-  {
-    name: 'verified',
-    status: 'closed',
-  },
-  {
-    name: 'cannot reproduce',
-    status: 'closed',
-  },
-  {
-    name: 'working as intended',
-    status: 'closed',
-  }
 ]
 
 issues: [
@@ -168,3 +154,6 @@ issues: [
     extends: ':issue',
   }
 ]
+
+Future:
+  Server needs json schemas to ensure requests are not malicious.

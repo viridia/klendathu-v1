@@ -11,10 +11,51 @@ import Radio from 'react-bootstrap/lib/Radio';
 import Typeahead from 'react-bootstrap-typeahead';
 import './issues.scss';
 
+class StateSelector extends React.Component {
+  constructor() {
+    super();
+    this.onChange = this.onChange.bind(this);
+  }
+
+  onChange(e) {
+    e.preventDefault();
+  }
+
+  render() {
+    function caption(state) {
+      if (state.open) {
+        return state.caption;
+      } else {
+        return <span>Closed: {state.caption}</span>;
+      }
+    }
+
+    const workflow = this.props.workflow;
+    const state = workflow.statesById[this.props.state || workflow.start];
+    return (<FormGroup controlId="state">
+      <ControlLabel>State</ControlLabel>
+      <Radio data-state={state.id} checked onChange={this.onChange}>{caption(state)}</Radio>
+      {state.to.map(s => {
+        const toState = workflow.statesById[s];
+        return (<Radio
+            key={toState.id}
+            data-state={toState.id}
+            onChange={this.onChange}>{caption(toState)}</Radio>);
+      })}
+    </FormGroup>);
+  }
+}
+
+StateSelector.propTypes = {
+  state: React.PropTypes.string,
+  project: React.PropTypes.shape({}),
+  workflow: React.PropTypes.shape({}),
+};
+
 class IssueCompose extends React.Component {
   render() {
-    const { project } = this.props;
-    console.log('IssueCompose:', project, this.props.params);
+    const { project, workflow } = this.props;
+    console.log('IssueCompose:', project, workflow);
     return (<section className="kdt issue-compose">
       <div className="card">
         <header>New Issue: {project.name}</header>
@@ -154,20 +195,7 @@ class IssueCompose extends React.Component {
             </table>
           </div>
           <aside className="right">
-            <FormGroup controlId="state">
-              <ControlLabel>State</ControlLabel>
-              <Radio>New</Radio>
-              <Radio>Assigned</Radio>
-              <Radio>Accepted</Radio>
-              <Radio>In Review</Radio>
-              <Radio>QA</Radio>
-              <Radio>Needs more information</Radio>
-              <Radio>Closed: Fixed</Radio>
-              <Radio>Closed: Duplicate</Radio>
-              <Radio>Closed: Cannot Reproduce</Radio>
-              <Radio>Closed: Working as Intended</Radio>
-              <Radio>Closed: Deferred</Radio>
-            </FormGroup>
+            <StateSelector project={project} workflow={workflow} state="new" />
           </aside>
         </section>
         <footer className="submit-buttons">
@@ -181,12 +209,16 @@ class IssueCompose extends React.Component {
 
 IssueCompose.propTypes = {
   project: React.PropTypes.shape({}),
+  workflow: React.PropTypes.shape({}),
   params: React.PropTypes.shape({
     project: React.PropTypes.string,
   }),
 };
 
 export default connect(
-  (state, ownProps) => ({ project: state.projects.byId.get(ownProps.params.project) }),
+  (state, ownProps) => ({
+    project: state.projects.byId.get(ownProps.params.project),
+    workflow: state.workflows['std/bugtrack'],
+  }),
   null,
 )(IssueCompose);

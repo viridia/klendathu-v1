@@ -10,6 +10,7 @@ const authActions = require('./actions/auth');
 const projectsActions = require('./actions/projects');
 const userActions = require('./actions/user');
 const issuesActions = require('./actions/issues');
+const workflowsActions = require('./actions/workflows');
 const logger = require('./common/logger');
 
 // Constants
@@ -64,6 +65,7 @@ mongo.then(db => {
   projectsActions(app, apiRouter);
   issuesActions(app, apiRouter);
   userActions(app, apiRouter);
+  workflowsActions(app, apiRouter);
   app.use('/api', apiRouter);
 
   // Proxy for webpack dev server.

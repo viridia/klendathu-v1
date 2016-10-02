@@ -1,0 +1,83 @@
+{
+  "project": "std",
+  "name": "bugtrack",
+  "start": "new",
+  "extends": null,
+  "states": [
+    {
+      "id": "new",
+      "caption": "New",
+      "open": true,
+      "to": [
+        "assigned",
+        "in_progress"
+      ]
+    },
+    {
+      "id": "assigned",
+      "caption": "Assigned",
+      "open": true,
+      "to": [
+        "new",
+        "in_progress",
+        "duplicate"
+      ]
+    },
+    {
+      "id": "in_progress",
+      "caption": "In Progress",
+      "open": true,
+      "to": [
+        "new",
+        "assigned",
+        "duplicate"
+      ]
+    },
+    {
+      "id": "needs_more_info",
+      "caption": "Needs More Information",
+      "open": true
+    },
+    {
+      "id": "review",
+      "caption": "In Review",
+      "open": true
+    },
+    {
+      "id": "qa",
+      "caption": "In QA",
+      "open": true,
+      "actions": {
+        "owner": "{reporter}"
+      }
+    },
+    {
+      "id": "verified",
+      "caption": "Verified",
+      "open": false,
+      "actions": {
+        "owner": null,
+      }
+    },
+    {
+      "id": "duplicate",
+      "caption": "Duplicate",
+      "open": false
+    },
+    {
+      "id": "working_as_intended",
+      "caption": "Working As Intended",
+      "open": false
+    },
+    {
+      "id": "deferred",
+      "caption": "Deferred",
+      "open": false
+    },
+    {
+      "id": "cannot_reproduce",
+      "caption": "Cannot Reproduce",
+      "open": false
+    }
+  ]
+}

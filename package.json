@@ -7,6 +7,7 @@
     "client": "cd client && webpack-dev-server --inline --port 8081",
     "client-build": "cd client && webpack",
     "start": "pm2 --node-args=\"--harmony\" start process.json",
+    "stop": "pm2 kill",
     "build-container": "docker build -t viridia/klendathu .",
     "start-container": "docker run --rm -it -u app -p 49160:8080 --name klendathu -v $(pwd):/usr/src/app viridia/klendathu",
     "test": "echo \"Error: no test specified\" && exit 1"

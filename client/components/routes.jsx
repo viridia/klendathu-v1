@@ -16,6 +16,7 @@ import LeftNav from './common/leftNav.jsx';
 import store from '../store/store';
 import { fetchProfile } from '../store/profile';
 import { fetchProjects } from '../store/projects';
+import { fetchWorkflow } from '../store/workflows';
 
 // Make sure we have a user profile before we enter the main part of the app.
 function checkAuth(nextState, replace, callback) {
@@ -23,7 +24,10 @@ function checkAuth(nextState, replace, callback) {
   if (state.profile.id === null) {
     // TODO: Combine into a single request.
     store.dispatch(fetchProfile()).then(_resp => {
-      return store.dispatch(fetchProjects()).then(_resp2 => {
+      return Promise.all([
+        store.dispatch(fetchProjects()),
+        store.dispatch(fetchWorkflow('std', 'bugtrack')),
+      ]).then(_resp2 => {
         callback();
       });
     }, reason => {
