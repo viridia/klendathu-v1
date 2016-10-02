@@ -11,9 +11,9 @@ class Page extends React.Component {
   }
 
   render() {
-    const { main, left, location } = this.props;
+    const { main, left, location, params } = this.props;
     return (<div className="kdt page">
-      <Header location={location} />
+      <Header location={location} params={params} />
       <div className="content">
         {left}
         {main}
@@ -23,12 +23,11 @@ class Page extends React.Component {
 }
 
 Page.propTypes = {
-  projects: React.PropTypes.shape({
-    // loaded: React.PropType.bool.isRequired,
-  }).isRequired,
+  projects: React.PropTypes.shape({}).isRequired,
   main: React.PropTypes.node.isRequired,
   left: React.PropTypes.node,
   location: React.PropTypes.shape({}).isRequired,
+  params: React.PropTypes.shape({}).isRequired,
   fetchProjects: React.PropTypes.func.isRequired,
 };
 

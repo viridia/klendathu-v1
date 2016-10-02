@@ -31,11 +31,10 @@ class ProjectCard extends React.Component {
     ev.preventDefault();
     this.setState({ showDelete: false });
     this.props.deleteProject(this.props.project.name);
-    console.log('delete project');
   }
 
   render() {
-    const { project, user } = this.props;
+    const { project, profile } = this.props;
     return (
       <div className="project-card" key={project.name}>
         {this.state.showDelete && (
@@ -61,10 +60,12 @@ class ProjectCard extends React.Component {
               Owned by: <UserName user={project.owningUser} />
             </div>
             <div className="owned-by">
-              {user.id === project.owningUser && <span>role: owner</span>}
+              {profile.id === project.owningUser && <span>role: owner</span>}
             </div>
           </div>
-          <Button bsStyle="primary" onClick={this.onShowDelete}>Delete</Button>
+          <div>
+            <Button bsStyle="primary" onClick={this.onShowDelete}>Delete</Button>
+          </div>
         </div>
       </div>
     );
@@ -75,13 +76,13 @@ ProjectCard.propTypes = {
   project: React.PropTypes.shape({
     name: React.PropTypes.string.isRequired,
   }).isRequired,
-  user: React.PropTypes.shape({
+  profile: React.PropTypes.shape({
     // id: React.PropTypes.string,
   }),
   deleteProject: React.PropTypes.func.isRequired,
 };
 
 export default connect(
-  null,
+  (state) => ({ profile: state.profile }),
   dispatch => bindActionCreators({ deleteProject }, dispatch),
 )(ProjectCard);

@@ -1,8 +1,8 @@
 import React from 'react';
 import Tab from 'react-bootstrap/lib/Tab';
 import Tabs from 'react-bootstrap/lib/Tabs';
-import CreateProjectPanel from './createProjectPanel.jsx';
-import ProjectList from './projectList.jsx';
+import CreateProjectPanel from '../projects/createProjectPanel.jsx';
+import ProjectList from '../projects/projectList.jsx';
 import './profile.scss';
 
 export default class ProfilePage extends React.Component {

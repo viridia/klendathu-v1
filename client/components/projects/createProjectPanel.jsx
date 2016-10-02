@@ -8,7 +8,7 @@ import AddBoxIcon from 'icons/ic_add_box_black_24px.svg';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { createProject } from '../../store/projects';
-import './profile.scss';
+import './createProjectPanel.scss';
 
 class CreateProjectPanel extends React.Component {
   constructor(props, context) {
@@ -68,8 +68,8 @@ class CreateProjectPanel extends React.Component {
   }
 
   render() {
-    const { user } = this.props;
-    if (!user) {
+    const { profile } = this.props;
+    if (!profile) {
       return null;
     }
     return (<div className="create-project-panel">
@@ -83,7 +83,7 @@ class CreateProjectPanel extends React.Component {
               label="Owner"
               value={this.state.owner}
               onChange={this.onChangeOwner}>
-            <option value="">{user.username}</option>
+            <option value="">{profile.username}</option>
             <option value="org">organization</option>
           </FormControl>
         </FormGroup>
@@ -111,7 +111,7 @@ class CreateProjectPanel extends React.Component {
 }
 
 CreateProjectPanel.propTypes = {
-  user: React.PropTypes.shape({
+  profile: React.PropTypes.shape({
     // username: React.PropTypes.string,
   }),
   location: React.PropTypes.shape({}).isRequired,
@@ -119,6 +119,6 @@ CreateProjectPanel.propTypes = {
 };
 
 export default connect(
-  state => ({ user: state.user }),
+  state => ({ profile: state.profile }),
   dispatch => bindActionCreators({ createProject }, dispatch),
 )(CreateProjectPanel);

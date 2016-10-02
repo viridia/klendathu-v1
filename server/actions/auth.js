@@ -70,7 +70,7 @@ module.exports = function (app, apiRouter) {
       return res.send(userProfile(req.user));
     } else {
       logger.info('/profile: not logged in.');
-      return res.send({});
+      return res.status(401).send({});
     }
   });
 

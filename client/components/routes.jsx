@@ -1,10 +1,11 @@
 import React from 'react';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import { Provider } from 'react-redux';
-import axios from 'axios';
 import Page from './page.jsx';
 import Dashboard from './dashboard/dashboard.jsx';
+import DashboardNav from './dashboard/dashboardNav.jsx';
 import IssueDetails from './issues/issueDetails.jsx';
+import IssueCompose from './issues/issueCompose.jsx';
 import IssueList from './issues/issueList.jsx';
 import LabelList from './issues/labelList.jsx';
 import ProjectSettings from './settings/projectSettings.jsx';
@@ -13,16 +14,16 @@ import LoginPage from './login/loginPage.jsx';
 import SignUpPage from './login/signupPage.jsx';
 import LeftNav from './common/leftNav.jsx';
 import store from '../store/store';
-import * as actions from '../store/actions';
+import { fetchProfile } from '../store/profile';
 
 // Make sure we have a user profile before we enter the main part of the app.
 function checkAuth(nextState, replace, callback) {
   const state = store.getState();
-  if (state.user === null) {
-    axios.get('profile').then(resp => {
-      store.dispatch(actions.login(resp.data));
+  if (state.profile.id === null) {
+    store.dispatch(fetchProfile()).then(_resp => {
       callback();
     }, reason => {
+      replace({ pathname: '/login', query: { next: nextState.location.pathname } });
       console.error('Error fetching user profile:', reason);
       callback();
     });
@@ -38,11 +39,12 @@ const Routes = (
       <Route component={SignUpPage} path="/signup" />
       <Route component={Page} path="/" onEnter={checkAuth}>
         <Route components={{ main: ProfilePage }} path="/profile" />
+        <Route components={{ main: IssueCompose, left: LeftNav }} path="/issues/:project/new" />
         <Route components={{ main: IssueDetails, left: LeftNav }} path="/issues/:project/:id" />
         <Route components={{ main: IssueList, left: LeftNav }} path="/issues/:project" />
         <Route components={{ main: LabelList, left: LeftNav }} path="/labels/:project" />
         <Route components={{ main: ProjectSettings, left: LeftNav }} path="/project/:project" />
-        <IndexRoute components={{ main: Dashboard }} />
+        <IndexRoute components={{ main: Dashboard, left: DashboardNav }} />
       </Route>
     </Router>
   </Provider>

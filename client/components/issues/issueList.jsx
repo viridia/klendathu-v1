@@ -1,18 +1,17 @@
 import React from 'react';
 import Button from 'react-bootstrap/lib/Button';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
-import axios from 'axios';
 import './issues.scss';
 
 export default class IssueList extends React.Component {
-  constructor() {
-    axios.get('projects').then(resp => {
-      console.log(resp.data);
-    }, err => {
-      console.error(err);
-    });
-    super();
-  }
+  // constructor() {
+  //   axios.get('projects').then(resp => {
+  //     console.log(resp.data);
+  //   }, err => {
+  //     console.error(err);
+  //   });
+  //   super();
+  // }
 
   render() {
     return (<section className="kdt issue-list">

@@ -1,0 +1,18 @@
+@import '../defines/base.scss';
+
+.kdt.dashboard {
+  flex: 1;
+  padding: 16px;
+
+  > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+
+    > .title {
+      font-family: $headerFont;
+      font-size: 120%;
+    }
+  }
+}

@@ -8,7 +8,7 @@ import SettingsIcon from 'icons/ic_settings_black_24px.svg';
 import LocalOfferIcon from 'icons/ic_local_offer_black_24px.svg';
 import './leftNav.scss';
 
-function NavItem({ title, icon, path, query = undefined, onlyActiveOnIndex = false }) {
+export function NavItem({ title, icon, path, query = undefined, onlyActiveOnIndex = false }) {
   return (<Link
       className="item"
       activeClassName="active"

@@ -6,13 +6,13 @@ import FormControl from 'react-bootstrap/lib/FormControl';
 import FormGroup from 'react-bootstrap/lib/FormGroup';
 import HelpBlock from 'react-bootstrap/lib/HelpBlock';
 import { LinkContainer } from 'react-router-bootstrap';
-import axios from 'axios';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import Header from '../common/header.jsx';
-import Store from '../../store/store';
-import * as actions from '../../store/actions';
+import { login } from '../../store/profile';
 import './login.scss';
 
-export default class LoginPage extends React.Component {
+class LoginPage extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -28,7 +28,7 @@ export default class LoginPage extends React.Component {
 
   onSubmit(ev) {
     ev.preventDefault();
-    axios.post('login', {
+    this.props.login({
       username: this.state.userName,
       password: this.state.password,
     }).then(resp => {
@@ -41,7 +41,6 @@ export default class LoginPage extends React.Component {
         case 'incorrect-password': errState.passwordError = 'Incorrect password.'; break;
         default: {
           const { next } = this.props.location.query;
-          Store.dispatch(actions.login(resp.data));
           browserHistory.push({ pathname: next || '/' });
           return;
         }
@@ -118,4 +117,12 @@ LoginPage.propTypes = {
       next: React.PropTypes.string,
     }).isRequired,
   }).isRequired,
+  login: React.PropTypes.func.isRequired,
 };
+
+export default connect(
+  (state) => ({
+    user: state.profile,
+  }),
+  dispatch => bindActionCreators({ login }, dispatch),
+)(LoginPage);
