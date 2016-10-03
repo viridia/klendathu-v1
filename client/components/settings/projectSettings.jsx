@@ -2,12 +2,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Tab from 'react-bootstrap/lib/Tab';
 import Tabs from 'react-bootstrap/lib/Tabs';
-import WorkflowList from '../workflow/workflowList.jsx';
+import WorkflowEdit from '../workflow/workflowEdit.jsx';
 import './settings.scss';
 
 class ProjectSettings extends React.Component {
-  constructor() {
-    super();
+  constructor(props, context) {
+    super(props, context);
     this.state = { selected: 3 };
     this.handleSelect = this.handleSelect.bind(this);
   }
@@ -35,12 +35,7 @@ class ProjectSettings extends React.Component {
           </section>
         </Tab>
         <Tab eventKey={3} title="Workflow">
-          <section className="kdt settings-tab-pane workflow-edit">
-            <WorkflowList {...this.props} />
-            <section className="workflow-diagram">
-              Workflow diagram goes here.
-            </section>
-          </section>
+          <WorkflowEdit {...this.props} />
         </Tab>
       </Tabs>
     </section>);
@@ -57,6 +52,7 @@ export default connect(
   (state, ownProps) => ({
     project: state.projects.byId.get(ownProps.params.project),
     workflow: state.workflows['std/bugtrack'],
+    editWorkflow: state.workflows.$edit,
   }),
   null,
 )(ProjectSettings);
