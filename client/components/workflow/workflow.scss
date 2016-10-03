@@ -1,0 +1,29 @@
+.workflow-list {
+  flex: 1;
+  margin-right: 8px;
+  padding-right: 8px;
+  overflow-y: scroll;
+}
+
+.workflow-state {
+  > header {
+    display: flex;
+    align-items: center;
+    > .caption {
+      flex: 1;
+    }
+  }
+
+  > .body {
+    overflow: hidden;
+  }
+
+  &.collapsed > .body {
+    height: 0;
+    padding: 0 8px;
+  }
+
+  &.collapsed > header {
+    box-shadow: none;
+  }
+}

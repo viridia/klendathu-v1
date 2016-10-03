@@ -36,7 +36,7 @@ class ProjectCard extends React.Component {
   render() {
     const { project, profile } = this.props;
     return (
-      <div className="project-card" key={project.name}>
+      <div className="card internal project-card" key={project.name}>
         {this.state.showDelete && (
           <Modal show onHide={this.onHideDelete}>
             <Modal.Header closeButton>

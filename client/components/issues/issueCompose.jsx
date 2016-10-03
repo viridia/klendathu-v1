@@ -53,6 +53,18 @@ StateSelector.propTypes = {
 };
 
 class IssueCompose extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      public: false,
+    };
+    this.onChangePublic = this.onChangePublic.bind(this);
+  }
+
+  onChangePublic(e) {
+    this.setState({ public: e.target.checked });
+  }
+
   render() {
     const { project, workflow } = this.props;
     console.log('IssueCompose:', project, workflow);
@@ -61,7 +73,7 @@ class IssueCompose extends React.Component {
         <header>New Issue: {project.name}</header>
         <section className="content create-issue">
           <div className="left">
-            <table className="create-issue-table">
+            <table className="create-issue-table form-table">
               <tbody>
                 <tr>
                   <th className="header"><ControlLabel>Issue Type:</ControlLabel></th>
@@ -125,7 +137,7 @@ class IssueCompose extends React.Component {
                 <tr>
                   <th />
                   <td>
-                    <Checkbox>
+                    <Checkbox checked={this.state.public} onChange={this.onChangePublic}>
                       Public
                     </Checkbox>
                   </td>

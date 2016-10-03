@@ -1,12 +1,14 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import Tab from 'react-bootstrap/lib/Tab';
 import Tabs from 'react-bootstrap/lib/Tabs';
+import WorkflowList from '../workflow/workflowList.jsx';
 import './settings.scss';
 
-export default class ProjectSettings extends React.Component {
+class ProjectSettings extends React.Component {
   constructor() {
     super();
-    this.state = { selected: 1 };
+    this.state = { selected: 3 };
     this.handleSelect = this.handleSelect.bind(this);
   }
 
@@ -23,21 +25,38 @@ export default class ProjectSettings extends React.Component {
           animation={false}
           id="project-panel">
         <Tab eventKey={1} title="Project Info">
-          <div className="kdt settings-tab-pane">
+          <section className="kdt settings-tab-pane">
             Project info goes here.
-          </div>
+          </section>
         </Tab>
         <Tab eventKey={2} title="Issue Templates">
-          <div className="kdt settings-tab-pane">
+          <section className="kdt settings-tab-pane issue-template-edit">
             Issue templates go here.
-          </div>
+          </section>
         </Tab>
         <Tab eventKey={3} title="Workflow">
-          <div className="kdt settings-tab-pane">
-            Workflow diagram goes here.
-          </div>
+          <section className="kdt settings-tab-pane workflow-edit">
+            <WorkflowList {...this.props} />
+            <section className="workflow-diagram">
+              Workflow diagram goes here.
+            </section>
+          </section>
         </Tab>
       </Tabs>
     </section>);
   }
 }
+
+// ProjectSettings.propTypes = {
+//   params: React.PropTypes.shape({
+//     project: React.PropTypes.string,
+//   }),
+// };
+
+export default connect(
+  (state, ownProps) => ({
+    project: state.projects.byId.get(ownProps.params.project),
+    workflow: state.workflows['std/bugtrack'],
+  }),
+  null,
+)(ProjectSettings);

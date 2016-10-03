@@ -1,0 +1,24 @@
+.form-table {
+  th {
+    text-align: right;
+  }
+
+  th, td {
+    vertical-align: top;
+    padding: 4px;
+    white-space: nowrap;
+  }
+
+  th {
+    text-align: right;
+    line-height: 1.8em;
+  }
+
+  td {
+    width: 80%;
+  }
+
+  textarea {
+    resize: none;
+  }
+}

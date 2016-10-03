@@ -1,11 +1,7 @@
 @import '../defines/base.scss';
 
 .project-card {
-  background: lighten($b0, 15%);
-  border: 1px solid lighten($cardBorder, 10%);
-  box-shadow: 0px 1px 2px 0 rgba(0,0,0,0.14);
-  padding: 8px;
-  margin-bottom: 8px;
+  padding: 12px;
 
   > .project-info {
     display: flex;
