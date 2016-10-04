@@ -6,10 +6,13 @@ section.workflow-edit {
   align-items: stretch;
 
   > header {
+    display: flex;
+    align-items: center;
     padding: 8px;
     margin-bottom: 8px;
 
     > .title {
+      flex: 1;
       font-family: $headerFont;
       font-size: 120%;
       font-weight: normal;

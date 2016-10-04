@@ -23,10 +23,10 @@ class StateSelector extends React.Component {
 
   render() {
     function caption(state) {
-      if (state.open) {
-        return state.caption;
-      } else {
+      if (state.closed) {
         return <span>Closed: {state.caption}</span>;
+      } else {
+        return state.caption;
       }
     }
 
@@ -35,7 +35,7 @@ class StateSelector extends React.Component {
     return (<FormGroup controlId="state">
       <ControlLabel>State</ControlLabel>
       <Radio data-state={state.id} checked onChange={this.onChange}>{caption(state)}</Radio>
-      {state.to.map(s => {
+      {state.transitions.map(s => {
         const toState = workflow.statesById[s];
         return (<Radio
             key={toState.id}

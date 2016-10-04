@@ -1,52 +1,87 @@
 {
-  "project": "std",
   "name": "bugtrack",
-  "start": "new",
+  "project": "std",
   "extends": null,
+  "start": "new",
   "states": [
     {
       "id": "new",
       "caption": "New",
-      "open": true,
-      "to": [
+      "closed": false,
+      "transitions": [
         "assigned",
         "in_progress"
-      ]
+      ],
+      "actions": []
     },
     {
       "id": "assigned",
       "caption": "Assigned",
-      "open": true,
-      "to": [
+      "closed": false,
+      "transitions": [
         "new",
         "in_progress",
-        "duplicate"
-      ]
+        "needs_more_info",
+        "review",
+        "qa",
+        "duplicate",
+        "working_as_intended",
+        "deferred"
+      ],
+      "actions": []
     },
     {
       "id": "in_progress",
       "caption": "In Progress",
-      "open": true,
-      "to": [
+      "closed": false,
+      "transitions": [
         "new",
         "assigned",
-        "duplicate"
-      ]
+        "needs_more_info",
+        "review",
+        "qa",
+        "duplicate",
+        "working_as_intended",
+        "deferred",
+        "cannot_reproduce"
+      ],
+      "actions": []
     },
     {
       "id": "needs_more_info",
       "caption": "Needs More Information",
-      "open": true
+      "closed": false,
+      "transitions": [
+        "assigned",
+        "verified",
+        "duplicate",
+        "working_as_intended",
+        "deferred",
+        "cannot_reproduce"
+      ],
+      "actions": []
     },
     {
       "id": "review",
       "caption": "In Review",
-      "open": true
+      "closed": false,
+      "transitions": [
+        "assigned",
+        "in_progress",
+        "qa",
+        "verified"
+      ],
+      "actions": []
     },
     {
       "id": "qa",
       "caption": "In QA",
-      "open": true,
+      "closed": false,
+      "transitions": [
+        "assigned",
+        "in_progress",
+        "verified"
+      ],
       "actions": {
         "owner": "{reporter}"
       }
@@ -54,7 +89,8 @@
     {
       "id": "verified",
       "caption": "Verified",
-      "open": false,
+      "closed": true,
+      "transitions": [],
       "actions": {
         "owner": null
       }
@@ -62,22 +98,39 @@
     {
       "id": "duplicate",
       "caption": "Duplicate",
-      "open": false
+      "closed": true,
+      "transitions": [],
+      "actions": []
     },
     {
       "id": "working_as_intended",
       "caption": "Working As Intended",
-      "open": false
+      "closed": true,
+      "transitions": [
+        "assigned",
+        "in_progress"
+      ],
+      "actions": []
     },
     {
       "id": "deferred",
       "caption": "Deferred",
-      "open": false
+      "closed": true,
+      "transitions": [
+        "assigned",
+        "in_progress"
+      ],
+      "actions": []
     },
     {
       "id": "cannot_reproduce",
       "caption": "Cannot Reproduce",
-      "open": false
+      "closed": true,
+      "transitions": [
+        "assigned",
+        "in_progress"
+      ],
+      "actions": []
     }
   ]
 }
