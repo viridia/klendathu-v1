@@ -1,6 +1,7 @@
 import { createAction, createReducer } from 'redux-act';
 import Immutable from 'immutable';
 import axios from 'axios';
+import { toastr } from 'react-redux-toastr';
 
 const requestWorkflow = createAction('REQUEST_WORKFLOW');
 const receiveWorkflow = createAction('RECEIVE_WORKFLOW');
@@ -46,6 +47,7 @@ export function saveWorkflow(project, name) {
       }),
     };
     console.log(JSON.stringify(newWorkflow, null, 2));
+    toastr.success('Workflow saved.');
   };
 }
 

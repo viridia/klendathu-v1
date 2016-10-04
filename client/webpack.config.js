@@ -88,6 +88,11 @@ module.exports = {
         loader: 'file-loader?name=fonts/[name]-[hash].[ext]',
       },
       {
+        // SVG Fonts
+        test: /redux-toastr\.svg$/,
+        loader: 'file-loader?name=fonts/[name]-[hash].[ext]',
+      },
+      {
         // Inline SVG icons
         include: path.join(__dirname, 'media/icons'),
         test: /\.svg$/i,

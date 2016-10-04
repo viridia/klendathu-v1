@@ -27,3 +27,7 @@ body {
     flex: 1;
   }
 }
+
+div.redux-toastr > .toastr.success {
+  background-color: $b5;
+}

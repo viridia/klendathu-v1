@@ -1,6 +1,8 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import ReduxToastr from 'react-redux-toastr';
+import 'react-redux-toastr/src/less/index.less';
 import Header from './common/header.jsx';
 import { fetchProjects } from '../store/projects';
 import './page.scss';
@@ -13,6 +15,7 @@ class Page extends React.Component {
   render() {
     const { main, left, location, params } = this.props;
     return (<div className="kdt page">
+      <ReduxToastr />
       <Header location={location} params={params} />
       <div className="content">
         {left}
