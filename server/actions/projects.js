@@ -37,11 +37,12 @@ module.exports = function (app, apiRouter) {
     } else {
       projects.findOne({ name: req.params.name }).then(proj => {
         if (proj) {
+          // TODO: Ownership test.
           projects.deleteOne({ name: req.params.name }).then(() => {
             res.status(200).end();
           }, error => {
             logger.error('Error deleting project', req.params.name);
-            res.status(404).json({ err: 'project-delete-error', details: error });
+            res.status(500).json({ err: 'project-delete-error', details: error });
           });
         } else {
           logger.error('Error deleting non-existent project', req.params.name);
@@ -93,6 +94,34 @@ module.exports = function (app, apiRouter) {
         }
       }, err => {
         logger.error('Error creating project', err);
+        return res.status(500).json({ err: 'internal' });
+      });
+    }
+  });
+
+  apiRouter.patch('/projects/:name', (req, res) => {
+    if (!req.user) {
+      res.status(401).json({ err: 'unauthorized' });
+    } else {
+      projects.findOne({ name: req.params.name }).then(proj => {
+        if (proj) {
+          // TODO: Ownership test.
+          const { description } = req.body;
+          const updates = { description };
+          projects.updateOne({ name: req.params.name }, {
+            $set: updates,
+          }).then(() => {
+            res.status(200).end();
+          }, error => {
+            logger.error('Error updating project', req.params.name);
+            res.status(500).json({ err: 'project-update-error', details: error });
+          });
+        } else {
+          logger.error('Error updating non-existent project', req.params.name);
+          res.status(404).json({ err: 'no-project' });
+        }
+      }, err => {
+        logger.error('Error finding project to delete', err);
         return res.status(500).json({ err: 'internal' });
       });
     }

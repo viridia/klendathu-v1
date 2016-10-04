@@ -1,3 +1,5 @@
+Hot loading?
+
 collections:
   issues
     -- cc

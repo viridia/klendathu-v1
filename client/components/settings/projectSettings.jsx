@@ -2,13 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Tab from 'react-bootstrap/lib/Tab';
 import Tabs from 'react-bootstrap/lib/Tabs';
+import ProjectInfoEdit from '../projects/projectInfoEdit.jsx';
 import WorkflowEdit from '../workflow/workflowEdit.jsx';
 import './settings.scss';
 
 class ProjectSettings extends React.Component {
   constructor(props, context) {
     super(props, context);
-    this.state = { selected: 3 };
+    this.state = { selected: 1 };
     this.handleSelect = this.handleSelect.bind(this);
   }
 
@@ -25,9 +26,7 @@ class ProjectSettings extends React.Component {
           animation={false}
           id="project-panel">
         <Tab eventKey={1} title="Project Info">
-          <section className="kdt settings-tab-pane">
-            Project info goes here.
-          </section>
+          <ProjectInfoEdit {...this.props} />
         </Tab>
         <Tab eventKey={2} title="Issue Templates">
           <section className="kdt settings-tab-pane issue-template-edit">
@@ -41,12 +40,6 @@ class ProjectSettings extends React.Component {
     </section>);
   }
 }
-
-// ProjectSettings.propTypes = {
-//   params: React.PropTypes.shape({
-//     project: React.PropTypes.string,
-//   }),
-// };
 
 export default connect(
   (state, ownProps) => ({
