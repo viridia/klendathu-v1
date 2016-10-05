@@ -25,6 +25,10 @@ collections:
     -- (opt) target milestone
     -- (opt) votes / likes
     -- (opt) fixed in version
+    -- where to insert:
+       -- after description
+       -- after keywords
+       -- after state
   workflows
   templates
   labels
@@ -67,38 +71,6 @@ do we want orgs to contain users or users to contain orgs?
 workflow:
 
 states: [
-  {
-    id: 'new',
-    name: 'New',
-    status: 'open',
-    to: [
-      'in progress',
-      'cannot reproduce',
-      'working as intended',
-    ]
-  },
-  {
-    name: 'in progress',
-    status: 'open',
-    to: [
-      'new',
-      'in review',
-      'QA',
-      'Fixed',
-      'cannot reproduce',
-      'working as intended',
-    ]
-  },
-  {
-    name: 'in review',
-    status: 'open',
-    to: [
-      'new',
-      'QA',
-      'cannot reproduce',
-      'working as intended',
-    ]
-  },
   {
     name: 'QA',
     status: 'open',
@@ -159,3 +131,10 @@ issues: [
 
 Future:
   Server needs json schemas to ensure requests are not malicious.
+
+Things to experiment with:
+  -- TypeScript
+  -- Webpack 2
+  -- React hot loading
+  -- minimal babel conversions
+  -- Nginx config and https

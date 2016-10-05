@@ -4,7 +4,7 @@
 body {
   display: flex;
   align-items: stretch;
-  font-family: $bodyFont;
+  font: $bodyFont;
   background-color: $contentBg;
   margin: 0;
 }

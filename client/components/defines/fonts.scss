@@ -122,6 +122,73 @@
   font-display: swap;
 }
 
-$bodyFont: 'Roboto', sans-serif;
-$titleFont: 'RussoOne', sans-serif;
-$headerFont: 'RussoOne', sans-serif;
+// Ubuntu
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Ubuntu-Light'), url(/fonts/Ubuntu/Ubuntu-Light.ttf) format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: italic;
+  font-weight: 300;
+  src: local('Ubuntu-LightItalic'), url(/fonts/Ubuntu/Ubuntu-LightItalic.ttf) format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Ubuntu-Regular'), url(/fonts/Ubuntu/Ubuntu-Regular.ttf) format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Ubuntu-Italic'), url(/fonts/Ubuntu/Ubuntu-Italic.ttf) format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 500;
+  src: local('Ubuntu-Medium'), url(/fonts/Ubuntu/Ubuntu-Medium.ttf) format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: italic;
+  font-weight: 500;
+  src: local('Ubuntu-MediumItalic'), url(/fonts/Ubuntu/Ubuntu-MediumItalic.ttf) format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Ubuntu-Bold'), url(/fonts/Ubuntu/Ubuntu-Bold.ttf) format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: italic;
+  font-weight: 700;
+  src: local('Ubuntu-BoldItalic'), url(/fonts/Ubuntu/Ubuntu-BoldItalic.ttf) format('truetype');
+  font-display: swap;
+}
+
+$bodyFontFamily: 'Ubuntu', sans-serif;
+$bodyFont: 400 1rem $bodyFontFamily;
+$titleFont: 400 1.5rem 'RussoOne', sans-serif;
+$headerFont: 700 1.3rem 'Ubuntu', sans-serif;
+$buttonFont: 400 1rem $bodyFontFamily;

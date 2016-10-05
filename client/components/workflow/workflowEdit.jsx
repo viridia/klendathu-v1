@@ -28,8 +28,8 @@ class WorkflowEdit extends React.Component {
   render() {
     const { name, project } = this.props;
     return (
-      <section className="kdt settings-tab-pane workflow-edit">
-        <header className="card internal">
+      <section className="settings-tab-pane">
+        <header>
           <span className="title">Workflow: {project}/{name}</span>
           <Button bsStyle="primary" disabled={!this.props.modified} onClick={this.onSave}>
             Save

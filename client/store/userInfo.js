@@ -4,10 +4,10 @@ import axios from 'axios';
 const requestUserInfo = createAction('REQUEST_USER_INFO');
 const receiveUserInfo = createAction('RECEIVE_USER_INFO');
 
-export function fetchUserInfo(id) {
+export function fetchUserInfo(id, force = false) {
   return (dispatch, getState) => {
     const ui = getState().userInfo[id];
-    if (ui && (ui.loading || ui.loaded)) {
+    if (ui && (ui.loading || ui.loaded) && !force) {
       return Promise.resolve();
     }
     dispatch(requestUserInfo(id));

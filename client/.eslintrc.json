@@ -36,6 +36,7 @@
     "react/jsx-indent-props": ["error", 4],
     "react/prefer-stateless-function": "off",
     "react/no-multi-comp": "off",
+    "react/no-unused-prop-types": "off",
     "react/jsx-closing-bracket-location": ["error", {
       "selfClosing": "after-props",
       "nonEmpty": "after-props"

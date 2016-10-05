@@ -44,8 +44,7 @@ $nav-link-hover-bg: #f6ecf8;
 .btn {
   display: inline-flex;
   align-items: center;
-  font-family: $bodyFont;
-  font-size: 100%;
+  font: $buttonFont;
   text-decoration: none;
   &.btn-sm {
     font-size: 80%;

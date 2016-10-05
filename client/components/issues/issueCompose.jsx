@@ -9,6 +9,7 @@ import FormGroup from 'react-bootstrap/lib/FormGroup';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
 import Radio from 'react-bootstrap/lib/Radio';
 import Typeahead from 'react-bootstrap-typeahead';
+import UserAutoComplete from '../common/userAutoComplete.jsx';
 import './issues.scss';
 
 class StateSelector extends React.Component {
@@ -53,12 +54,43 @@ StateSelector.propTypes = {
 };
 
 class IssueCompose extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      public: false,
-    };
+  constructor(props) {
+    super(props);
+    this.onChangeType = this.onChangeType.bind(this);
+    this.onChangeSummary = this.onChangeSummary.bind(this);
+    this.onChangeDescription = this.onChangeDescription.bind(this);
+    this.onChangeReporter = this.onChangeReporter.bind(this);
+    this.onChangeOwner = this.onChangeOwner.bind(this);
     this.onChangePublic = this.onChangePublic.bind(this);
+    this.me = { id: props.profile.username, label: props.profile.username };
+    this.state = {
+      issueType: 'bug',
+      public: false,
+      summary: '',
+      description: '',
+      reporter: this.me,
+      owner: null,
+    };
+  }
+
+  onChangeType(e) {
+    this.setState({ issueType: e.target.dataset.type });
+  }
+
+  onChangeSummary(e) {
+    this.setState({ summary: e.target.value });
+  }
+
+  onChangeDescription(e) {
+    this.setState({ description: e.target.value });
+  }
+
+  onChangeReporter(e) {
+    this.setState({ reporter: e });
+  }
+
+  onChangeOwner(e) {
+    this.setState({ owner: e });
   }
 
   onChangePublic(e) {
@@ -67,7 +99,13 @@ class IssueCompose extends React.Component {
 
   render() {
     const { project, workflow } = this.props;
-    console.log('IssueCompose:', project, workflow);
+    const issueTypes = [
+      { id: 'bug', caption: 'Bug' },
+      { id: 'feature', caption: 'Feature' },
+      { id: 'task', caption: 'Task' },
+      { id: 'story', caption: 'Story' },
+      { id: 'epic', caption: 'Epic' },
+    ];
     return (<section className="kdt issue-compose">
       <div className="card">
         <header>New Issue: {project.name}</header>
@@ -79,11 +117,14 @@ class IssueCompose extends React.Component {
                   <th className="header"><ControlLabel>Issue Type:</ControlLabel></th>
                   <td>
                     <div className="issue-type">
-                      <Radio inline>Bug</Radio>
-                      <Radio inline>Feature</Radio>
-                      <Radio inline>Task</Radio>
-                      <Radio inline>Story</Radio>
-                      <Radio inline>Epic</Radio>
+                      {issueTypes.map(rank => (
+                        <Radio
+                            key={rank.id}
+                            data-type={rank.id}
+                            checked={rank.id === this.state.issueType}
+                            onChange={this.onChangeType}
+                            inline>{rank.caption}</Radio>
+                      ))}
                     </div>
                   </td>
                 </tr>
@@ -93,7 +134,9 @@ class IssueCompose extends React.Component {
                     <FormControl
                         className="summary"
                         type="text"
-                        placeholder="summary of this issue" />
+                        value={this.state.summary}
+                        placeholder="summary of this issue"
+                        onChange={this.onChangeSummary} />
                   </td>
                 </tr>
                 <tr>
@@ -102,33 +145,35 @@ class IssueCompose extends React.Component {
                     <FormControl
                         className="description"
                         componentClass="textarea"
-                        placeholder="description of this issue" />
+                        value={this.state.description}
+                        placeholder="description of this issue"
+                        onChange={this.onChangeDescription} />
                   </td>
                 </tr>
                 <tr>
                   <th className="header"><ControlLabel>Reporter:</ControlLabel></th>
-                  <td>
-                    <Typeahead
-                        className="reporter ac-single"
-                        options={['me']}
-                        placeholder="me" />
+                  <td className="reporter single-static">
+                    <span>{this.props.profile.username}</span>
                   </td>
                 </tr>
                 <tr>
                   <th className="header"><ControlLabel>Assign to:</ControlLabel></th>
                   <td>
-                    <Typeahead
+                    <UserAutoComplete
                         className="assignee ac-single"
-                        options={['(unassigned)', 'me']}
-                        placeholder="(unassigned)" />
+                        project={project}
+                        placeholder="(unassigned)"
+                        defaultSelected={this.state.owner}
+                        onChange={this.onChangeOwner} />
                   </td>
                 </tr>
                 <tr>
                   <th className="header"><ControlLabel>CC:</ControlLabel></th>
                   <td>
                     <div className="ac-multi-group">
-                      <Typeahead
+                      <UserAutoComplete
                           className="cc ac-multi"
+                          project={project}
                           options={['(unassigned)', 'me']} />
                       <Button bsSize="small">Add</Button>
                     </div>
@@ -220,6 +265,9 @@ class IssueCompose extends React.Component {
 }
 
 IssueCompose.propTypes = {
+  profile: React.PropTypes.shape({
+    username: React.PropTypes.string,
+  }),
   project: React.PropTypes.shape({}),
   workflow: React.PropTypes.shape({}),
   params: React.PropTypes.shape({
@@ -229,6 +277,7 @@ IssueCompose.propTypes = {
 
 export default connect(
   (state, ownProps) => ({
+    profile: state.profile,
     project: state.projects.byId.get(ownProps.params.project),
     workflow: state.workflows['std/bugtrack'],
   }),

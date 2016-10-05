@@ -5,6 +5,7 @@ import FormControl from 'react-bootstrap/lib/FormControl';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { saveProject, updateProject } from '../../store/projects';
+import UserName from '../common/userName.jsx';
 
 class ProjectInfoEdit extends React.Component {
   constructor(props) {
@@ -33,14 +34,14 @@ class ProjectInfoEdit extends React.Component {
     const { project } = this.props;
     const modified = project.description !== this.state.description;
     return (
-      <section className="kdt settings-tab-pane workflow-edit">
-        <header className="card internal">
+      <section className="settings-tab-pane">
+        <header>
           <span className="title">{project.name}</span>
           <Button bsStyle="primary" disabled={!modified} onClick={this.onSave}>
             Save
           </Button>
         </header>
-        <table className="project-info-table form-table">
+        <table className="form-table">
           <tbody>
             <tr>
               <th className="header"><ControlLabel>Description:</ControlLabel></th>
@@ -51,6 +52,12 @@ class ProjectInfoEdit extends React.Component {
                     placeholder="description of the project"
                     value={this.state.description}
                     onChange={this.onChangeDescription} />
+              </td>
+            </tr>
+            <tr>
+              <th className="header"><ControlLabel>Owner:</ControlLabel></th>
+              <td className="owner single-static">
+                <UserName user={project.owningUser} />
               </td>
             </tr>
           </tbody>

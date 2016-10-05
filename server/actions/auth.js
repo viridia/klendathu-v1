@@ -91,6 +91,10 @@ module.exports = function (app, apiRouter) {
     // TODO: Validate email, username, fullname.
     if (email.length < 3) {
       res.send({ err: 'invalid-email' });
+    } else if (username.length < 5) {
+      res.send({ err: 'username-too-short' });
+    } else if (username.toLowerCase() !== username) {
+      res.send({ err: 'username-lower-case' });
     } else if (password !== password2) {
       res.send({ err: 'password-match' });
     } else {

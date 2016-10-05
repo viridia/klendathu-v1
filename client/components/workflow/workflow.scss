@@ -1,31 +1,5 @@
 @import '../defines/base.scss';
 
-section.workflow-edit {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-
-  > header {
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    margin-bottom: 8px;
-
-    > .title {
-      flex: 1;
-      font-family: $headerFont;
-      font-size: 120%;
-      font-weight: normal;
-    }
-  }
-
-  > .columns {
-    display: flex;
-    flex: 1;
-    align-items: stretch;
-  }
-}
-
 .workflow-list {
   flex: 1;
   margin-right: 8px;

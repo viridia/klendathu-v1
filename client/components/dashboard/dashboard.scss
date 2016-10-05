@@ -11,8 +11,7 @@
     margin-bottom: 8px;
 
     > .title {
-      font-family: $headerFont;
-      font-size: 120%;
+      font: $headerFont;
     }
   }
 }

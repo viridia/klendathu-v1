@@ -9,7 +9,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import axios from 'axios';
 import Store from '../../store/store';
 import Header from '../common/header.jsx';
-import * as actions from '../../store/actions';
+import { login } from '../../store/profile';
 import './login.scss';
 
 export default class SignUpPage extends React.Component {
@@ -52,6 +52,12 @@ export default class SignUpPage extends React.Component {
         password2Error: null,
       };
       switch (resp.data.err) {
+        case 'username-too-short':
+          errState.userNameError = 'User name must be at least 6 characters.';
+          break;
+        case 'username-lower-case':
+          errState.userNameError = 'User name cannot contain capital letters.';
+          break;
         case 'user-exists': errState.userNameError = 'User name not available.'; break;
         case 'invalid-name': errState.nameError = 'Invalid name.'; break;
         case 'invalid-email': errState.emailError = 'Invalid email address.'; break;
@@ -61,7 +67,7 @@ export default class SignUpPage extends React.Component {
           break;
         default: {
           const { next } = this.props.location.query;
-          Store.dispatch(actions.login(resp.data));
+          Store.dispatch(login(resp.data));
           browserHistory.push({ pathname: next || '/' });
           return;
         }
@@ -171,7 +177,9 @@ export default class SignUpPage extends React.Component {
 
 SignUpPage.propTypes = {
   location: React.PropTypes.shape({
-    query: React.PropTypes.string.isRequired,
+    query: React.PropTypes.shape({
+      next: React.PropTypes.string,
+    }),
   }).isRequired,
   params: React.PropTypes.shape({}),
 };

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import Tab from 'react-bootstrap/lib/Tab';
 import Tabs from 'react-bootstrap/lib/Tabs';
 import ProjectInfoEdit from '../projects/projectInfoEdit.jsx';
+import ProjectTemplateEdit from '../projects/projectTemplateEdit.jsx';
 import WorkflowEdit from '../workflow/workflowEdit.jsx';
 import './settings.scss';
 
@@ -29,9 +30,7 @@ class ProjectSettings extends React.Component {
           <ProjectInfoEdit {...this.props} />
         </Tab>
         <Tab eventKey={2} title="Issue Templates">
-          <section className="kdt settings-tab-pane issue-template-edit">
-            Issue templates go here.
-          </section>
+          <ProjectTemplateEdit {...this.props} />
         </Tab>
         <Tab eventKey={3} title="Workflow">
           <WorkflowEdit {...this.props} />
