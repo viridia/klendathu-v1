@@ -4,7 +4,7 @@
   "description": "Flexible bug tracking and agile task management application.",
   "main": "server/index.js",
   "scripts": {
-    "client": "cd client && webpack-dev-server --inline --port 8081",
+    "client": "REACT_HOT=1 cd client && webpack-dev-server --inline --port 8081",
     "client-build": "cd client && webpack",
     "start": "pm2 --node-args=\"--harmony\" start process.json",
     "stop": "pm2 kill",
@@ -80,6 +80,7 @@
     "source-map-support": "^0.4.2",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.2",
+    "webpack-combine-loaders": "^2.0.0",
     "webpack-dev-server": "^1.16.1",
     "winston": "^2.2.0"
   },

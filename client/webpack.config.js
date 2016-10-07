@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 
 const debug = process.env.NODE_ENV !== 'production';
+const hot = process.env.REACT_HOT;
 const plugins = [];
 
 const envVars = {
@@ -22,9 +23,17 @@ plugins.push(
     'react-bootstrap-autosuggest/src/Autosuggest.scss')
 );
 
+if (hot) {
+  plugins.push(new webpack.HotModuleReplacementPlugin());
+}
+
 module.exports = {
   entry: {
-    main: [
+    main: hot ? [
+      'webpack-dev-server/client?http://0.0.0.0:3000', // WebpackDevServer host and port
+      'webpack/hot/only-dev-server', // "only" prevents reload on syntax errors
+      './main.js', // Your appʼs entry point
+    ] : [
       './main.js',
     ],
   },
@@ -45,6 +54,7 @@ module.exports = {
   devtool: debug ? 'cheap-eval-source-map' : false,
   devServer: {
     historyApiFallback: true,
+    stats: 'errors-only',
   },
   module: {
     preLoaders: debug ? [
@@ -66,6 +76,7 @@ module.exports = {
           plugins: [
             'transform-runtime',
             'transform-object-rest-spread',
+            'react-hot-loader/babel',
           ],
           presets: [
             'es2015',
