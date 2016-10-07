@@ -1,88 +1,133 @@
 import React from 'react';
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Button from 'react-bootstrap/lib/Button';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import DropdownButton from 'react-bootstrap/lib/DropdownButton';
 import FormControl from 'react-bootstrap/lib/FormControl';
-import FormGroup from 'react-bootstrap/lib/FormGroup';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
-import Radio from 'react-bootstrap/lib/Radio';
 import Typeahead from 'react-bootstrap-typeahead';
+import AddBoxIcon from 'icons/ic_add_box_black_24px.svg';
 import UserAutoComplete from '../common/userAutoComplete.jsx';
+import StateSelector from './stateSelector.jsx';
+import TypeSelector from './typeSelector.jsx';
+import CustomEnumField from './customEnumField.jsx';
+import UserName from '../common/userName.jsx';
+import { setIssueType, setIssueSummary, setIssueDescription, setCustomField, addIssueCC,
+  addIssueComment, resetIssue } from '../../store/issues';
 import './issues.scss';
 
-class StateSelector extends React.Component {
+class CustomTextField extends React.Component {
   constructor() {
     super();
     this.onChange = this.onChange.bind(this);
   }
 
   onChange(e) {
-    e.preventDefault();
+    this.props.setCustomField(this.props.field.id, e.target.value);
   }
 
   render() {
-    function caption(state) {
-      if (state.closed) {
-        return <span>Closed: {state.caption}</span>;
-      } else {
-        return state.caption;
-      }
-    }
-
-    const workflow = this.props.workflow;
-    const state = workflow.statesById[this.props.state || workflow.start];
-    return (<FormGroup controlId="state">
-      <ControlLabel>State</ControlLabel>
-      <Radio data-state={state.id} checked onChange={this.onChange}>{caption(state)}</Radio>
-      {state.transitions.map(s => {
-        const toState = workflow.statesById[s];
-        return (<Radio
-            key={toState.id}
-            data-state={toState.id}
-            onChange={this.onChange}>{caption(toState)}</Radio>);
-      })}
-    </FormGroup>);
+    const { issue, field } = this.props;
+    const value = (issue.custom && issue.custom.get(field.id)) || field.default || '';
+    return (
+      <FormControl
+          type="text"
+          value={value}
+          maxLength={field.max_length}
+          onChange={this.onChange} />
+      );
   }
 }
 
-StateSelector.propTypes = {
-  state: React.PropTypes.string,
-  project: React.PropTypes.shape({}),
-  workflow: React.PropTypes.shape({}),
+CustomTextField.propTypes = {
+  field: React.PropTypes.shape({
+    id: React.PropTypes.string.isRequired,
+    default: React.PropTypes.string,
+    max_length: React.PropTypes.number,
+  }).isRequired,
+  issue: React.PropTypes.shape({}),
+  setCustomField: React.PropTypes.func.isRequired,
+};
+
+class CustomSuggestField extends React.Component {
+  constructor() {
+    super();
+    this.onChange = this.onChange.bind(this);
+    this.onInputChange = this.onInputChange.bind(this);
+  }
+
+  onChange(selected) {
+    console.log(selected);
+    // this.props.setCustomField(this.props.field.id, e.target.value);
+  }
+
+  onInputChange(text) {
+    console.log(text);
+  }
+
+  render() {
+    const { issue, field } = this.props;
+    const value = (issue.custom && issue.custom.get(field.id)) || field.default || '';
+    return (
+      <Typeahead
+          className="keywords ac-multi"
+          defaultSelected={[value]}
+          options={[]}
+          onChange={this.onChange}
+          onInputChange={this.onInputChange}
+          allowNew
+          newSelectionPrefix=""
+          emptyLabel="No suggestions" />
+      );
+  }
+}
+
+CustomSuggestField.propTypes = {
+  field: React.PropTypes.shape({
+    id: React.PropTypes.string.isRequired,
+    default: React.PropTypes.string,
+    max_length: React.PropTypes.number,
+  }).isRequired,
+  issue: React.PropTypes.shape({}),
+  setCustomField: React.PropTypes.func.isRequired,
 };
 
 class IssueCompose extends React.Component {
   constructor(props) {
     super(props);
-    this.onChangeType = this.onChangeType.bind(this);
     this.onChangeSummary = this.onChangeSummary.bind(this);
     this.onChangeDescription = this.onChangeDescription.bind(this);
     this.onChangeReporter = this.onChangeReporter.bind(this);
     this.onChangeOwner = this.onChangeOwner.bind(this);
     this.onChangePublic = this.onChangePublic.bind(this);
+    this.onChangeCommentText = this.onChangeCommentText.bind(this);
+    this.onAddCC = this.onAddCC.bind(this);
+    this.onAddComment = this.onAddComment.bind(this);
     this.me = { id: props.profile.username, label: props.profile.username };
     this.state = {
-      issueType: 'bug',
+      summaryError: '',
+      descriptionError: '',
       public: false,
-      summary: '',
-      description: '',
       reporter: this.me,
       owner: null,
+      commentText: '',
     };
   }
 
-  onChangeType(e) {
-    this.setState({ issueType: e.target.dataset.type });
+  componentDidMount() {
+    this.reset();
   }
 
   onChangeSummary(e) {
-    this.setState({ summary: e.target.value });
+    // TODO: validate length
+    this.props.setIssueSummary(e.target.value);
   }
 
   onChangeDescription(e) {
-    this.setState({ description: e.target.value });
+    // TODO: validate length
+    this.props.setIssueDescription(e.target.value);
   }
 
   onChangeReporter(e) {
@@ -90,6 +135,7 @@ class IssueCompose extends React.Component {
   }
 
   onChangeOwner(e) {
+    console.log(e);
     this.setState({ owner: e });
   }
 
@@ -97,15 +143,75 @@ class IssueCompose extends React.Component {
     this.setState({ public: e.target.checked });
   }
 
+  onAddCC(e) {
+    this.props.addIssueCC(e.id);
+  }
+
+  onChangeCommentText(e) {
+    this.setState({ commentText: e.target.value });
+  }
+
+  onAddComment(e) {
+    e.preventDefault();
+    this.props.addIssueComment({
+      author: this.props.profile.id,
+      body: this.state.commentText,
+    });
+    this.setState({ commentText: '' });
+  }
+
+  reset() {
+    const { template } = this.props;
+    const concreteTypes = template.types.filter(t => !t.abstract);
+    this.props.resetIssue();
+    this.props.setIssueType(concreteTypes[0].id);
+  }
+
+  renderCustomFields(schema, result) {
+    const { issue, template } = this.props;
+    if (schema.extends && schema.extends.startsWith('./')) {
+      const parentSchema = template.typesById[schema.extends.slice(2)];
+      if (parentSchema) {
+        this.renderCustomFields(parentSchema, result);
+      }
+    }
+    if (schema.fields) {
+      for (const field of schema.fields) {
+        let component = null;
+        switch (field.type) {
+          case 'text':
+            component = (<CustomSuggestField
+                issue={issue} field={field} setCustomField={this.props.setCustomField} />);
+            break;
+          case 'enum':
+            component = (<CustomEnumField field={field} />);
+            break;
+          default:
+            break;
+        }
+        if (component) {
+          result.push(<tr key={field.id}>
+            <th>{field.caption}:</th>
+            <td>{component}</td>
+          </tr>);
+        }
+      }
+    }
+    return result;
+  }
+
+  renderTemplateFields() {
+    const { template, issue } = this.props;
+    const schema = template.typesById[issue.type];
+    const result = [];
+    if (schema) {
+      return this.renderCustomFields(schema, result);
+    }
+    return result;
+  }
+
   render() {
-    const { project, workflow } = this.props;
-    const issueTypes = [
-      { id: 'bug', caption: 'Bug' },
-      { id: 'feature', caption: 'Feature' },
-      { id: 'task', caption: 'Task' },
-      { id: 'story', caption: 'Story' },
-      { id: 'epic', caption: 'Epic' },
-    ];
+    const { project, workflow, issue } = this.props;
     return (<section className="kdt issue-compose">
       <div className="card">
         <header>New Issue: {project.name}</header>
@@ -115,18 +221,7 @@ class IssueCompose extends React.Component {
               <tbody>
                 <tr>
                   <th className="header"><ControlLabel>Issue Type:</ControlLabel></th>
-                  <td>
-                    <div className="issue-type">
-                      {issueTypes.map(rank => (
-                        <Radio
-                            key={rank.id}
-                            data-type={rank.id}
-                            checked={rank.id === this.state.issueType}
-                            onChange={this.onChangeType}
-                            inline>{rank.caption}</Radio>
-                      ))}
-                    </div>
-                  </td>
+                  <td><TypeSelector /></td>
                 </tr>
                 <tr>
                   <th className="header"><ControlLabel>Summary:</ControlLabel></th>
@@ -134,7 +229,7 @@ class IssueCompose extends React.Component {
                     <FormControl
                         className="summary"
                         type="text"
-                        value={this.state.summary}
+                        value={issue.summary || ''}
                         placeholder="summary of this issue"
                         onChange={this.onChangeSummary} />
                   </td>
@@ -145,7 +240,7 @@ class IssueCompose extends React.Component {
                     <FormControl
                         className="description"
                         componentClass="textarea"
-                        value={this.state.description}
+                        value={issue.description || ''}
                         placeholder="description of this issue"
                         onChange={this.onChangeDescription} />
                   </td>
@@ -163,7 +258,7 @@ class IssueCompose extends React.Component {
                         className="assignee ac-single"
                         project={project}
                         placeholder="(unassigned)"
-                        defaultSelected={this.state.owner}
+                        value={this.state.owner}
                         onChange={this.onChangeOwner} />
                   </td>
                 </tr>
@@ -174,19 +269,16 @@ class IssueCompose extends React.Component {
                       <UserAutoComplete
                           className="cc ac-multi"
                           project={project}
-                          options={['(unassigned)', 'me']} />
+                          onChange={this.onAddCC} />
                       <Button bsSize="small">Add</Button>
                     </div>
+                    <ul>
+                      {issue.cc && issue.cc.map(
+                        u => <li key={u}><UserName user={u} /></li>)}
+                    </ul>
                   </td>
                 </tr>
-                <tr>
-                  <th />
-                  <td>
-                    <Checkbox checked={this.state.public} onChange={this.onChangePublic}>
-                      Public
-                    </Checkbox>
-                  </td>
-                </tr>
+                {this.renderTemplateFields()}
                 <tr>
                   <th className="header"><ControlLabel>Labels:</ControlLabel></th>
                   <td>
@@ -239,12 +331,22 @@ class IssueCompose extends React.Component {
                 <tr>
                   <th className="header"><ControlLabel>Comments:</ControlLabel></th>
                   <td>
+                    {issue.comments && issue.comments.map((comment, index) =>
+                      (<div className="comment card internal" key={index}>
+                        <div className="author"><UserName user={comment.author} /></div>
+                        {comment.body}
+                      </div>))}
                     <div className="add-comment-group">
                       <FormControl
                           className="add-comment"
                           componentClass="textarea"
-                          placeholder="add a comment..." />
-                      <Button bsSize="small">Add</Button>
+                          placeholder="add a comment..."
+                          value={this.state.commentText}
+                          onChange={this.onChangeCommentText} />
+                      <Button
+                          bsSize="small"
+                          disabled={this.state.commentText.length === 0}
+                          onClick={this.onAddComment}>Add</Button>
                     </div>
                   </td>
                 </tr>
@@ -253,11 +355,15 @@ class IssueCompose extends React.Component {
           </div>
           <aside className="right">
             <StateSelector project={project} workflow={workflow} state="new" />
+            <ControlLabel>Visbility</ControlLabel>
+            <Checkbox checked={this.state.public} onChange={this.onChangePublic}>
+              Public
+            </Checkbox>
           </aside>
         </section>
         <footer className="submit-buttons">
           <Button>Cancel</Button>
-          <Button bsStyle="primary">Create</Button>
+          <Button bsStyle="primary"><AddBoxIcon />Create</Button>
         </footer>
       </div>
     </section>);
@@ -266,13 +372,23 @@ class IssueCompose extends React.Component {
 
 IssueCompose.propTypes = {
   profile: React.PropTypes.shape({
-    username: React.PropTypes.string,
+    id: React.PropTypes.string.isRequired,
+    username: React.PropTypes.string.isRequired,
   }),
+  issue: React.PropTypes.shape({}),
   project: React.PropTypes.shape({}),
   workflow: React.PropTypes.shape({}),
+  template: React.PropTypes.shape({}),
   params: React.PropTypes.shape({
     project: React.PropTypes.string,
   }),
+  addIssueCC: React.PropTypes.func.isRequired,
+  addIssueComment: React.PropTypes.func.isRequired,
+  resetIssue: React.PropTypes.func.isRequired,
+  setIssueType: React.PropTypes.func.isRequired,
+  setIssueSummary: React.PropTypes.func.isRequired,
+  setIssueDescription: React.PropTypes.func.isRequired,
+  setCustomField: React.PropTypes.func.isRequired,
 };
 
 export default connect(
@@ -280,6 +396,16 @@ export default connect(
     profile: state.profile,
     project: state.projects.byId.get(ownProps.params.project),
     workflow: state.workflows['std/bugtrack'],
+    template: state.templates['std/software'],
+    issue: state.issues.$edit,
   }),
-  null,
+  dispatch => bindActionCreators({
+    addIssueCC,
+    addIssueComment,
+    resetIssue,
+    setIssueType,
+    setIssueSummary,
+    setIssueDescription,
+    setCustomField,
+  }, dispatch)
 )(IssueCompose);

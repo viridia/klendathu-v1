@@ -1,0 +1,71 @@
+{
+  "types": [
+    {
+      "id": "issue",
+      "abstract": true,
+      "extends": "std/issue",
+      "fields": [
+        {
+          "id": "priority",
+          "caption": "Priority",
+          "type": "enum",
+          "default": "P2",
+          "values": [ "P0", "P1", "P2", "P3", "P4" ],
+          "position": "top"
+        }
+      ]
+    },
+    {
+      "id": "bug",
+      "caption": "Bug",
+      "extends": "./issue",
+      "fields": [
+        {
+          "id": "severity",
+          "caption": "Severity",
+          "type": "enum",
+          "default": "S2",
+          "values": [ "S0", "S1", "S2", "S3", "S4" ],
+          "position": "top"
+        },
+        {
+          "id": "hardware_os",
+          "caption": "Hardware/OS",
+          "type": "text",
+          "max_length": 128,
+          "position": "top",
+          "suggest": true
+        },
+        {
+          "id": "version",
+          "caption": "Product Version",
+          "type": "text",
+          "max_length": 64,
+          "position": "top",
+          "suggest": true
+        }
+      ]
+    },
+    {
+      "id": "feature",
+      "caption": "Feature",
+      "extends": "./issue"
+    },
+    {
+      "id": "task",
+      "caption": "Task",
+      "contains": [ "task" ],
+      "extends": "./issue"
+    },
+    {
+      "id": "documentation",
+      "caption": "Docs",
+      "extends": "./issue"
+    },
+    {
+      "id": "internal_cleanup",
+      "caption": "Internal Cleanup",
+      "extends": "./issue"
+    }
+  ]
+}

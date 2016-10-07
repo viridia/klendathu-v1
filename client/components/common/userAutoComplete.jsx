@@ -1,81 +1,71 @@
 import React from 'react';
-import Typeahead from 'react-bootstrap-typeahead';
+import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest';
 import axios from 'axios';
+import 'react-bootstrap-autosuggest/src/Autosuggest.scss';
+import './userAutoComplete.scss';
+
+class UserAdapter extends ItemAdapter {
+  getTextRepresentations(item) {
+    return item.username;
+  }
+  renderItem(item) {
+    return (<div className="user">
+      {item.username} ({item.fullname})
+    </div>);
+  }
+}
+UserAdapter.instance = new UserAdapter();
 
 export default class UserAutoComplete extends React.Component {
   constructor(props) {
     super(props);
-    this.onChange = this.onChange.bind(this);
-    this.onInputChange = this.onInputChange.bind(this);
+    this.onSearch = this.onSearch.bind(this);
     this.state = {
-      token: '',
-      options: [],
+      datalist: [],
     };
-    this.timer = null;
   }
 
-  componentWillUnmount() {
-    clearTimeout(this.timer);
-  }
-
-  onChange(matches) {
-    this.props.onChange(matches.length === 1 ? matches[0] : null);
-  }
-
-  onInputChange(text) {
-    clearTimeout(this.timer);
-    this.timer = setTimeout(() => {
-      const token = text.trim();
-      if (token === '') {
-        this.setState({ options: [] });
-        return;
-      }
-      axios.get('user', { params: { project: this.props.project.name, token } }).then(resp => {
-        const options = resp.data.users.map(user => ({
-          id: user.username,
-          label: user.username,
-          fullname: user.fullname,
-        }));
-        // 'me' is an alias for the current user.
-        // if (token === 'me') {
-        //   options.push({ id: 'me', label: 'me', fullname: '' });
-        // }
-        this.setState({ options });
-      });
-    }, 20);
+  onSearch(token) {
+    if (token.length < 2) {
+      this.setState({ datalist: [] });
+      return;
+    }
+    axios.get('user', { params: { project: this.props.project.name, token } }).then(resp => {
+      this.setState({ datalist: resp.data.users.map(u => ({
+        ...u,
+        label: `${u.username} (${u.fullname})`,
+      })) });
+    });
   }
 
   render() {
-    const { className, placeholder, defaultSelected } = this.props;
-    const defaultEntry = defaultSelected ? [defaultSelected] : [];
+    const { className, placeholder, multiple, onSelect } = this.props;
     return (
-      <Typeahead
-          className={className}
-          options={this.state.options}
+      <Autosuggest
+          groupClassName={className}
           placeholder={placeholder}
-          defaultSelected={defaultEntry}
-          onInputChange={this.onInputChange}
-          onChange={this.onChange}
-          renderMenuItemChildren={(props, option, idx) => {
-            console.log(props, option, idx);
-            return (<span>
-              {option.label}
-              {option.fullname && <span> (<em>{option.fullname}</em>)</span>}
-            </span>);
-          }} />
+          datalist={this.state.datalist}
+          datalistOnly
+          datalistPartial
+          multiple={multiple}
+          onSearch={this.onSearch}
+          showToggle
+          itemReactKeyPropName="username"
+          itemSortKeyPropName="username"
+          itemValuePropName="username"
+          itemAdapter={UserAdapter.instance}
+          onSelect={onSelect} />
     );
   }
 }
 
 UserAutoComplete.propTypes = {
-  defaultSelected: React.PropTypes.shape({
-    id: React.PropTypes.string.isRequired,
-    label: React.PropTypes.string.isRequired,
-  }),
+  value: React.PropTypes.string,
   className: React.PropTypes.string,
   placeholder: React.PropTypes.string,
   project: React.PropTypes.shape({
     name: React.PropTypes.string,
   }),
-  onChange: React.PropTypes.func,
+  multiple: React.PropTypes.bool,
+  onSelect: React.PropTypes.func,
 };

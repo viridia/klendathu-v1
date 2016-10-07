@@ -15,12 +15,12 @@ collections:
     -- linked issues
     -- labels
     -- tags
-    -- (opt) severity
-    -- (opt) priority
+      -- (opt) severity
+      -- (opt) priority
     -- (opt) product
-    -- (opt) hardware
-    -- (opt) version
-    -- (opt) operating system
+      -- (opt) hardware
+      -- (opt) version
+      -- (opt) operating system
     -- (opt) browser
     -- (opt) target milestone
     -- (opt) votes / likes
@@ -82,50 +82,12 @@ states: [
 
 issues: [
   {
-    id: 'issue',
-    abstract: true,
-    extends: 'klendathu/issue',
     fields: [
-      {
-        name: 'priority',
-        type: enum,
-        initial: 'P2',
-        values: [ 'P0', 'P1', 'P2', 'P3', 'P4' ],
-      },
-      {
-        name: 'severity',
-        type: enum,
-        values: [ 'S0', 'S1', 'S2', 'S3', 'S4' ],
-      },
       {
         name: 'due by',
         type: 'date',
       }
     ],
-  }
-  {
-    id: 'epic',
-    name: 'Epic',
-    contains: ['story', 'task'],
-    extends: './issue',
-  },
-  {
-    id: 'story',
-    name: 'Story',
-    contains: ['task'],
-    extends: ':issue',
-  },
-  {
-    id: 'task',
-    name: 'Task',
-    contains: ['subtask'],
-    extends: ':issue',
-  },
-  {
-    id: 'subtask',
-    name: 'Subtask',
-    contains: [],
-    extends: ':issue',
   }
 ]
 

@@ -16,6 +16,12 @@ plugins.push(
     },
   }));
 
+plugins.push(
+  new webpack.NormalModuleReplacementPlugin(
+    /Autosuggest\.scss$/,
+    'react-bootstrap-autosuggest/src/Autosuggest.scss')
+);
+
 module.exports = {
   entry: {
     main: [

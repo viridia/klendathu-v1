@@ -1,12 +1,12 @@
 import React from 'react';
-import AddBoxIcon from 'icons/ic_play_arrow_black_24px.svg';
+import DiscloseIcon from 'icons/ic_play_arrow_black_24px.svg';
 import classNames from 'classnames';
 import './discloseButton.scss';
 
 export default function DiscloseButton(props) {
   return (
     <button className={classNames('disclose', { checked: props.checked })} onClick={props.onClick}>
-      <AddBoxIcon className="svg-icon" />
+      <DiscloseIcon className="svg-icon" />
     </button>
   );
 }

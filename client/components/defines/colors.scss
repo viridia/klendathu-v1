@@ -21,4 +21,5 @@ $contentBg: #E9DBEB;
 $cardBg: #fcf7fc;
 $cardBgAlt: #f6ecf8;
 $cardBorder: #C3A1C9;
-$cardHeaderBg: #f6ecf8;
+// $cardHeaderBg: #f6ecf8;
+$cardHeaderBg: lighten($b1, 10%);

@@ -17,6 +17,7 @@ import store from '../store/store';
 import { fetchProfile } from '../store/profile';
 import { fetchProjects } from '../store/projects';
 import { fetchWorkflow } from '../store/workflows';
+import { fetchTemplate } from '../store/templates';
 
 // Make sure we have a user profile before we enter the main part of the app.
 function checkAuth(nextState, replace, callback) {
@@ -27,6 +28,7 @@ function checkAuth(nextState, replace, callback) {
       return Promise.all([
         store.dispatch(fetchProjects()),
         store.dispatch(fetchWorkflow('std', 'bugtrack')),
+        store.dispatch(fetchTemplate('std', 'software')),
       ]).then(_resp2 => {
         callback();
       });

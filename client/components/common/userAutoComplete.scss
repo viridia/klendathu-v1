@@ -1,0 +1,4 @@
+// Don't show buggy toggle control.
+.autosuggest .input-group-btn {
+  display: none;
+}

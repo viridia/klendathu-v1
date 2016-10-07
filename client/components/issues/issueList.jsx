@@ -1,5 +1,4 @@
 import React from 'react';
-import Button from 'react-bootstrap/lib/Button';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
 import './issues.scss';
 
@@ -23,7 +22,7 @@ export default class IssueList extends React.Component {
       </div>
       <div className="card">
         <table className="issue">
-          <tbody>
+          <thead>
             <tr className="heading">
               <th className="selected"><Checkbox /></th>
               <th className="id">#</th>
@@ -33,6 +32,8 @@ export default class IssueList extends React.Component {
               <th className="custom">Priority</th>
               <th className="summary">Summary</th>
             </tr>
+          </thead>
+          <tbody>
             {[1, 2, 3, 4, 5, 6].map(n => (
               <tr key={n}>
                 <td className="selected"><Checkbox /></td>
@@ -52,14 +53,6 @@ export default class IssueList extends React.Component {
       </div>
       <div className="card">
         <div className="no-issues">No issues found</div>
-      </div>
-      <div className="card">
-        <div className="heading">Heading</div>
-        <div className="content">
-          <Button>Default</Button>
-          <Button bsStyle="primary">Primary</Button>
-          <Button bsStyle="success">Success</Button>
-        </div>
       </div>
     </section>);
   }
