@@ -30,7 +30,7 @@ if (hot) {
 module.exports = {
   entry: {
     main: hot ? [
-      'webpack-dev-server/client?http://0.0.0.0:3000', // WebpackDevServer host and port
+      'webpack-dev-server/client?http://0.0.0.0:8081', // WebpackDevServer host and port
       'webpack/hot/only-dev-server', // "only" prevents reload on syntax errors
       './main.js', // Your appʼs entry point
     ] : [

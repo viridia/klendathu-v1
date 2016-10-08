@@ -9,6 +9,7 @@ import FormControl from 'react-bootstrap/lib/FormControl';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
 import Typeahead from 'react-bootstrap-typeahead';
 import AddBoxIcon from 'icons/ic_add_box_black_24px.svg';
+import AutoComplete from '../common/autocomplete.jsx';
 import UserAutoComplete from '../common/userAutoComplete.jsx';
 import StateSelector from './stateSelector.jsx';
 import TypeSelector from './typeSelector.jsx';
@@ -105,6 +106,8 @@ class IssueCompose extends React.Component {
     this.onChangeCommentText = this.onChangeCommentText.bind(this);
     this.onAddCC = this.onAddCC.bind(this);
     this.onAddComment = this.onAddComment.bind(this);
+    this.onAddLabel = this.onAddLabel.bind(this);
+    this.onSearchLabels = this.onSearchLabels.bind(this);
     this.me = { id: props.profile.username, label: props.profile.username };
     this.state = {
       summaryError: '',
@@ -145,6 +148,22 @@ class IssueCompose extends React.Component {
 
   onAddCC(e) {
     this.props.addIssueCC(e.id);
+  }
+
+  onSearchLabels(token, callback) {
+    if (token.length < 2) {
+      callback([]);
+    } else {
+      callback([
+        'Red',
+        'Green',
+        'Blue',
+      ]);
+    }
+  }
+
+  onAddLabel(e) {
+    console.info(e);
   }
 
   onChangeCommentText(e) {
@@ -283,10 +302,17 @@ class IssueCompose extends React.Component {
                   <th className="header"><ControlLabel>Labels:</ControlLabel></th>
                   <td>
                     <div className="ac-multi-group">
-                      <Typeahead
+                      <AutoComplete
+                          id="labels"
                           className="labels ac-multi"
-                          options={['new...']} />
-                      <Button bsSize="small">Add</Button>
+                          onSearch={this.onSearchLabels} />
+                      {/* <Typeahead
+                          className="labels ac-multi"
+                          options={['red', 'green', 'blue', 'new...']}
+                          onChange={this.onAddLabel}
+                          emptyLabel="No suggestions"
+                          multiple />
+                      <Button bsSize="small">Add</Button>*/}
                     </div>
                   </td>
                 </tr>

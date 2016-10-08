@@ -4,7 +4,7 @@
   "description": "Flexible bug tracking and agile task management application.",
   "main": "server/index.js",
   "scripts": {
-    "client": "REACT_HOT=1 cd client && webpack-dev-server --inline --port 8081",
+    "client": "cd client && REACT_HOT=1 webpack-dev-server --inline --port 8081",
     "client-build": "cd client && webpack",
     "start": "pm2 --node-args=\"--harmony\" start process.json",
     "stop": "pm2 kill",
@@ -86,5 +86,13 @@
   },
   "devDependencies": {
     "react-hot-loader": "^3.0.0-beta.5"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/viridia/klendathu.git"
+  },
+  "bugs": {
+    "url": "https://github.com/viridia/klendathu/issues"
+  },
+  "homepage": "https://github.com/viridia/klendathu#readme"
 }
