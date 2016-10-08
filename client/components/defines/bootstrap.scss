@@ -3,8 +3,8 @@
 
 // Default button
 $btn-default-color: #482848;
-$btn-default-bg: lighten(#D794E2, 10%);
-$btn-default-border: #BB79C5;
+$btn-default-bg: lighten($b2, 20%);
+$btn-default-border: lighten($b2, 10%);
 
 // Primary button
 $btn-primary-color: #f3e5f5;

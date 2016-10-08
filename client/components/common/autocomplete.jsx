@@ -1,53 +1,12 @@
 import React from 'react';
-import Dropdown from 'react-bootstrap/lib/Dropdown';
 import FormControl from 'react-bootstrap/lib/FormControl';
-import MenuItem from 'react-bootstrap/lib/MenuItem';
 import classNames from 'classnames';
 import './autocomplete.scss';
-
-class AcInput extends React.Component {
-  // module.exports = {
-  //   BACKSPACE: 8,
-  //   TAB: 9,
-  //   RETURN: 13,
-  //   ESC: 27,
-  //   SPACE: 32,
-  //   LEFT: 37,
-  //   UP: 38,
-  //   RIGHT: 39,
-  //   DOWN: 40,
-  // };
-
-  render() {
-    const { className, maxLength, value, ref, onChange, onKeyDown } = this.props;
-    return (
-      <FormControl
-          type="text"
-          className={className}
-          ref={ref}
-          value={value}
-          maxLength={maxLength}
-          onChange={onChange}
-          onKeyDown={onKeyDown} />
-    );
-  }
-}
-
-AcInput.propTypes = {
-  className: React.PropTypes.string,
-  maxLength: React.PropTypes.number,
-  // onClick: React.PropTypes.func.isRequired,
-  value: React.PropTypes.string.isRequired,
-  ref: React.PropTypes.func,
-  onChange: React.PropTypes.func.isRequired,
-  onKeyDown: React.PropTypes.func.isRequired,
-};
 
 export default class AutoComplete extends React.Component {
   constructor(props) {
     super(props);
     this.onValueChange = this.onValueChange.bind(this);
-    this.onToggle = this.onToggle.bind(this);
     this.onReceiveSuggestions = this.onReceiveSuggestions.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.state = {
@@ -55,19 +14,14 @@ export default class AutoComplete extends React.Component {
       valid: false,
       suggestions: [],
       value: '',
+      selected: null,
+      selectedValue: '',
+      selectedIndex: -1,
     };
+    this.suggestionMap = new Map();
     this.searchValue = null;
     this.timer = null;
   }
-
-  // componentWillUpdate(nextProps, nextState) {
-  //   if (this.state.value !== nextState.value) {
-  //     clearTimeout(this.timer);
-  //     this.timer = setTimeout(() => {
-  //       this.props.onSearch(nextState.value, this.onReceiveSuggestions);
-  //     }, 30);
-  //   }
-  // }
 
   componentWillUnmount() {
     clearTimeout(this.timer);
@@ -86,21 +40,18 @@ export default class AutoComplete extends React.Component {
         }, 30);
       }
     }
-    // this.setState({
-    //   value: value,
-    //   open: e.target.value.length > 1,
-    // });
   }
 
   onReceiveSuggestions(suggestions) {
-    this.setState({ suggestions, open: suggestions.length > 0 });
+    this.setState({
+      suggestions,
+      open: suggestions.length > 0,
+      selected: suggestions.length > 0 ? suggestions[0] : null,
+      selectedIndex: suggestions.length > 0 ? 0 : -1,
+    });
     if (this.state.value !== this.searchValue) {
       this.props.onSearch(this.state.value, this.onReceiveSuggestions);
     }
-  }
-
-  onToggle(open) {
-    this.setState({ open });
   }
 
   onKeyDown(e) {
@@ -108,54 +59,101 @@ export default class AutoComplete extends React.Component {
       case 40: // DOWN
         if (this.state.suggestions.length > 0) {
           e.preventDefault();
-          // console.log(this.dropdown);
-          this.dropdown.focusNext();
+          e.stopPropagation();
+          let index = this.state.selectedIndex + 1;
+          if (index >= this.state.suggestions.length) {
+            index = 0;
+          }
+          this.setState({
+            selectedIndex: index,
+            open: true,
+          });
         }
         break;
+      case 38: // UP
+        if (this.state.suggestions.length > 0 && this.state.open) {
+          e.preventDefault();
+          e.stopPropagation();
+          let index = this.state.selectedIndex - 1;
+          if (index < 0) {
+            index = this.state.suggestions.length - 1;
+          }
+          this.setState({ selectedIndex: index });
+        }
+        break;
+      case 13: // RETURN
+        e.preventDefault();
+        e.stopPropagation();
+        if (this.state.suggestions.length > 0 && this.state.selectedIndex !== -1) {
+          if (!this.state.open) {
+            if (this.props.onFocusNext) {
+              this.props.onFocusNext();
+            }
+          } else {
+            this.setState({
+              value: this.state.suggestions[this.state.selectedIndex],
+              open: false,
+            });
+          }
+        }
+        break;
+      case 9: // TAB
+      case 27: // ESC
       default:
         break;
     }
   }
 
   renderSuggestions() {
-    const cb = this.props.onRenderSuggestion;
-    return this.state.suggestions.map(s => cb(s));
+    const { onGetValue, onRenderSuggestion } = this.props;
+    return this.state.suggestions.map((s, index) => {
+      const value = onGetValue(s);
+      const active = index === this.state.selectedIndex;
+      return (<li
+          className={classNames({ active })}
+          key={value}
+          role="presentation">
+        <a role="menuitem" tabIndex="-1" href="">{onRenderSuggestion(s)}</a>
+      </li>);
+    });
   }
 
   render() {
-    const { id } = this.props;
+    const { className, maxLength, placeholder } = this.props;
+    const { value, valid, open } = this.state;
     return (
-      <Dropdown
-          className={classNames('autocomplete', { valid: this.state.valid })}
-          id={id}
-          open={this.state.open}
-          onToggle={this.onToggle}>
+      <div className={classNames('autocomplete dropdown btn-group', { valid, open })}>
         {/* <div className="hint">hint</div> */}
-        <AcInput
-            {...this.props}
-            value={this.state.value}
+        <FormControl
+            type="text"
+            className={className}
+            placeholder={placeholder}
+            value={value}
+            maxLength={maxLength}
             onChange={this.onValueChange}
-            onKeyDown={this.onKeyDown}
-            bsRole="toggle" />
-        <Dropdown.Menu
-            ref={el => { this.dropdown = el; }}
-            className="ac-menu"
-            bsRole="menu">
+            onKeyDown={this.onKeyDown} />
+        <ul
+            role="menu"
+            className="ac-menu dropdown-menu"
+            aria-labelledby="labels">
           {this.renderSuggestions()}
-        </Dropdown.Menu>
-      </Dropdown>
+        </ul>
+      </div>
     );
   }
 }
 
 AutoComplete.propTypes = {
-  id: React.PropTypes.string.isRequired,
   className: React.PropTypes.string,
+  placeholder: React.PropTypes.string,
+  maxLength: React.PropTypes.number,
   onSearch: React.PropTypes.func.isRequired,
   onRenderSuggestion: React.PropTypes.func,
+  onGetValue: React.PropTypes.func,
+  onFocusNext: React.PropTypes.func,
 };
 
 AutoComplete.defaultProps = {
-  onRenderSuggestion: suggestion =>
-    <MenuItem key={suggestion} eventKey={suggestion}>{suggestion}</MenuItem>,
+  onRenderSuggestion: (suggestion) => suggestion,
+  onGetValue: (suggestion) => suggestion,
 };

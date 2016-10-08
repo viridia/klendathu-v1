@@ -1,60 +1,37 @@
 import React from 'react';
-import Autosuggest, { ItemAdapter } from 'react-bootstrap-autosuggest';
 import axios from 'axios';
-import 'react-bootstrap-autosuggest/src/Autosuggest.scss';
-import './userAutoComplete.scss';
-
-class UserAdapter extends ItemAdapter {
-  getTextRepresentations(item) {
-    return item.username;
-  }
-  renderItem(item) {
-    return (<div className="user">
-      {item.username} ({item.fullname})
-    </div>);
-  }
-}
-UserAdapter.instance = new UserAdapter();
+import AutoComplete from './autocomplete.jsx';
 
 export default class UserAutoComplete extends React.Component {
   constructor(props) {
     super(props);
     this.onSearch = this.onSearch.bind(this);
+    this.onRenderSuggestion = this.onRenderSuggestion.bind(this);
     this.state = {
       datalist: [],
     };
   }
 
-  onSearch(token) {
+  onSearch(token, callback) {
     if (token.length < 2) {
       this.setState({ datalist: [] });
       return;
     }
     axios.get('user', { params: { project: this.props.project.name, token } }).then(resp => {
-      this.setState({ datalist: resp.data.users.map(u => ({
-        ...u,
-        label: `${u.username} (${u.fullname})`,
-      })) });
+      callback(resp.data.users);
     });
   }
 
+  onRenderSuggestion(user) {
+    return user.fullname;
+  }
+
   render() {
-    const { className, placeholder, multiple, onSelect } = this.props;
     return (
-      <Autosuggest
-          groupClassName={className}
-          placeholder={placeholder}
-          datalist={this.state.datalist}
-          datalistOnly
-          datalistPartial
-          multiple={multiple}
+      <AutoComplete
+          {...this.props}
           onSearch={this.onSearch}
-          showToggle
-          itemReactKeyPropName="username"
-          itemSortKeyPropName="username"
-          itemValuePropName="username"
-          itemAdapter={UserAdapter.instance}
-          onSelect={onSelect} />
+          onRenderSuggestion={this.onRenderSuggestion} />
     );
   }
 }
@@ -68,4 +45,5 @@ UserAutoComplete.propTypes = {
   }),
   multiple: React.PropTypes.bool,
   onSelect: React.PropTypes.func,
+  onFocusNext: React.PropTypes.func,
 };

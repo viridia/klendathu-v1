@@ -108,6 +108,8 @@ class IssueCompose extends React.Component {
     this.onAddComment = this.onAddComment.bind(this);
     this.onAddLabel = this.onAddLabel.bind(this);
     this.onSearchLabels = this.onSearchLabels.bind(this);
+    this.onFocusNext = this.onFocusNext.bind(this);
+    this.onFocusPrev = this.onFocusPrev.bind(this);
     this.me = { id: props.profile.username, label: props.profile.username };
     this.state = {
       summaryError: '',
@@ -121,6 +123,14 @@ class IssueCompose extends React.Component {
 
   componentDidMount() {
     this.reset();
+  }
+
+  onFocusNext() {
+    this.navigate(1);
+  }
+
+  onFocusPrev() {
+    this.navigate(-1);
   }
 
   onChangeSummary(e) {
@@ -151,14 +161,27 @@ class IssueCompose extends React.Component {
   }
 
   onSearchLabels(token, callback) {
-    if (token.length < 2) {
+    if (token.length === 0) {
       callback([]);
     } else {
-      callback([
-        'Red',
-        'Green',
+      const colors = [
+        'Black',
         'Blue',
-      ]);
+        'Coral',
+        'Cyan',
+        'Gray',
+        'Green',
+        'Magenta',
+        'Orange',
+        'Pink',
+        'Purple',
+        'Red',
+        'Rose',
+        'Violet',
+        'Yellow',
+      ];
+      const tokLower = token.toLowerCase();
+      callback(colors.filter(color => color.toLowerCase().startsWith(tokLower)));
     }
   }
 
@@ -184,6 +207,27 @@ class IssueCompose extends React.Component {
     const concreteTypes = template.types.filter(t => !t.abstract);
     this.props.resetIssue();
     this.props.setIssueType(concreteTypes[0].id);
+  }
+
+  navigate(dir) {
+    const activeEl = document.activeElement;
+    let activeIndex = -1;
+    for (let i = 0; i < this.form.elements.length; i += 1) {
+      if (this.form.elements[i] === activeEl) {
+        activeIndex = i;
+        break;
+      }
+    }
+    activeIndex += dir;
+    if (activeIndex < 0) {
+      activeIndex = this.form.elements.length - 1;
+    } else if (activeIndex >= this.form.elements.length) {
+      activeIndex = 0;
+    }
+    const nextActive = this.form.elements[activeIndex];
+    if (nextActive) {
+      nextActive.focus();
+    }
   }
 
   renderCustomFields(schema, result) {
@@ -236,148 +280,144 @@ class IssueCompose extends React.Component {
         <header>New Issue: {project.name}</header>
         <section className="content create-issue">
           <div className="left">
-            <table className="create-issue-table form-table">
-              <tbody>
-                <tr>
-                  <th className="header"><ControlLabel>Issue Type:</ControlLabel></th>
-                  <td><TypeSelector /></td>
-                </tr>
-                <tr>
-                  <th className="header"><ControlLabel>Summary:</ControlLabel></th>
-                  <td>
-                    <FormControl
-                        className="summary"
-                        type="text"
-                        value={issue.summary || ''}
-                        placeholder="summary of this issue"
-                        onChange={this.onChangeSummary} />
-                  </td>
-                </tr>
-                <tr>
-                  <th className="header"><ControlLabel>Description:</ControlLabel></th>
-                  <td>
-                    <FormControl
-                        className="description"
-                        componentClass="textarea"
-                        value={issue.description || ''}
-                        placeholder="description of this issue"
-                        onChange={this.onChangeDescription} />
-                  </td>
-                </tr>
-                <tr>
-                  <th className="header"><ControlLabel>Reporter:</ControlLabel></th>
-                  <td className="reporter single-static">
-                    <span>{this.props.profile.username}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <th className="header"><ControlLabel>Assign to:</ControlLabel></th>
-                  <td>
-                    <UserAutoComplete
-                        className="assignee ac-single"
-                        project={project}
-                        placeholder="(unassigned)"
-                        value={this.state.owner}
-                        onChange={this.onChangeOwner} />
-                  </td>
-                </tr>
-                <tr>
-                  <th className="header"><ControlLabel>CC:</ControlLabel></th>
-                  <td>
-                    <div className="ac-multi-group">
-                      <UserAutoComplete
-                          className="cc ac-multi"
-                          project={project}
-                          onChange={this.onAddCC} />
-                      <Button bsSize="small">Add</Button>
-                    </div>
-                    <ul>
-                      {issue.cc && issue.cc.map(
-                        u => <li key={u}><UserName user={u} /></li>)}
-                    </ul>
-                  </td>
-                </tr>
-                {this.renderTemplateFields()}
-                <tr>
-                  <th className="header"><ControlLabel>Labels:</ControlLabel></th>
-                  <td>
-                    <div className="ac-multi-group">
-                      <AutoComplete
-                          id="labels"
-                          className="labels ac-multi"
-                          onSearch={this.onSearchLabels} />
-                      {/* <Typeahead
-                          className="labels ac-multi"
-                          options={['red', 'green', 'blue', 'new...']}
-                          onChange={this.onAddLabel}
-                          emptyLabel="No suggestions"
-                          multiple />
-                      <Button bsSize="small">Add</Button>*/}
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th className="header"><ControlLabel>Keywords:</ControlLabel></th>
-                  <td>
-                    <div className="ac-multi-group">
-                      <Typeahead
-                          className="keywords ac-multi"
-                          options={['(unassigned)', 'me']} />
-                      <Button bsSize="small">Add</Button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th className="header"><ControlLabel>Attach files:</ControlLabel></th>
-                  <td>
-                    <div className="upload">
-                      Drop files here to upload (or click)
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th className="header"><ControlLabel>Linked Issues:</ControlLabel></th>
-                  <td>
-                    <div className="linked-group">
-                      <DropdownButton bsSize="small" title="Blocked By" id="issue-link-type">
-                        <MenuItem eventKey="1" active>Blocked By</MenuItem>
-                        <MenuItem eventKey="2">Blocks</MenuItem>
-                        <MenuItem eventKey="3">Duplicates</MenuItem>
-                        <MenuItem eventKey="4">Related to</MenuItem>
-                        <MenuItem eventKey="5">Child of</MenuItem>
-                        <MenuItem eventKey="6">Parent of</MenuItem>
-                      </DropdownButton>
-                      <Typeahead
-                          className="linked-issue"
-                          options={['new...']} />
-                      <Button bsSize="small">Add</Button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th className="header"><ControlLabel>Comments:</ControlLabel></th>
-                  <td>
-                    {issue.comments && issue.comments.map((comment, index) =>
-                      (<div className="comment card internal" key={index}>
-                        <div className="author"><UserName user={comment.author} /></div>
-                        {comment.body}
-                      </div>))}
-                    <div className="add-comment-group">
+            <form ref={el => { this.form = el; }}>
+              <table className="create-issue-table form-table">
+                <tbody>
+                  <tr>
+                    <th className="header"><ControlLabel>Issue Type:</ControlLabel></th>
+                    <td><TypeSelector /></td>
+                  </tr>
+                  <tr>
+                    <th className="header"><ControlLabel>Summary:</ControlLabel></th>
+                    <td>
                       <FormControl
-                          className="add-comment"
+                          className="summary"
+                          type="text"
+                          value={issue.summary || ''}
+                          placeholder="one-line summary of this issue"
+                          onChange={this.onChangeSummary} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="header"><ControlLabel>Description:</ControlLabel></th>
+                    <td>
+                      <FormControl
+                          className="description"
                           componentClass="textarea"
-                          placeholder="add a comment..."
-                          value={this.state.commentText}
-                          onChange={this.onChangeCommentText} />
-                      <Button
-                          bsSize="small"
-                          disabled={this.state.commentText.length === 0}
-                          onClick={this.onAddComment}>Add</Button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                          value={issue.description || ''}
+                          placeholder="description of this issue"
+                          onChange={this.onChangeDescription} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="header"><ControlLabel>Reporter:</ControlLabel></th>
+                    <td className="reporter single-static">
+                      <span>{this.props.profile.username}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="header"><ControlLabel>Assign to:</ControlLabel></th>
+                    <td>
+                      <UserAutoComplete
+                          className="assignee ac-single"
+                          project={project}
+                          placeholder="(unassigned)"
+                          value={this.state.owner}
+                          onChange={this.onChangeOwner} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="header"><ControlLabel>CC:</ControlLabel></th>
+                    <td>
+                      <div className="ac-multi-group">
+                        <UserAutoComplete
+                            className="cc ac-multi"
+                            project={project}
+                            onChange={this.onAddCC} />
+                        <Button bsSize="small">Add</Button>
+                      </div>
+                      <ul>
+                        {issue.cc && issue.cc.map(
+                          u => <li key={u}><UserName user={u} /></li>)}
+                      </ul>
+                    </td>
+                  </tr>
+                  {this.renderTemplateFields()}
+                  <tr>
+                    <th className="header"><ControlLabel>Labels:</ControlLabel></th>
+                    <td>
+                      <div className="ac-multi-group">
+                        <AutoComplete
+                            id="labels"
+                            className="labels ac-multi"
+                            onSearch={this.onSearchLabels}
+                            onFocusNext={this.onFocusNext} />
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="header"><ControlLabel>Keywords:</ControlLabel></th>
+                    <td>
+                      <div className="ac-multi-group">
+                        <Typeahead
+                            className="keywords ac-multi"
+                            options={['(unassigned)', 'me']} />
+                        <Button bsSize="small">Add</Button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="header"><ControlLabel>Attach files:</ControlLabel></th>
+                    <td>
+                      <div className="upload">
+                        Drop files here to upload (or click)
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="header"><ControlLabel>Linked Issues:</ControlLabel></th>
+                    <td>
+                      <div className="linked-group">
+                        <DropdownButton bsSize="small" title="Blocked By" id="issue-link-type">
+                          <MenuItem eventKey="1" active>Blocked By</MenuItem>
+                          <MenuItem eventKey="2">Blocks</MenuItem>
+                          <MenuItem eventKey="3">Duplicates</MenuItem>
+                          <MenuItem eventKey="4">Related to</MenuItem>
+                          <MenuItem eventKey="5">Child of</MenuItem>
+                          <MenuItem eventKey="6">Parent of</MenuItem>
+                        </DropdownButton>
+                        <Typeahead
+                            className="linked-issue"
+                            options={['new...']} />
+                        <Button bsSize="small">Add</Button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="header"><ControlLabel>Comments:</ControlLabel></th>
+                    <td>
+                      {issue.comments && issue.comments.map((comment, index) =>
+                        (<div className="comment card internal" key={index}>
+                          <div className="author"><UserName user={comment.author} /></div>
+                          {comment.body}
+                        </div>))}
+                      <div className="add-comment-group">
+                        <FormControl
+                            className="add-comment"
+                            componentClass="textarea"
+                            placeholder="add a comment..."
+                            value={this.state.commentText}
+                            onChange={this.onChangeCommentText} />
+                        <Button
+                            bsSize="small"
+                            disabled={this.state.commentText.length === 0}
+                            onClick={this.onAddComment}>Add</Button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </form>
           </div>
           <aside className="right">
             <StateSelector project={project} workflow={workflow} state="new" />
