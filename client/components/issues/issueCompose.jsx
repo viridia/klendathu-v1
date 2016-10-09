@@ -461,7 +461,7 @@ IssueCompose.propTypes = {
 export default connect(
   (state, ownProps) => ({
     profile: state.profile,
-    project: state.projects.byId.get(ownProps.params.project),
+    project: state.projects.byId.get(state.projects.byName.get(ownProps.params.project)),
     workflow: state.workflows['std/bugtrack'],
     template: state.templates['std/software'],
     issue: state.issues.$edit,

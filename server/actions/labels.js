@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
 const serializers = require('./serializers');
 
@@ -6,7 +7,6 @@ module.exports = function (app, apiRouter) {
   const labels = app.db.collection('labels');
 
   apiRouter.get('/labels', (req, res) => {
-    console.info(req.query);
     if (!req.query.project) {
       res.status(400).json({ err: 'no-project' });
     } else if (!req.user) {
@@ -61,34 +61,28 @@ module.exports = function (app, apiRouter) {
   });
 
   apiRouter.put('/labels', (req, res) => {
+    logger.info(req.body);
     if (!req.user) {
       res.status(401).json({ err: 'unauthorized' });
     } else {
-      const { name, creator, color, project } = req.body;
-      if (name.length < 6) {
+      const { name, color, project } = req.body;
+      if (name.length < 3) {
         // Name too short
         res.status(400).json({ err: 'too-short' });
         return;
       } else if (!color) {
         res.status(400).json({ err: 'no-color' });
         return;
-      } else if (!creator) {
-        res.status(400).json({ err: 'no-owner' });
-        return;
       }
-      // } else if (!name.match(/^[a-z0-9\-]+$/)) {
-      //   // Special characters not allowed
-      //   res.status(400).json({ err: 'invalid-name' });
-      //   return;
-      projects.findOne({ _id: project }).then(proj => {
+      projects.findOne({ _id: new ObjectId(project) }).then(proj => {
         // Check if project exists
         if (!proj) {
           res.status(400).json({ err: 'no-project' });
         } else {
           const now = new Date();
-          const label = { name, creator: req.user._id, color, created: now, updated: now };
+          const label = { project, name, creator: req.user._id, color, created: now, updated: now };
           labels.insertOne(label).then(row => {
-            res.json(serializers.label(row));
+            res.json(serializers.label(row.ops[0]));
             logger.info('Created label', name);
           }, error => {
             logger.error('Error creating label', error);

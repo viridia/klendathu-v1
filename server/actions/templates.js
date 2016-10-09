@@ -9,7 +9,7 @@ module.exports = function (app, apiRouter) {
     if (req.params.project === 'std') {
       // Handle built-in templates
       const wfPath = path.resolve(__dirname, `../templates/${req.params.name}.json`);
-      logger.info(wfPath);
+      // logger.info(wfPath);
       fs.readFile(wfPath, 'utf8', (err, data) => {
         if (err) {
           logger.error('Error reading template file:', JSON.stringify(err));

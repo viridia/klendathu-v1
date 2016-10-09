@@ -7,6 +7,8 @@ import FormControl from 'react-bootstrap/lib/FormControl';
 import FormGroup from 'react-bootstrap/lib/FormGroup';
 import Modal from 'react-bootstrap/lib/Modal';
 import classNames from 'classnames';
+import { toastr } from 'react-redux-toastr';
+import { createLabel } from '../../store/labels';
 import LABEL_COLORS from '../common/labelColors';
 import './labelSelector.scss';
 import '../common/ac/chip.scss';
@@ -19,21 +21,22 @@ class LabelDialog extends React.Component {
     this.onCreateLabel = this.onCreateLabel.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.state = {
-      labelText: '',
-      labelColor: '#BA68C8',
+      name: '',
+      color: '#BA68C8',
+      busy: false,
     };
   }
 
   onChangeLabelText(e) {
-    this.setState({ labelText: e.target.value });
+    this.setState({ name: e.target.value });
   }
 
   onChangeLabelColor(e) {
-    this.setState({ labelColor: e.target.dataset.color });
+    this.setState({ color: e.target.dataset.color });
   }
 
   onKeyDown(e) {
-    if (e.keyCode === 13 && this.state.labelText.length >= 3) { // RETURN
+    if (e.keyCode === 13 && this.state.name.length >= 3) { // RETURN
       e.preventDefault();
       e.stopPropagation();
       this.onCreateLabel();
@@ -41,8 +44,29 @@ class LabelDialog extends React.Component {
   }
 
   onCreateLabel() {
-    console.log('create');
-    this.props.onHide();
+    const { name, color } = this.state;
+    this.setState({ busy: true });
+    this.props.createLabel(this.props.project.id, name, color).then(resp => {
+      this.props.onInsertLabel(resp.data);
+      this.setState({ busy: false });
+      this.props.onHide();
+    }, error => {
+      if (error.response && error.response.data && error.response.data.err) {
+        switch (error.response.data.err) {
+          case 'no-project':
+            toastr.error('Operation failed.', 'Invalid project id');
+            break;
+          default:
+            toastr.error('Operation failed.', `Server returned '${error.response.data.err}'`);
+            console.error('response:', error.response);
+            break;
+        }
+      } else {
+        toastr.error('Operation failed.', error.message);
+      }
+      this.setState({ busy: false });
+      this.props.onHide();
+    });
   }
 
   render() {
@@ -59,7 +83,7 @@ class LabelDialog extends React.Component {
             <ControlLabel>Label text</ControlLabel>
             <FormControl
                 type="text"
-                value={this.state.labelText}
+                value={this.state.name}
                 placeholder="Text for this label"
                 autoFocus
                 maxLength={64}
@@ -75,7 +99,7 @@ class LabelDialog extends React.Component {
                   {row.map(color =>
                     <button
                         className={classNames('color-selector',
-                          { selected: color === this.state.labelColor })}
+                          { selected: color === this.state.color })}
                         key={color}
                         data-color={color}
                         style={{ backgroundColor: color }}
@@ -87,8 +111,8 @@ class LabelDialog extends React.Component {
             <ControlLabel>Label preview:</ControlLabel>
             <div
                 className="label-preview chip"
-                style={{ backgroundColor: this.state.labelColor }}>
-              <span className="title">{this.state.labelText || '???'}</span>
+                style={{ backgroundColor: this.state.color }}>
+              <span className="title">{this.state.name || '???'}</span>
             </div>
           </FormGroup>
         </Modal.Body>
@@ -96,7 +120,7 @@ class LabelDialog extends React.Component {
           <Button onClick={this.onHide}>Cancel</Button>
           <Button
               onClick={this.onCreateLabel}
-              disabled={this.state.labelText.length < 3}
+              disabled={this.state.name.length < 3 && !this.state.busy}
               bsStyle="primary">Create</Button>
         </Modal.Footer>
       </Modal>);
@@ -105,13 +129,16 @@ class LabelDialog extends React.Component {
 
 LabelDialog.propTypes = {
   project: React.PropTypes.shape({
-    labels: React.PropTypes.arrayOf(React.PropTypes.shape({}).isRequired),
+    id: React.PropTypes.string.isRequired,
   }).isRequired,
   onHide: React.PropTypes.func.isRequired,
+  createLabel: React.PropTypes.func.isRequired,
+  onInsertLabel: React.PropTypes.func.isRequired,
 };
 
 export default connect(
   null,
   dispatch => bindActionCreators({
+    createLabel,
   }, dispatch)
 )(LabelDialog);

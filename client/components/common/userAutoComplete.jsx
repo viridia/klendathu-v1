@@ -17,7 +17,7 @@ export default class UserAutoComplete extends React.Component {
     if (token.length < 1) {
       callback([]);
     } else {
-      axios.get('user', { params: { project: this.props.project.name, token } }).then(resp => {
+      axios.get('user', { params: { project: this.props.project.id, token } }).then(resp => {
         callback(resp.data.users);
       });
     }
@@ -63,7 +63,7 @@ UserAutoComplete.propTypes = {
   className: React.PropTypes.string,
   placeholder: React.PropTypes.string,
   project: React.PropTypes.shape({
-    name: React.PropTypes.string,
+    id: React.PropTypes.string,
   }),
   multiple: React.PropTypes.bool,
   onSelect: React.PropTypes.func,

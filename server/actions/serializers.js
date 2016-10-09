@@ -1,6 +1,7 @@
 module.exports = {
   // Serialize a project
   project: p => ({
+    id: p._id,
     name: p.name,
     title: p.title,
     description: p.description,

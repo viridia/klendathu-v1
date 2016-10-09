@@ -121,7 +121,7 @@ module.exports = function (app, apiRouter) {
                 verified: false,
               }).then(u => {
                 logger.info('User creation successful:', username);
-                return req.logIn(u, () => {
+                return req.logIn(u.ops[0], () => {
                   return res.end();
                   // return res.json(serializers.profile(u));
                 });

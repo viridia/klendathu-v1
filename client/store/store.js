@@ -2,6 +2,7 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import { reducer as toastrReducer } from 'react-redux-toastr';
 import issuesReducer from './issues';
+import labelsReducer from './labels';
 import profileReducer from './profile';
 import projectsReducer from './projects';
 import templatesReducer from './templates';
@@ -10,6 +11,7 @@ import userInfoReducer from './userInfo';
 
 const store = createStore(combineReducers({
   issues: issuesReducer,
+  labels: labelsReducer,
   profile: profileReducer,
   projects: projectsReducer,
   templates: templatesReducer,

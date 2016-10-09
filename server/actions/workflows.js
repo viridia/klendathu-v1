@@ -9,7 +9,7 @@ module.exports = function (app, apiRouter) {
     if (req.params.project === 'std') {
       // Handle built-in workflows
       const wfPath = path.resolve(__dirname, `../workflows/${req.params.name}.json`);
-      logger.info(wfPath);
+      // logger.info(wfPath);
       fs.readFile(wfPath, 'utf8', (err, data) => {
         if (err) {
           logger.error('Error reading workflow file:', JSON.stringify(err));

@@ -6,7 +6,7 @@ export const requestProjects = createAction('REQUEST_PROJECTS');
 export const receiveProjects = createAction('RECEIVE_PROJECTS');
 
 // Patch the project with new
-export const updateProject = createAction('PATCH_PROJECT', (pname, props) => [pname, props]);
+export const updateProject = createAction('PATCH_PROJECT', (pid, props) => [pid, props]);
 
 // Fetch projects action.
 export function fetchProjects(force = false) {
@@ -53,8 +53,9 @@ export default createReducer({
   [requestProjects]: (state) => ({ ...state, loading: true }),
   [receiveProjects]: (state, projects) => {
     return {
-      byId: new Immutable.Map(projects.map(proj => [proj.name, proj])),
-      idList: projects.map(p => p.name),
+      byId: new Immutable.Map(projects.map(proj => [proj.id, proj])),
+      byName: new Immutable.Map(projects.map(proj => [proj.name, proj.id])),
+      idList: projects.map(p => p.id),
       loaded: true,
     };
   },
@@ -63,6 +64,15 @@ export default createReducer({
     if (!proj) {
       return state;
     }
-    return { ...state, byId: state.byId.set(pid, { ...proj, ...props }) };
+    return { ...state,
+      byId: state.byId.set(pid, { ...proj, ...props }),
+      byName: state.byName.set(proj.name, pid),
+    };
   },
-}, { byId: Immutable.Map.of(), idList: [], loading: false, loaded: false });
+}, {
+  byId: Immutable.Map.of(),
+  byName: Immutable.Map.of(),
+  idList: [],
+  loading: false,
+  loaded: false,
+});

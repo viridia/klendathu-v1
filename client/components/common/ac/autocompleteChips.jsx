@@ -18,6 +18,7 @@ export default class AutoCompleteChips extends React.Component {
       valid: false,
       focused: false,
       suggestions: [],
+      suggestionsSuffix: [],
       suggestionIndex: -1,
       value: '',
       selection: [],
@@ -65,11 +66,16 @@ export default class AutoCompleteChips extends React.Component {
     inputEl.focus();
   }
 
-  onReceiveSuggestions(suggestions) {
+  onReceiveSuggestions(suggestions, suggestionsSuffix = []) {
+    const alreadySelected = new Set(this.state.selection.map(s => this.props.onGetValue(s)));
+    const uniqueSuggestions =
+      suggestions.filter(s => !alreadySelected.has(this.props.onGetValue(s)));
+    const suggestionCount = uniqueSuggestions.length + suggestionsSuffix.length;
     this.setState({
-      suggestions,
-      open: suggestions.length > 0,
-      suggestionIndex: suggestions.length > 0 ? 0 : -1,
+      suggestions: uniqueSuggestions,
+      suggestionsSuffix,
+      open: suggestionCount > 0,
+      suggestionIndex: uniqueSuggestions.length > 0 ? 0 : -1,
     });
     if (this.state.value !== this.searchValue) {
       this.searchValue = this.this.value;
@@ -78,13 +84,15 @@ export default class AutoCompleteChips extends React.Component {
   }
 
   onKeyDown(e) {
+    const { suggestions, suggestionsSuffix, suggestionIndex } = this.state;
+    const suggestionCount = suggestions.length + suggestionsSuffix.length;
     switch (e.keyCode) {
       case 40: // DOWN
-        if (this.state.suggestions.length > 0) {
+        if (suggestionCount > 0) {
           e.preventDefault();
           e.stopPropagation();
-          let index = this.state.suggestionIndex + 1;
-          if (index >= this.state.suggestions.length) {
+          let index = suggestionIndex + 1;
+          if (index >= suggestionCount) {
             index = 0;
           }
           this.setState({
@@ -94,12 +102,12 @@ export default class AutoCompleteChips extends React.Component {
         }
         break;
       case 38: // UP
-        if (this.state.suggestions.length > 0 && this.state.open) {
+        if (suggestionCount > 0 && this.state.open) {
           e.preventDefault();
           e.stopPropagation();
-          let index = this.state.suggestionIndex - 1;
+          let index = suggestionIndex - 1;
           if (index < 0) {
-            index = this.state.suggestions.length - 1;
+            index = -1;
           }
           this.setState({ suggestionIndex: index });
         }
@@ -107,13 +115,13 @@ export default class AutoCompleteChips extends React.Component {
       case 13: // RETURN
         e.preventDefault();
         e.stopPropagation();
-        if (this.state.suggestions.length > 0 && this.state.suggestionIndex !== -1) {
+        if (suggestionCount > 0 && suggestionIndex !== -1) {
           if (!this.state.open) {
             if (this.props.onFocusNext) {
               this.props.onFocusNext();
             }
           } else {
-            const item = this.state.suggestions[this.state.suggestionIndex];
+            const item = suggestions.concat(suggestionsSuffix)[suggestionIndex];
             this.setState({
               value: '',
               open: false,
@@ -168,9 +176,10 @@ export default class AutoCompleteChips extends React.Component {
 
   renderSuggestions() {
     const { onGetValue, onRenderSuggestion } = this.props;
-    return this.state.suggestions.map((s, index) => {
+    const { suggestions, suggestionsSuffix, suggestionIndex } = this.state;
+    const menu = suggestions.map((s, index) => {
       const value = onGetValue(s);
-      const active = index === this.state.suggestionIndex;
+      const active = index === suggestionIndex;
       return (<li
           className={classNames({ active })}
           key={value}
@@ -178,6 +187,20 @@ export default class AutoCompleteChips extends React.Component {
         <a role="menuitem" tabIndex="-1" href="">{onRenderSuggestion(s)}</a>
       </li>);
     });
+    if (menu.length > 0 && suggestionsSuffix) {
+      menu.push(<hr key="-hr-" />);
+    }
+    const suffix = suggestionsSuffix.map((s, index) => {
+      const value = onGetValue(s);
+      const active = index === suggestionIndex - suggestions.length;
+      return (<li
+          className={classNames({ active })}
+          key={value}
+          role="presentation">
+        <a role="menuitem" tabIndex="-1" href="">{onRenderSuggestion(s)}</a>
+      </li>);
+    });
+    return menu.concat(suffix);
   }
 
   renderSelection() {
