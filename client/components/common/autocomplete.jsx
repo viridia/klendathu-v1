@@ -1,6 +1,8 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import classNames from 'classnames';
+import CloseIcon from 'icons/ic_close_black_24px.svg';
 import './autocomplete.scss';
 
 export default class AutoComplete extends React.Component {
@@ -13,10 +15,9 @@ export default class AutoComplete extends React.Component {
       open: false,
       valid: false,
       suggestions: [],
+      suggestionIndex: -1,
       value: '',
-      selected: null,
-      selectedValue: '',
-      selectedIndex: -1,
+      selection: [],
     };
     this.suggestionMap = new Map();
     this.searchValue = null;
@@ -28,17 +29,14 @@ export default class AutoComplete extends React.Component {
   }
 
   onValueChange(e) {
-    const previ = this.state.value;
     const value = e.target.value;
-    if (previ !== value) {
-      this.setState({ value });
-      if (value !== this.searchValue) {
-        this.searchValue = value;
-        clearTimeout(this.timer);
-        this.timer = setTimeout(() => {
-          this.props.onSearch(value, this.onReceiveSuggestions);
-        }, 30);
-      }
+    this.setState({ value });
+    if (value !== this.searchValue) {
+      this.searchValue = value;
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => {
+        this.props.onSearch(value, this.onReceiveSuggestions);
+      }, 30);
     }
   }
 
@@ -46,8 +44,7 @@ export default class AutoComplete extends React.Component {
     this.setState({
       suggestions,
       open: suggestions.length > 0,
-      selected: suggestions.length > 0 ? suggestions[0] : null,
-      selectedIndex: suggestions.length > 0 ? 0 : -1,
+      suggestionIndex: suggestions.length > 0 ? 0 : -1,
     });
     if (this.state.value !== this.searchValue) {
       this.props.onSearch(this.state.value, this.onReceiveSuggestions);
@@ -60,12 +57,12 @@ export default class AutoComplete extends React.Component {
         if (this.state.suggestions.length > 0) {
           e.preventDefault();
           e.stopPropagation();
-          let index = this.state.selectedIndex + 1;
+          let index = this.state.suggestionIndex + 1;
           if (index >= this.state.suggestions.length) {
             index = 0;
           }
           this.setState({
-            selectedIndex: index,
+            suggestionIndex: index,
             open: true,
           });
         }
@@ -74,26 +71,37 @@ export default class AutoComplete extends React.Component {
         if (this.state.suggestions.length > 0 && this.state.open) {
           e.preventDefault();
           e.stopPropagation();
-          let index = this.state.selectedIndex - 1;
+          let index = this.state.suggestionIndex - 1;
           if (index < 0) {
             index = this.state.suggestions.length - 1;
           }
-          this.setState({ selectedIndex: index });
+          this.setState({ suggestionIndex: index });
         }
         break;
       case 13: // RETURN
         e.preventDefault();
         e.stopPropagation();
-        if (this.state.suggestions.length > 0 && this.state.selectedIndex !== -1) {
+        if (this.state.suggestions.length > 0 && this.state.suggestionIndex !== -1) {
           if (!this.state.open) {
             if (this.props.onFocusNext) {
               this.props.onFocusNext();
             }
           } else {
+            const item = this.state.suggestions[this.state.suggestionIndex];
             this.setState({
-              value: this.state.suggestions[this.state.selectedIndex],
+              value: '',
               open: false,
             });
+            this.addToSelection(item);
+          }
+        }
+        break;
+      case 8: // BACKSPACE
+        {
+          // Remove the last chip from the selection.
+          const inputEl = ReactDOM.findDOMNode(this.input); // eslint-disable-line
+          if (inputEl.selectionStart === 0 && inputEl.selectionEnd === 0) {
+            this.setState({ selection: this.state.selection.slice(0, -1) });
           }
         }
         break;
@@ -104,11 +112,30 @@ export default class AutoComplete extends React.Component {
     }
   }
 
+  addToSelection(item) {
+    let selection = this.state.selection;
+    for (let i = 0; i < selection.length; i += 1) {
+      // Value is already in the list.
+      if (this.props.onGetValue(item) === this.props.onGetValue(selection[i])) {
+        return;
+      }
+    }
+    selection = selection.concat([item]);
+    selection.sort((a, b) => {
+      const aKey = this.props.onGetSortKey(a);
+      const bKey = this.props.onGetSortKey(b);
+      if (aKey < bKey) { return -1; }
+      if (aKey < bKey) { return 1; }
+      return 0;
+    });
+    this.setState({ selection });
+  }
+
   renderSuggestions() {
     const { onGetValue, onRenderSuggestion } = this.props;
     return this.state.suggestions.map((s, index) => {
       const value = onGetValue(s);
-      const active = index === this.state.selectedIndex;
+      const active = index === this.state.suggestionIndex;
       return (<li
           className={classNames({ active })}
           key={value}
@@ -118,16 +145,39 @@ export default class AutoComplete extends React.Component {
     });
   }
 
+  renderSelection() {
+    const { selection } = this.state;
+    const result = [];
+    for (let i = 0; i < selection.length; i += 1) {
+      const item = selection[i];
+      const value = this.props.onGetValue(item);
+      const last = i === selection.length - 1;
+      result.push(
+        <span className={classNames('ac-chip-wrapper', { last })} key={value}>
+          <span className="ac-chip">
+            <CloseIcon />
+            <span className="title">{this.props.onRenderSuggestion(item)}</span>
+          </span>
+        </span>
+      );
+    }
+    return result;
+  }
+
   render() {
     const { className, maxLength, placeholder } = this.props;
     const { value, valid, open } = this.state;
     return (
-      <div className={classNames('autocomplete dropdown btn-group', { valid, open })}>
+      <div
+          className={classNames('autocomplete dropdown',
+            className, { valid, open })}>
+        {this.renderSelection()}
         {/* <div className="hint">hint</div> */}
         <FormControl
             type="text"
-            className={className}
+            bsClass="ac-input"
             placeholder={placeholder}
+            ref={el => { this.input = el; }}
             value={value}
             maxLength={maxLength}
             onChange={this.onValueChange}
@@ -147,13 +197,16 @@ AutoComplete.propTypes = {
   className: React.PropTypes.string,
   placeholder: React.PropTypes.string,
   maxLength: React.PropTypes.number,
+  multiple: React.PropTypes.bool,
   onSearch: React.PropTypes.func.isRequired,
   onRenderSuggestion: React.PropTypes.func,
   onGetValue: React.PropTypes.func,
+  onGetSortKey: React.PropTypes.func,
   onFocusNext: React.PropTypes.func,
 };
 
 AutoComplete.defaultProps = {
   onRenderSuggestion: (suggestion) => suggestion,
   onGetValue: (suggestion) => suggestion,
+  onGetSortKey: (suggestion) => suggestion.toLowerCase(),
 };

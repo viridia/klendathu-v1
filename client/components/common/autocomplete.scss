@@ -1,4 +1,13 @@
 .autocomplete {
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #ccc;
+  background-color: white;
+  padding: 2px;
+  border-radius: 4px;
+  flex-wrap: wrap;
+
   .hint {
     position: absolute;
     top: 8px;
@@ -7,7 +16,53 @@
     font-size: 14px;
   }
 
+  .ac-chip-wrapper {
+    width: 100%;
+    &.last {
+      width: auto;
+    }
+  }
+
+  .ac-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 12px;
+    background: #ddd;
+    vertical-align: middle;
+    padding: 1px 5px;
+    line-height: 24px;
+    font-size: 90%;
+    margin: 2px;
+
+    > .svg-icon {
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      > svg {
+        fill: #888;
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    > .title {
+      margin: 0 8px 0 4px;
+    }
+  }
+
   .ac-menu {
     right: 0;
+  }
+
+  .ac-input-container {
+  }
+
+  input.ac-input {
+    flex: 1 1;
+    display: inline-block;
+    width: auto;
+    line-height: 20px;
+    margin: 0;
+    width: 100%;
   }
 }

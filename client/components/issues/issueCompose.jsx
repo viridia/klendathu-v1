@@ -323,7 +323,8 @@ class IssueCompose extends React.Component {
                           project={project}
                           placeholder="(unassigned)"
                           value={this.state.owner}
-                          onChange={this.onChangeOwner} />
+                          onChange={this.onChangeOwner}
+                          onFocusNext={this.onFocusNext} />
                     </td>
                   </tr>
                   <tr>
@@ -331,10 +332,10 @@ class IssueCompose extends React.Component {
                     <td>
                       <div className="ac-multi-group">
                         <UserAutoComplete
-                            className="cc ac-multi"
+                            className="assignee ac-multi"
                             project={project}
-                            onChange={this.onAddCC} />
-                        <Button bsSize="small">Add</Button>
+                            multiple
+                            onFocusNext={this.onFocusNext} />
                       </div>
                       <ul>
                         {issue.cc && issue.cc.map(

@@ -4,7 +4,8 @@
   "description": "Flexible bug tracking and agile task management application.",
   "main": "server/index.js",
   "scripts": {
-    "client": "cd client && REACT_HOT=1 webpack-dev-server --inline --port 8081",
+    "client": "cd client && webpack-dev-server --inline --port 8081",
+    "client-hot": "cd client && REACT_HOT=1 webpack-dev-server --inline --port 8081",
     "client-build": "cd client && webpack",
     "start": "pm2 --node-args=\"--harmony\" start process.json",
     "stop": "pm2 kill",
