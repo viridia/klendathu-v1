@@ -17,12 +17,6 @@ plugins.push(
     },
   }));
 
-plugins.push(
-  new webpack.NormalModuleReplacementPlugin(
-    /Autosuggest\.scss$/,
-    'react-bootstrap-autosuggest/src/Autosuggest.scss')
-);
-
 if (hot) {
   plugins.push(new webpack.HotModuleReplacementPlugin());
 }

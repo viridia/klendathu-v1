@@ -9,7 +9,7 @@ import FormControl from 'react-bootstrap/lib/FormControl';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
 import Typeahead from 'react-bootstrap-typeahead';
 import AddBoxIcon from 'icons/ic_add_box_black_24px.svg';
-import AutoComplete from '../common/autocomplete.jsx';
+import AutocompleteChips from '../common/ac/autocompleteChips.jsx';
 import UserAutoComplete from '../common/userAutoComplete.jsx';
 import StateSelector from './stateSelector.jsx';
 import TypeSelector from './typeSelector.jsx';
@@ -348,7 +348,7 @@ class IssueCompose extends React.Component {
                     <th className="header"><ControlLabel>Labels:</ControlLabel></th>
                     <td>
                       <div className="ac-multi-group">
-                        <AutoComplete
+                        <AutocompleteChips
                             id="labels"
                             className="labels ac-multi"
                             onSearch={this.onSearchLabels}

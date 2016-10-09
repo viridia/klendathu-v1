@@ -16,6 +16,9 @@ $nav-tabs-active-link-hover-border-color: $cardBorder;
 $nav-tabs-active-link-hover-bg: $cardBg;
 $nav-link-hover-bg: #f6ecf8;
 
+$dropdown-link-active-color: $textDarkAccent;
+$dropdown-link-active-bg: $b1;
+
 // Include bootstrap styles that we are using.
 @import '~bootstrap-sass/assets/stylesheets/bootstrap/_mixins.scss';
 @import '~bootstrap-sass/assets/stylesheets/bootstrap/_variables.scss';

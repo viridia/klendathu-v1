@@ -6,8 +6,7 @@ import { fetchUserInfo } from '../../store/userInfo';
 
 class ProjectList extends React.Component {
   render() {
-    const { projects, profile } = this.props;
-    this.props.fetchUserInfo(profile.id);
+    const { projects } = this.props;
     return (<div className="project-list">
       {projects.map(p => (<ProjectCard project={p} key={p.name} />))}
     </div>);

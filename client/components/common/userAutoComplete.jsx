@@ -1,12 +1,14 @@
 import React from 'react';
 import axios from 'axios';
-import AutoComplete from './autocomplete.jsx';
+import AutoCompleteChips from './ac/autocompleteChips.jsx';
+import Chip from './ac/chip.jsx';
 
 export default class UserAutoComplete extends React.Component {
   constructor(props) {
     super(props);
     this.onSearch = this.onSearch.bind(this);
     this.onRenderSuggestion = this.onRenderSuggestion.bind(this);
+    this.onRenderSelection = this.onRenderSelection.bind(this);
     this.onGetValue = this.onGetValue.bind(this);
     this.onGetSortKey = this.onGetSortKey.bind(this);
   }
@@ -28,6 +30,13 @@ export default class UserAutoComplete extends React.Component {
     </span>);
   }
 
+  onRenderSelection(user) {
+    return (<Chip>
+      <span className="name">{user.fullname}</span>
+      &nbsp;- <span className="username">{user.username}</span>
+    </Chip>);
+  }
+
   onGetValue(user) {
     return user.username;
   }
@@ -38,12 +47,13 @@ export default class UserAutoComplete extends React.Component {
 
   render() {
     return (
-      <AutoComplete
+      <AutoCompleteChips
           {...this.props}
           onSearch={this.onSearch}
           onGetValue={this.onGetValue}
           onGetSortKey={this.onGetSortKey}
-          onRenderSuggestion={this.onRenderSuggestion} />
+          onRenderSuggestion={this.onRenderSuggestion}
+          onRenderSelection={this.onRenderSelection} />
     );
   }
 }

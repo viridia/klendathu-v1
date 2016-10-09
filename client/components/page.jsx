@@ -13,20 +13,23 @@ class Page extends React.Component {
   }
 
   render() {
-    const { main, left, location, params } = this.props;
+    const { main, left, location, params, profile } = this.props;
     return (<div className="kdt page">
       <ReduxToastr />
       <Header location={location} params={params} />
-      <div className="content">
+      {profile.id && (<div className="content">
         {left}
         {main}
-      </div>
+      </div>)}
     </div>);
   }
 }
 
 Page.propTypes = {
   projects: React.PropTypes.shape({}).isRequired,
+  profile: React.PropTypes.shape({
+    id: React.PropTypes.string,
+  }).isRequired,
   main: React.PropTypes.node.isRequired,
   left: React.PropTypes.node,
   location: React.PropTypes.shape({}).isRequired,
@@ -35,6 +38,9 @@ Page.propTypes = {
 };
 
 export default connect(
-  state => ({ projects: state.projects }),
+  state => ({
+    projects: state.projects,
+    profile: state.profile,
+  }),
   dispatch => bindActionCreators({ fetchProjects }, dispatch),
 )(Page);
