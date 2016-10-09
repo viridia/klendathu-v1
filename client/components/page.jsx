@@ -8,10 +8,6 @@ import { fetchProjects } from '../store/projects';
 import './page.scss';
 
 class Page extends React.Component {
-  componentDidMount() {
-    this.props.fetchProjects();
-  }
-
   render() {
     const { main, left, location, params, profile } = this.props;
     return (<div className="kdt page">

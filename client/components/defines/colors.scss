@@ -23,3 +23,23 @@ $cardBgAlt: #f6ecf8;
 $cardBorder: #C3A1C9;
 // $cardHeaderBg: #f6ecf8;
 $cardHeaderBg: lighten($b1, 10%);
+
+// Bootstrap overrides
+
+// Default button
+$btn-default-color: #482848;
+$btn-default-bg: lighten($b2, 20%);
+$btn-default-border: lighten($b2, 10%);
+
+// Primary button
+$btn-primary-color: #f3e5f5;
+$btn-primary-bg: #ab47bc;
+$btn-primary-border: darken(#ab47bc, 10%);
+
+// Change appearance of tabs
+$nav-tabs-active-link-hover-border-color: $cardBorder;
+$nav-tabs-active-link-hover-bg: $cardBg;
+$nav-link-hover-bg: #f6ecf8;
+
+$dropdown-link-active-color: $textDarkAccent;
+$dropdown-link-active-bg: $b1;

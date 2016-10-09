@@ -9,8 +9,8 @@ import FormControl from 'react-bootstrap/lib/FormControl';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
 import Typeahead from 'react-bootstrap-typeahead';
 import AddBoxIcon from 'icons/ic_add_box_black_24px.svg';
-import AutocompleteChips from '../common/ac/autocompleteChips.jsx';
 import UserAutoComplete from '../common/userAutoComplete.jsx';
+import LabelSelector from './labelSelector.jsx';
 import StateSelector from './stateSelector.jsx';
 import TypeSelector from './typeSelector.jsx';
 import CustomEnumField from './customEnumField.jsx';
@@ -348,10 +348,10 @@ class IssueCompose extends React.Component {
                     <th className="header"><ControlLabel>Labels:</ControlLabel></th>
                     <td>
                       <div className="ac-multi-group">
-                        <AutocompleteChips
+                        <LabelSelector
                             id="labels"
                             className="labels ac-multi"
-                            onSearch={this.onSearchLabels}
+                            project={project}
                             onFocusNext={this.onFocusNext} />
                       </div>
                     </td>

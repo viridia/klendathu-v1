@@ -1,22 +1,34 @@
 Hot loading?
 
+-- Permission model
+  # Note that this doesn't require fetching orgs
+  -- fetching projects
+    or:
+      project.owner == user
+      project.id in user.projects
+      project.owningOrg in user.orgs
+  -- fetching users for project
+    or:
+      user == project.owner
+      user.projects contains project
+      user.orgs contains project.owningOrg
+  -- checking permissions
+    perm level:
+      owner: project.owner == user
+      level = user.projects[project.id].rank
+      level = user.orgs[project.owningOrg].rank
+
+question about ownership of labels: who can create them?
+  -- anyone with manager access to a project
+who can delete them?
+  -- same.
+are labels stored with the project, or are they separate?
+  -- depends on how many labels we expect to have. Let's say max 1000 for now.
+
 collections:
   issues
-    -- cc
-    -- reporter
-    -- owner / assigned
-    -- subject
-    -- description
-    -- comments
-    -- attachments
-    -- state / status
-    -- resolution
-    -- public
     -- linked issues
     -- labels
-    -- tags
-      -- (opt) severity
-      -- (opt) priority
     -- (opt) product
       -- (opt) hardware
       -- (opt) version
@@ -32,16 +44,10 @@ collections:
   workflows
   templates
   labels
-    - owner
+    - project.id
+    - owner.id
     - name
-  projects
-    - workflow
-    - issue templates
-    - members[]:
-      - user
-      - access
-    - orgs[]:
-      - organization
+    - color
   project.settings:
     - user
     - labels

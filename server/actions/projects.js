@@ -42,11 +42,11 @@ module.exports = function (app, apiRouter) {
             res.status(200).end();
           }, error => {
             logger.error('Error deleting project', req.params.name);
-            res.status(500).json({ err: 'project-delete-error', details: error });
+            res.status(500).json({ err: 'delete-error', details: error });
           });
         } else {
           logger.error('Error deleting non-existent project', req.params.name);
-          res.status(404).json({ err: 'no-project' });
+          res.status(404).json({ err: 'delete-nonexistent' });
         }
       }, err => {
         logger.error('Error finding project to delete', err);
@@ -121,7 +121,7 @@ module.exports = function (app, apiRouter) {
           res.status(404).json({ err: 'no-project' });
         }
       }, err => {
-        logger.error('Error finding project to delete', err);
+        logger.error('Error finding project to update', err);
         return res.status(500).json({ err: 'internal' });
       });
     }

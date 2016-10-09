@@ -8,6 +8,17 @@ module.exports = {
     owningOrg: p.owningOrg,
     created: p.created,
     updated: p.updated,
+    labels: p.labels,
+  }),
+
+  // Serialize a label
+  label: l => ({
+    id: l._id,
+    name: l.name,
+    creator: l.creator,
+    created: l.created,
+    updated: l.updated,
+    color: l.color,
   }),
 
   // Serialize userInfo

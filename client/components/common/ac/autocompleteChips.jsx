@@ -49,10 +49,14 @@ export default class AutoCompleteChips extends React.Component {
 
   onFocus() {
     this.setState({ focused: true });
+    if (this.state.value.length === 0) {
+      this.searchValue = this.state.value;
+      this.props.onSearch(this.searchValue, this.onReceiveSuggestions);
+    }
   }
 
   onBlur() {
-    this.setState({ focused: false });
+    this.setState({ focused: false, open: false });
   }
 
   onClickContainer(e) {
@@ -115,7 +119,7 @@ export default class AutoCompleteChips extends React.Component {
               open: false,
             });
             this.searchValue = '';
-            this.addToSelection(item);
+            this.chooseSuggestion(item);
           }
         }
         break;
@@ -132,6 +136,14 @@ export default class AutoCompleteChips extends React.Component {
       case 27: // ESC
       default:
         break;
+    }
+  }
+
+  chooseSuggestion(suggestion) {
+    const callback = s => { this.addToSelection(s); };
+    const done = this.props.onChooseSuggestion(suggestion, callback);
+    if (!done) {
+      this.addToSelection(suggestion);
     }
   }
 
@@ -223,6 +235,7 @@ AutoCompleteChips.propTypes = {
   maxLength: React.PropTypes.number,
   multiple: React.PropTypes.bool,
   onSearch: React.PropTypes.func.isRequired,
+  onChooseSuggestion: React.PropTypes.func,
   onRenderSuggestion: React.PropTypes.func,
   onRenderSelection: React.PropTypes.func,
   onGetValue: React.PropTypes.func,
@@ -231,6 +244,7 @@ AutoCompleteChips.propTypes = {
 };
 
 AutoCompleteChips.defaultProps = {
+  onChooseSuggestion: () => false,
   onRenderSuggestion: (suggestion) => suggestion,
   onGetValue: (suggestion) => suggestion,
   onGetSortKey: (suggestion) => suggestion.toLowerCase(),

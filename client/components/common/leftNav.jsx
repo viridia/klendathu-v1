@@ -41,8 +41,8 @@ export default class LeftNav extends React.Component {
           query={{ owner: 'me', status: 'open' }} />
       <NavItem icon={<LocalOfferIcon />} title="Labels" path="/labels" />
       <ul>
-        <li><Link to={`/label/${project}`}>release-blockers</Link></li>
-        <li><Link to={`/label/${project}`}>feature-set-1</Link></li>
+        <li><Link to={`/labels/${project}`}>release-blockers</Link></li>
+        <li><Link to={`/labels/${project}`}>feature-set-1</Link></li>
       </ul>
       <NavItem icon={<BookmarkIcon />} title="Saved Queries" path={`/queries/${project}`} />
       <NavItem icon={<SettingsIcon />} title="Project Settings" path={`/project/${project}`} />

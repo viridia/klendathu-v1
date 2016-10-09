@@ -1,4 +1,6 @@
-@import '../../defines/bootstrap.scss';
+@import '../../defines/base';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_mixins.scss';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/_variables.scss';
 
 .autocomplete {
   display: flex;
@@ -38,7 +40,7 @@
     flex: 1 1;
     display: block;
     width: auto;
-    height: 30px;
+    height: 26px;
     line-height: 20px;
     margin: 0;
     min-width: 1px;

@@ -7,6 +7,7 @@ const MongoStore = require('connect-mongo')(session);
 const bodyParser = require('body-parser');
 const compression = require('compression');
 const authActions = require('./actions/auth');
+const labelsActions = require('./actions/labels');
 const projectsActions = require('./actions/projects');
 const userActions = require('./actions/user');
 const issuesActions = require('./actions/issues');
@@ -63,6 +64,7 @@ mongo.then(db => {
   // Import routes
   const apiRouter = express.Router(); // eslint-disable-line new-cap
   authActions(app, apiRouter);
+  labelsActions(app, apiRouter);
   projectsActions(app, apiRouter);
   issuesActions(app, apiRouter);
   userActions(app, apiRouter);

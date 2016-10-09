@@ -3,6 +3,7 @@ import axios from 'axios';
 import Routes from './components/routes.jsx';
 import { env } from './globals';
 import './components/defines/bootstrap.scss'; // Bootstrap styles
+import './components/defines/font-faces.scss';
 
 document.addEventListener('DOMContentLoaded', () => {
   axios.defaults.baseURL = env.apiUrl;

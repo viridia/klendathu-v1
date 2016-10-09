@@ -22,7 +22,7 @@ import { fetchTemplate } from '../store/templates';
 // Make sure we have a user profile before we enter the main part of the app.
 function checkAuth(nextState, replace, callback) {
   const state = store.getState();
-  if (state.profile.id === null) {
+  if (!state.profile.id) {
     // TODO: Combine into a single request.
     store.dispatch(fetchProfile()).then(_resp => {
       return Promise.all([
@@ -48,13 +48,13 @@ const Routes = (
       <Route component={LoginPage} path="/login" />
       <Route component={SignUpPage} path="/signup" />
       <Route component={Page} path="/" onEnter={checkAuth}>
+        <IndexRoute components={{ main: Dashboard, left: DashboardNav }} />
         <Route components={{ main: ProfilePage }} path="/profile" />
         <Route components={{ main: IssueCompose, left: LeftNav }} path="/issues/:project/new" />
         <Route components={{ main: IssueDetails, left: LeftNav }} path="/issues/:project/:id" />
         <Route components={{ main: IssueList, left: LeftNav }} path="/issues/:project" />
         <Route components={{ main: LabelList, left: LeftNav }} path="/labels/:project" />
         <Route components={{ main: ProjectSettings, left: LeftNav }} path="/project/:project" />
-        <IndexRoute components={{ main: Dashboard, left: DashboardNav }} />
       </Route>
     </Router>
   </Provider>
