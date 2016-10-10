@@ -1,4 +1,13 @@
 Hot loading?
+* Click on autocomplete menu (in addition to ENTER).
+* Deletion of labels
+* Editing of labels
+* Simplify rendering of suggestionsSuffix
+* return key to navigate between fields
+* escape to dismiss menus
+* make note about hash tags and @mentions
+* option to add label to hot list when creating it
+  * Need project settings
 
 -- Permission model
   # Note that this doesn't require fetching orgs

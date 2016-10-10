@@ -1,6 +1,7 @@
 const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
 const serializers = require('./serializers');
+const escapeRegExp = require('../lib/escapeRegExp');
 
 module.exports = function (app, apiRouter) {
   const projects = app.db.collection('projects');
@@ -23,6 +24,11 @@ module.exports = function (app, apiRouter) {
       const query = {
         project: req.query.project,
       };
+      if (req.query.token) {
+        const pattern = `\\b${escapeRegExp(req.query.token)}`;
+        query.name = { $regex: pattern, $options: 'i' };
+        // console.info(req.query.token);
+      }
       labels.find(query).sort({ name: 1 }).toArray((error, rows) => {
         if (error) {
           logger.error('Error fetching labels', error);
@@ -83,7 +89,6 @@ module.exports = function (app, apiRouter) {
           const label = { project, name, creator: req.user._id, color, created: now, updated: now };
           labels.insertOne(label).then(row => {
             res.json(serializers.label(row.ops[0]));
-            logger.info('Created label', name);
           }, error => {
             logger.error('Error creating label', error);
             return res.status(500).json({ err: 'internal' });

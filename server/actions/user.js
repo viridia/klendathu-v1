@@ -1,10 +1,7 @@
 const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
 const serializers = require('./serializers');
-
-function escapeRegExp(str) {
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-}
+const escapeRegExp = require('../lib/escapeRegExp');
 
 module.exports = function (app, apiRouter) {
   const users = app.db.collection('users');
