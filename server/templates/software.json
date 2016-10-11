@@ -1,4 +1,6 @@
 {
+  "name": "software",
+  "project": "std",
   "types": [
     {
       "id": "issue",

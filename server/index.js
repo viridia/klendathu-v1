@@ -6,6 +6,7 @@ const proxy = require('express-http-proxy');
 const MongoStore = require('connect-mongo')(session);
 const bodyParser = require('body-parser');
 const compression = require('compression');
+const graphql = require('express-graphql');
 const authActions = require('./actions/auth');
 const labelsActions = require('./actions/labels');
 const projectsActions = require('./actions/projects');
@@ -13,6 +14,7 @@ const userActions = require('./actions/user');
 const issuesActions = require('./actions/issues');
 const workflowsActions = require('./actions/workflows');
 const templatesActions = require('./actions/templates');
+const schema = require('./schema');
 const logger = require('./common/logger');
 
 // Constants
@@ -70,6 +72,14 @@ mongo.then(db => {
   userActions(app, apiRouter);
   workflowsActions(app, apiRouter);
   templatesActions(app, apiRouter);
+
+  // Register GraphQL middleware
+  apiRouter.use('/gql', graphql(req => ({
+    schema,
+    graphiql: true,
+    rootValue: { db: req.db, user: req.user },
+  })));
+
   app.use('/api', apiRouter);
 
   // Proxy for webpack dev server.

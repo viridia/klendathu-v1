@@ -9,6 +9,12 @@ Hot loading?
 * option to add label to hot list when creating it
   * Need project settings
 
+URLS:
+  https://github.com/mlabieniec/complexity
+  https://www.npmjs.com/package/email-validator
+  https://github.com/gaearon/redux-thunk
+  https://github.com/pauldijou/redux-act
+  
 -- Permission model
   # Note that this doesn't require fetching orgs
   -- fetching projects

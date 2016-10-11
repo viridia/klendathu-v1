@@ -13,6 +13,7 @@ import ProfilePage from './profile/profilePage.jsx';
 import LoginPage from './login/loginPage.jsx';
 import SignUpPage from './login/signupPage.jsx';
 import LeftNav from './common/leftNav.jsx';
+import GraphQLPage from './debug/graphiql.jsx';
 import store from '../store/store';
 import { fetchProfile } from '../store/profile';
 import { fetchProjects } from '../store/projects';
@@ -47,6 +48,7 @@ const Routes = (
     <Router history={browserHistory}>
       <Route component={LoginPage} path="/login" />
       <Route component={SignUpPage} path="/signup" />
+      <Route component={GraphQLPage} path="/gql" onEnter={checkAuth} />
       <Route component={Page} path="/" onEnter={checkAuth}>
         <IndexRoute components={{ main: Dashboard, left: DashboardNav }} />
         <Route components={{ main: ProfilePage }} path="/profile" />
