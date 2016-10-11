@@ -9,7 +9,7 @@ module.exports = function (app, apiRouter) {
   const users = app.db.collection('users');
 
   // Initialize passport on /api route only.
-  apiRouter.use(passport.initialize());
+  // apiRouter.use(passport.initialize());
 
   // Set up local username+password strategy
   passport.use(new LocalStrategy({
@@ -52,7 +52,7 @@ module.exports = function (app, apiRouter) {
   });
 
   // Initialize sessions
-  apiRouter.use(passport.session());
+  // apiRouter.use(passport.session());
 
   // Returns profile of current logged-in user
   apiRouter.get('/profile', (req, res) => {

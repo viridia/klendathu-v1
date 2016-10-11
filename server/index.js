@@ -1,5 +1,6 @@
 const path = require('path');
 const express = require('express');
+const passport = require('passport');
 const { MongoClient } = require('mongodb');
 const session = require('express-session');
 const proxy = require('express-http-proxy');
@@ -35,12 +36,12 @@ mongo.then(db => {
   app.db = db;
 
   // Cross-domain config for local testing.
-  const allowCrossDomain = (req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:8081');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    next();
-  };
+  // const allowCrossDomain = (req, res, next) => {
+  //   res.header('Access-Control-Allow-Origin', 'http://localhost:8081');
+  //   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  //   res.header('Access-Control-Allow-Headers', 'Content-Type');
+  //   next();
+  // };
 
   // Make our db accessible to our router
   app.use((req, res, next) => {
@@ -57,7 +58,7 @@ mongo.then(db => {
     store: new MongoStore({ db }),
   }));
   // app.use(express.methodOverride());
-  app.use(allowCrossDomain);
+  // app.use(allowCrossDomain);
 
   // Static files
   app.use('/fonts', express.static(path.join(__dirname, '../client/media/fonts')));
@@ -65,6 +66,12 @@ mongo.then(db => {
 
   // Import routes
   const apiRouter = express.Router(); // eslint-disable-line new-cap
+
+  // Initialize passport on /api route only.
+  const passportMiddleware = passport.initialize();
+  apiRouter.use(passportMiddleware);
+  apiRouter.use(passport.session());
+
   authActions(app, apiRouter);
   labelsActions(app, apiRouter);
   projectsActions(app, apiRouter);
@@ -74,11 +81,19 @@ mongo.then(db => {
   templatesActions(app, apiRouter);
 
   // Register GraphQL middleware
-  apiRouter.use('/gql', graphql(req => ({
-    schema,
-    graphiql: true,
-    rootValue: { db: req.db, user: req.user },
-  })));
+  apiRouter.use('/gql', graphql(req => {
+    logger.info('user:', req.user);
+    return {
+      schema,
+      graphiql: true,
+      rootValue: { db: req.db, user: req.user },
+      formatError: error => ({
+        message: error.message,
+        locations: error.locations,
+        stack: error.stack,
+      }),
+    };
+  }));
 
   app.use('/api', apiRouter);
 

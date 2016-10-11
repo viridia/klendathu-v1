@@ -8,6 +8,7 @@ import projectsReducer from './projects';
 import templatesReducer from './templates';
 import workflowsReducer from './workflows';
 import userInfoReducer from './userInfo';
+import client from './apollo';
 
 const store = createStore(combineReducers({
   issues: issuesReducer,
@@ -18,6 +19,7 @@ const store = createStore(combineReducers({
   toastr: toastrReducer,
   workflows: workflowsReducer,
   userInfo: userInfoReducer,
-}), applyMiddleware(thunk));
+  apollo: client.reducer(),
+}), applyMiddleware(thunk, client.middleware()));
 
 export default store;

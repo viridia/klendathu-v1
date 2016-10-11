@@ -1,7 +1,7 @@
 const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLID,
     GraphQLNonNull } = require('graphql');
 const { ObjectId } = require('mongodb');
-// const logger = require('./common/logger');
+const logger = require('./common/logger');
 const escapeRegExp = require('./lib/escapeRegExp');
 
 const labelType = require('./schemas/labelType');
@@ -72,8 +72,8 @@ const schema = new GraphQLSchema({
           project: { type: new GraphQLNonNull(GraphQLString) },
           name: { type: new GraphQLNonNull(GraphQLString) },
         },
-        resolve({ db }, { project, name }, context) {
-          return workflowResolver(db, context.user, { project, name });
+        resolve({ db, user }, { project, name }) {
+          return workflowResolver(db, user, { project, name });
         },
       },
       template: {
@@ -82,8 +82,19 @@ const schema = new GraphQLSchema({
           project: { type: new GraphQLNonNull(GraphQLString) },
           name: { type: new GraphQLNonNull(GraphQLString) },
         },
-        resolve({ db }, { project, name }, context) {
-          return templateResolver(db, context.user, { project, name });
+        resolve({ db, user }, { project, name }) {
+          return templateResolver(db, user, { project, name });
+        },
+      },
+      profile: {
+        type: userType,
+        resolve({ user }) {
+          logger.info(user);
+          // return null;
+          // logger.info(user, context.user);
+          if (!user) { return null; }
+          const { _id, username, fullname, photo, verified } = user;
+          return { id: _id, username, fullname, photo, verified };
         },
       },
       users: {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
-import { Provider } from 'react-redux';
+import { ApolloProvider } from 'react-apollo';
 import Page from './page.jsx';
 import Dashboard from './dashboard/dashboard.jsx';
 import DashboardNav from './dashboard/dashboardNav.jsx';
@@ -14,6 +14,7 @@ import LoginPage from './login/loginPage.jsx';
 import SignUpPage from './login/signupPage.jsx';
 import LeftNav from './common/leftNav.jsx';
 import GraphQLPage from './debug/graphiql.jsx';
+import client from '../store/apollo';
 import store from '../store/store';
 import { fetchProfile } from '../store/profile';
 import { fetchProjects } from '../store/projects';
@@ -44,7 +45,7 @@ function checkAuth(nextState, replace, callback) {
 }
 
 const Routes = (
-  <Provider store={store}>
+  <ApolloProvider store={store} client={client}>
     <Router history={browserHistory}>
       <Route component={LoginPage} path="/login" />
       <Route component={SignUpPage} path="/signup" />
@@ -59,7 +60,7 @@ const Routes = (
         <Route components={{ main: ProjectSettings, left: LeftNav }} path="/project/:project" />
       </Route>
     </Router>
-  </Provider>
+  </ApolloProvider>
 );
 
 export default Routes;

@@ -14,7 +14,7 @@ URLS:
   https://www.npmjs.com/package/email-validator
   https://github.com/gaearon/redux-thunk
   https://github.com/pauldijou/redux-act
-  
+
 -- Permission model
   # Note that this doesn't require fetching orgs
   -- fetching projects
@@ -121,3 +121,46 @@ Things to experiment with:
   -- React hot loading
   -- minimal babel conversions
   -- Nginx config and https
+
+
+  query ProfileQuery($project: String) {
+    labels(token: "opt") {
+      project
+      name
+    }
+    projects {
+      id
+      name
+    }
+    users {
+      fullname
+    }
+    workflow(project: "std", name: "bugtrack") {
+      name
+      project
+      extends
+      start
+      states {
+        id
+        caption
+        closed
+        transitions
+      }
+    }
+    template(project: "std", name: "software") {
+      name
+      project
+      types {
+        id
+        abstract
+        extends
+        fields {
+          id
+          caption
+          type
+          default
+          values
+        }
+      }
+    }
+  }

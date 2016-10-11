@@ -22,6 +22,7 @@
   "author": "Talin <viridia@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
+    "apollo-client": "^0.4.20",
     "axios": "^0.14.0",
     "babel-core": "^6.14.0",
     "babel-eslint": "^6.1.2",
@@ -58,6 +59,7 @@
     "graphiql": "^0.7.8",
     "graphql": "^0.7.1",
     "graphql-date": "^1.0.2",
+    "graphql-tag": "^0.1.14",
     "immutable": "^3.8.1",
     "imports-loader": "^0.6.5",
     "less": "^2.7.1",
@@ -68,6 +70,7 @@
     "passport-local": "^1.0.0",
     "pm2": "^2.0.18",
     "react": "^15.3.2",
+    "react-apollo": "^0.5.8",
     "react-bootstrap": "^0.30.3",
     "react-bootstrap-typeahead": "^0.9.4",
     "react-dom": "^15.3.2",
