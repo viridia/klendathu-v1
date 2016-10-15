@@ -11,7 +11,6 @@ const graphql = require('express-graphql');
 const authActions = require('./actions/auth');
 const labelsActions = require('./actions/labels');
 const projectsActions = require('./actions/projects');
-const userActions = require('./actions/user');
 const issuesActions = require('./actions/issues');
 const workflowsActions = require('./actions/workflows');
 const templatesActions = require('./actions/templates');
@@ -77,7 +76,6 @@ mongo.then(db => {
   labelsActions(app, apiRouter);
   projectsActions(app, apiRouter);
   issuesActions(app, apiRouter);
-  userActions(app, apiRouter);
   workflowsActions(app, apiRouter);
   templatesActions(app, apiRouter);
 

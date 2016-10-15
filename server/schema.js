@@ -1,11 +1,11 @@
-const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLID,
-    GraphQLNonNull } = require('graphql');
-const { ObjectId } = require('mongodb');
+const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLID, GraphQLNonNull }
+  = require('graphql');
 const labelType = require('./schemas/labelType');
 const userType = require('./schemas/userType');
 const projectType = require('./schemas/projectType');
 const templateType = require('./schemas/templateType');
 const workflowType = require('./schemas/workflowType');
+const userResolver = require('./resolvers/user');
 
 module.exports = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -55,14 +55,9 @@ module.exports = new GraphQLSchema({
         args: {
           id: { type: new GraphQLNonNull(GraphQLID) },
         },
+        // This needs to be here because we already have a 'user' field on the root object.
         resolve({ db }, { id }) {
-          return db.collection('users').findOne({ _id: new ObjectId(id) }).then(user => {
-            if (!user) {
-              return null;
-            }
-            const { _id, username, fullname, photo, verified } = user;
-            return { id: _id, username, fullname, photo, verified };
-          });
+          return userResolver.user({ id }, { db });
         },
       },
       users: {

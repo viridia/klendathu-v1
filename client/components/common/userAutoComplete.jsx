@@ -1,9 +1,20 @@
 import React from 'react';
-import axios from 'axios';
+import { withApollo } from 'react-apollo';
+import ApolloClient from 'apollo-client';
+import gql from 'graphql-tag';
 import AutoCompleteChips from './ac/autocompleteChips.jsx';
 import Chip from './ac/chip.jsx';
 
-export default class UserAutoComplete extends React.Component {
+const UserQuery = gql`query UsersQuery($token:String!) {
+  users(token: $token) {
+    username
+    fullname
+    id
+    photo
+  }
+}`;
+
+class UserAutoComplete extends React.Component {
   constructor(props) {
     super(props);
     this.onSearch = this.onSearch.bind(this);
@@ -17,7 +28,10 @@ export default class UserAutoComplete extends React.Component {
     if (token.length < 1) {
       callback([]);
     } else {
-      axios.get('user', { params: { project: this.props.project.id, token } }).then(resp => {
+      this.props.client.query({
+        query: UserQuery,
+        variables: { token, project: this.props.project.id },
+      }).then(resp => {
         callback(resp.data.users);
       });
     }
@@ -68,4 +82,7 @@ UserAutoComplete.propTypes = {
   multiple: React.PropTypes.bool,
   onSelect: React.PropTypes.func,
   onFocusNext: React.PropTypes.func,
+  client: React.PropTypes.instanceOf(ApolloClient).isRequired,
 };
+
+export default withApollo(UserAutoComplete);
