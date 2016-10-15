@@ -2,9 +2,7 @@ const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
 
 function serialize(issue) {
-  return Object.assign({}, issue, {
-    _id: issue.id,
-  });
+  return Object.assign({}, issue);
 }
 
 module.exports = {
@@ -23,15 +21,16 @@ module.exports = {
 
   issues({ project, token }, { db }) {
     const query = {};
-    if (project) {
-      query.project = project;
+    if (!project) {
+      return Promise.reject(400);
     }
-    return db.collection('issues').find(query).sort({ created: -1 }).toArray()
+    query.project = new ObjectId(project);
+    return db.collection('issues').find(query).sort({ id: -1 }).toArray()
         .then(issues => issues.map(serialize));
   },
 
   newIssue({ project, issue }, { db, user }) {
-    if (!this.user) {
+    if (!user) {
       return Promise.reject(401);
     }
     if (!issue.type || !issue.state || !issue.summary) {
@@ -40,7 +39,10 @@ module.exports = {
     }
     const projects = db.collection('projects');
     const issues = db.collection('issues');
-    return projects.findOne({ _id: new ObjectId(project) }).then(p => {
+    return projects.findOneAndUpdate(
+        { _id: new ObjectId(project) },
+        { $inc: { issueIdCounter: 1 } })
+    .then(p => {
       if (!p) {
         logger.error('Non-existent project', project);
         return Promise.reject(404);
@@ -48,6 +50,7 @@ module.exports = {
       // TODO: Ownership test.
       const now = new Date();
       const record = {
+        id: p.value.issueIdCounter,
         project: new ObjectId(project),
         type: issue.type,
         state: issue.state,
@@ -64,8 +67,7 @@ module.exports = {
       };
       // Insert new user into the database.
       return issues.insertOne(record).then(result => {
-        logger.info(result.insertedId);
-        return { id: result.insertedId };
+        return { id: result.ops[0].id };
       }, error => {
         logger.error('Error creating issue', issue, error);
         return Promise.reject(500);

@@ -29,12 +29,12 @@ class Page extends React.Component {
   }
 
   render() {
-    const { children, location, params, data: { errors } } = this.props;
+    const { children, location, params, data: { errors, profile } } = this.props;
     if (errors) {
       return <p>{JSON.stringify(errors)}</p>;
     }
     const child = React.Children.only(children);
-    const main = React.cloneElement(child, { params });
+    const main = React.cloneElement(child, { params, profile });
     return (<div className="kdt page">
       <ReduxToastr />
       <Header location={location} params={params} />

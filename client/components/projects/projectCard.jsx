@@ -1,14 +1,12 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 import Button from 'react-bootstrap/lib/Button';
 import Modal from 'react-bootstrap/lib/Modal';
 import UserName from '../common/userName.jsx';
 import { deleteProject } from '../../store/projects';
 import './projectCard.scss';
 
-class ProjectCard extends React.Component {
+export default class ProjectCard extends React.Component {
   constructor() {
     super();
     this.onShowDelete = this.onShowDelete.bind(this);
@@ -30,12 +28,13 @@ class ProjectCard extends React.Component {
   onConfirmDelete(ev) {
     ev.preventDefault();
     this.setState({ showDelete: false });
-    this.props.deleteProject(this.props.project.name);
+    deleteProject(this.props.project.id).then(() => {
+      this.props.onChange();
+    });
   }
 
   render() {
     const { project } = this.props;
-    const { profile } = this.context;
     return (
       <div className="card internal project-card" key={project.name}>
         {this.state.showDelete && (
@@ -60,9 +59,7 @@ class ProjectCard extends React.Component {
             <div className="owned-by">
               Owned by: <UserName user={project.owningUser} />
             </div>
-            <div className="owned-by">
-              {profile.id === project.owningUser && <span>role: owner</span>}
-            </div>
+            <div className="role">Role: {project.role.rank.toLowerCase()}</div>
           </div>
           <div>
             <Button bsStyle="primary" onClick={this.onShowDelete}>Delete</Button>
@@ -75,16 +72,8 @@ class ProjectCard extends React.Component {
 
 ProjectCard.propTypes = {
   project: PropTypes.shape({
+    id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
   }).isRequired,
-  deleteProject: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
-
-ProjectCard.contextTypes = {
-  profile: PropTypes.shape({}).isRequired,
-};
-
-export default connect(
-  (state) => ({ profile: state.profile }),
-  dispatch => bindActionCreators({ deleteProject }, dispatch),
-)(ProjectCard);

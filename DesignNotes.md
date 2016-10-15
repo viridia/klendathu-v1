@@ -1,5 +1,7 @@
 Hot loading?
 New React Router?
+* I think we're going to need tests for the graphql stuff, and the tests will probably need
+  a real db.
 * Custom suggest field / enter key support.
   * Will be easier once we have some data
   * Get rid of typeahead

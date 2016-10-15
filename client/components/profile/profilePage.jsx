@@ -39,3 +39,9 @@ export default class ProfilePage extends React.Component {
     </section>);
   }
 }
+
+ProfilePage.contextTypes = {
+  profile: React.PropTypes.shape({
+    // username: React.PropTypes.string,
+  }),
+};

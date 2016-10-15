@@ -20,7 +20,7 @@ export default class Dashboard extends React.Component {
           <Button bsStyle="primary"><AddBoxIcon />New Project...</Button>
         </header>
         <ProjectList />
-      </section>;
+      </section>
     </div>);
   }
 }

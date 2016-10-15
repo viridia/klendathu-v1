@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { graphql } from 'react-apollo';
+import { toastr } from 'react-redux-toastr';
 import gql from 'graphql-tag';
 import Button from 'react-bootstrap/lib/Button';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
@@ -198,7 +199,9 @@ class IssueCompose extends React.Component {
         project: this.props.project.id,
       },
     }).then(resp => {
-      console.log(resp);
+      console.log('onCreate', resp);
+      toastr.success(`Issue #${resp.data.newIssue.id} created.`);
+      this.reset();
     });
     // console.log('create', this.props.issue);
   }

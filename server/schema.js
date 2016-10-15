@@ -5,6 +5,7 @@ const issueInputType = require('./schemas/issueInputType');
 const labelType = require('./schemas/labelType');
 const userType = require('./schemas/userType');
 const projectType = require('./schemas/projectType');
+const projectInputType = require('./schemas/projectInputType');
 const templateType = require('./schemas/templateType');
 const workflowType = require('./schemas/workflowType');
 const userResolver = require('./resolvers/user');
@@ -22,7 +23,7 @@ module.exports = new GraphQLSchema({
       issues: {
         type: new GraphQLNonNull(new GraphQLList(issueType)),
         args: {
-          id: { type: GraphQLID },
+          project: { type: GraphQLID },
           token: { type: GraphQLString },
         },
       },
@@ -123,19 +124,11 @@ module.exports = new GraphQLSchema({
         },
       },
       newProject: {
-        type: new GraphQLNonNull(new GraphQLList(projectType)),
+        type: new GraphQLNonNull(projectType),
         args: {
-          name: {
-            type: GraphQLString,
-            description: 'Unique name of this project.',
-          },
-          title: {
-            type: GraphQLString,
-            description: 'Short description of the project.',
-          },
-          description: {
-            type: GraphQLString,
-            description: 'A more detailed description of the project.',
+          project: {
+            type: projectInputType,
+            description: 'Contents of the project to be created.',
           },
         },
       },
@@ -146,13 +139,9 @@ module.exports = new GraphQLSchema({
             type: new GraphQLNonNull(GraphQLID),
             description: 'Id of the project to update.',
           },
-          title: {
-            type: GraphQLString,
-            description: 'Short description of the project.',
-          },
-          description: {
-            type: GraphQLString,
-            description: 'A more detailed description of the project.',
+          project: {
+            type: projectInputType,
+            description: 'Contents of the project to be updated.',
           },
         },
       },

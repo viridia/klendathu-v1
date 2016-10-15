@@ -85,11 +85,19 @@ mongo.then(db => {
     graphiql: true,
     // rootValue: { db: req.db, user: req.user },
     rootValue: new RootResolver(req.db, req.user),
-    formatError: error => ({
-      message: error.message,
-      locations: error.locations,
-      stack: error.stack,
-    }),
+    formatError: error => {
+      if (error.originalError) {
+        logger.error('original error:', error.originalError);
+      } else {
+        logger.error(error);
+      }
+      return {
+        message: error.message,
+        locations: error.locations,
+        stack: error.stack,
+        details: error.originalError,
+      };
+    },
   })));
 
   app.use('/api', apiRouter);

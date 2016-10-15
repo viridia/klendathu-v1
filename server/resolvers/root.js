@@ -40,14 +40,18 @@ class RootResolver {
   }
 }
 
-RootResolver.prototype.issue = issueResolver.issue;
-RootResolver.prototype.issues = issueResolver.issues;
-RootResolver.prototype.newIssue = issueResolver.newIssue;
-RootResolver.prototype.project = projectResolver.project;
-RootResolver.prototype.projects = projectResolver.projects;
-RootResolver.prototype.template = templateResolver.template;
-RootResolver.prototype.updateProject = projectResolver.update;
-RootResolver.prototype.users = userResolver.users;
-RootResolver.prototype.workflow = workflowResolver.workflow;
+Object.assign(RootResolver.prototype, {
+  deleteProject: projectResolver.delete,
+  issue: issueResolver.issue,
+  issues: issueResolver.issues,
+  newIssue: issueResolver.newIssue,
+  newProject: projectResolver.newProject,
+  project: projectResolver.project,
+  projects: projectResolver.projects,
+  template: templateResolver.template,
+  updateProject: projectResolver.update,
+  users: userResolver.users,
+  workflow: workflowResolver.workflow,
+});
 
 module.exports = RootResolver;

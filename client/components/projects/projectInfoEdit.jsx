@@ -2,13 +2,11 @@ import React, { PropTypes } from 'react';
 import Button from 'react-bootstrap/lib/Button';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FormControl from 'react-bootstrap/lib/FormControl';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import { saveProject, updateProject } from '../../store/projects';
+import { saveProject } from '../../store/projects';
 import UserName from '../common/userName.jsx';
 import pick from '../../lib/pick';
 
-class ProjectInfoEdit extends React.Component {
+export default class ProjectInfoEdit extends React.Component {
   constructor(props) {
     super();
     this.onChangeTitle = this.onChangeTitle.bind(this);
@@ -39,7 +37,7 @@ class ProjectInfoEdit extends React.Component {
     e.preventDefault();
     e.stopPropagation();
     const state = pick(this.state, ['title', 'description']);
-    this.props.saveProject(this.props.project.id, state).then(resp => {
+    saveProject(this.props.project.id, state).then(resp => {
       this.setState(pick(resp.data.updateProject, ['title', 'description']));
     });
   }
@@ -103,11 +101,4 @@ ProjectInfoEdit.propTypes = {
     owningUser: PropTypes.string,
     owningOrg: PropTypes.string,
   }),
-  saveProject: PropTypes.func.isRequired,
-  updateProject: PropTypes.func.isRequired,
 };
-
-export default connect(
-  null,
-  dispatch => bindActionCreators({ saveProject, updateProject }, dispatch),
-)(ProjectInfoEdit);
