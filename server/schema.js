@@ -1,5 +1,7 @@
 const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLID, GraphQLNonNull }
-  = require('graphql');
+    = require('graphql');
+const issueType = require('./schemas/issueType');
+const issueInputType = require('./schemas/issueInputType');
 const labelType = require('./schemas/labelType');
 const userType = require('./schemas/userType');
 const projectType = require('./schemas/projectType');
@@ -11,6 +13,19 @@ module.exports = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: 'Query',
     fields: {
+      issue: {
+        type: issueType,
+        args: {
+          id: { type: GraphQLID },
+        },
+      },
+      issues: {
+        type: new GraphQLNonNull(new GraphQLList(issueType)),
+        args: {
+          id: { type: GraphQLID },
+          token: { type: GraphQLString },
+        },
+      },
       project: {
         type: projectType,
         args: {
@@ -72,6 +87,41 @@ module.exports = new GraphQLSchema({
   mutation: new GraphQLObjectType({
     name: 'Mutation',
     fields: {
+      newIssue: {
+        type: new GraphQLNonNull(issueType),
+        args: {
+          project: {
+            type: new GraphQLNonNull(GraphQLID),
+            description: 'Id of the project the new issue is being added to.',
+          },
+          issue: {
+            type: issueInputType,
+            description: 'Contents of the issue to be created.',
+          },
+        },
+      },
+      updateIssue: {
+        type: new GraphQLNonNull(issueType),
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLID),
+            description: 'Id of the issue to update.',
+          },
+          issue: {
+            type: issueInputType,
+            description: 'Contents of the issue to be created.',
+          },
+        },
+      },
+      deleteIssue: {
+        type: new GraphQLNonNull(new GraphQLList(issueType)),
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLID),
+            description: 'Id of the issue to delete.',
+          },
+        },
+      },
       newProject: {
         type: new GraphQLNonNull(new GraphQLList(projectType)),
         args: {
@@ -94,7 +144,7 @@ module.exports = new GraphQLSchema({
         args: {
           id: {
             type: new GraphQLNonNull(GraphQLID),
-            description: 'Id of the project to change.',
+            description: 'Id of the project to update.',
           },
           title: {
             type: GraphQLString,

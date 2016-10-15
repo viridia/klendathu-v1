@@ -1,4 +1,10 @@
 Hot loading?
+New React Router?
+* Custom suggest field / enter key support.
+  * Will be easier once we have some data
+  * Get rid of typeahead
+* Get closer to submitting an issue
+* Search users on both username and fullname.
 * Click on autocomplete menu (in addition to ENTER).
 * Deletion of labels
 * Editing of labels

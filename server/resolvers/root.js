@@ -1,5 +1,6 @@
 const { ObjectId } = require('mongodb');
 const escapeRegExp = require('../lib/escapeRegExp');
+const issueResolver = require('../resolvers/issue');
 const projectResolver = require('../resolvers/project');
 const templateResolver = require('../resolvers/template');
 const workflowResolver = require('../resolvers/workflow');
@@ -39,6 +40,9 @@ class RootResolver {
   }
 }
 
+RootResolver.prototype.issue = issueResolver.issue;
+RootResolver.prototype.issues = issueResolver.issues;
+RootResolver.prototype.newIssue = issueResolver.newIssue;
 RootResolver.prototype.project = projectResolver.project;
 RootResolver.prototype.projects = projectResolver.projects;
 RootResolver.prototype.template = templateResolver.template;

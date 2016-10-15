@@ -1,6 +1,10 @@
 const { ObjectId } = require('mongodb');
 const escapeRegExp = require('../lib/escapeRegExp');
-const logger = require('../common/logger');
+
+function serialize(user) {
+  const { _id, username, fullname, photo, verified } = user;
+  return { id: _id, username, fullname, photo, verified };
+}
 
 module.exports = {
   user({ id }, { db }) {
@@ -8,8 +12,7 @@ module.exports = {
       if (!user) {
         return null;
       }
-      const { _id, username, fullname, photo, verified } = user;
-      return { id: _id, username, fullname, photo, verified };
+      return serialize(user);
     });
   },
 
@@ -23,11 +26,6 @@ module.exports = {
       query.fullname = { $regex: pattern, $options: 'i' };
     }
     return db.collection('users').find(query).sort({ fullname: 1 }).toArray()
-    .then(users => {
-      return users.map(user => {
-        const { _id, username, fullname, photo, verified } = user;
-        return { id: _id, username, fullname, photo, verified };
-      });
-    });
+    .then(users => users.map(serialize));
   },
 };

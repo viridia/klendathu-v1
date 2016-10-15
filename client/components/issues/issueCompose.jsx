@@ -1,6 +1,8 @@
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import Button from 'react-bootstrap/lib/Button';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
@@ -15,7 +17,7 @@ import StateSelector from './stateSelector.jsx';
 import TypeSelector from './typeSelector.jsx';
 import CustomEnumField from './customEnumField.jsx';
 import UserName from '../common/userName.jsx';
-import { setIssueType, setIssueSummary, setIssueDescription, setCustomField,
+import { setIssueType, setIssueState, setIssueSummary, setIssueDescription, setCustomField,
   addIssueCC, addIssueComment, resetIssue } from '../../store/actions';
 import './issues.scss';
 
@@ -103,13 +105,13 @@ class IssueCompose extends React.Component {
     this.onChangeReporter = this.onChangeReporter.bind(this);
     this.onChangeOwner = this.onChangeOwner.bind(this);
     this.onChangePublic = this.onChangePublic.bind(this);
+    this.onChangeAnother = this.onChangeAnother.bind(this);
     this.onChangeCommentText = this.onChangeCommentText.bind(this);
     this.onAddCC = this.onAddCC.bind(this);
     this.onAddComment = this.onAddComment.bind(this);
-    this.onAddLabel = this.onAddLabel.bind(this);
-    this.onSearchLabels = this.onSearchLabels.bind(this);
     this.onFocusNext = this.onFocusNext.bind(this);
     this.onFocusPrev = this.onFocusPrev.bind(this);
+    this.onCreate = this.onCreate.bind(this);
     this.me = { id: context.profile.username, label: context.profile.username };
     this.templateTypes = new Map();
     this.state = {
@@ -120,6 +122,7 @@ class IssueCompose extends React.Component {
       reporter: this.me,
       owner: null,
       commentText: '',
+      another: false,
     };
   }
 
@@ -166,37 +169,12 @@ class IssueCompose extends React.Component {
     this.setState({ public: e.target.checked });
   }
 
+  onChangeAnother(e) {
+    this.setState({ another: e.target.checked });
+  }
+
   onAddCC(e) {
     this.props.addIssueCC(e.id);
-  }
-
-  onSearchLabels(token, callback) {
-    if (token.length === 0) {
-      callback([]);
-    } else {
-      const colors = [
-        'Black',
-        'Blue',
-        'Coral',
-        'Cyan',
-        'Gray',
-        'Green',
-        'Magenta',
-        'Orange',
-        'Pink',
-        'Purple',
-        'Red',
-        'Rose',
-        'Violet',
-        'Yellow',
-      ];
-      const tokLower = token.toLowerCase();
-      callback(colors.filter(color => color.toLowerCase().startsWith(tokLower)));
-    }
-  }
-
-  onAddLabel(e) {
-    console.info(e);
   }
 
   onChangeCommentText(e) {
@@ -212,12 +190,29 @@ class IssueCompose extends React.Component {
     this.setState({ commentText: '' });
   }
 
+  onCreate(e) {
+    e.preventDefault();
+    this.props.newIssue({
+      variables: {
+        issue: this.props.issue,
+        project: this.props.project.id,
+      },
+    }).then(resp => {
+      console.log(resp);
+    });
+    // console.log('create', this.props.issue);
+  }
+
   reset() {
     const { project } = this.props;
     const concreteTypes = project.template.types.filter(t => !t.abstract);
+    const initialState = project.workflow.start || 'new';
+    this.setState({ selectedState: initialState });
     this.props.resetIssue();
     this.props.setIssueType(concreteTypes[0].id);
-    this.setState({ selectedState: project.workflow.start || project.workflow.states[0].id });
+    this.props.setIssueState(initialState);
+    this.props.setIssueSummary('');
+    this.props.setIssueDescription('');
   }
 
   buildTypeMap() {
@@ -452,8 +447,14 @@ class IssueCompose extends React.Component {
           </aside>
         </section>
         <footer className="submit-buttons">
+          <Checkbox checked={this.state.another} onChange={this.onChangeAnother}>
+            Create another
+          </Checkbox>
           <Button>Cancel</Button>
-          <Button bsStyle="primary"><AddBoxIcon />Create</Button>
+          <Button
+              bsStyle="primary"
+              disabled={!issue.summary}
+              onClick={this.onCreate}><AddBoxIcon />Create</Button>
         </footer>
       </div>
     </section>);
@@ -463,6 +464,7 @@ class IssueCompose extends React.Component {
 IssueCompose.propTypes = {
   issue: PropTypes.shape({}),
   project: PropTypes.shape({
+    id: PropTypes.string.isRequired,
     workflow: PropTypes.shape({}),
     template: PropTypes.shape({}),
   }).isRequired,
@@ -473,9 +475,12 @@ IssueCompose.propTypes = {
   addIssueComment: PropTypes.func.isRequired,
   resetIssue: PropTypes.func.isRequired,
   setIssueType: PropTypes.func.isRequired,
+  setIssueState: PropTypes.func.isRequired,
   setIssueSummary: PropTypes.func.isRequired,
   setIssueDescription: PropTypes.func.isRequired,
   setCustomField: PropTypes.func.isRequired,
+  newIssue: PropTypes.func.isRequired,
+  updateIssue: PropTypes.func.isRequired,
 };
 
 IssueCompose.contextTypes = {
@@ -485,17 +490,32 @@ IssueCompose.contextTypes = {
   }),
 };
 
-export default connect(
-  (state) => ({
-    issue: state.issue,
-  }),
-  dispatch => bindActionCreators({
-    addIssueCC,
-    addIssueComment,
-    resetIssue,
-    setIssueType,
-    setIssueSummary,
-    setIssueDescription,
-    setCustomField,
-  }, dispatch)
-)(IssueCompose);
+const NewIssueMutation = gql`mutation NewIssueMutation($project: ID!, $issue: IssueInput!) {
+  newIssue(project: $project, issue: $issue) {
+    id
+  }
+}`;
+
+const UpdateIssueMutation = gql`mutation UpdateIssueMutation($id: ID!, $issue: IssueInput!) {
+  updateIssue(id: $id, issue: $issue) {
+    id
+  }
+}`;
+
+export default graphql(NewIssueMutation, { name: 'newIssue' })(
+  graphql(UpdateIssueMutation, { name: 'updateIssue' })(
+  connect(
+    (state) => ({
+      issue: state.issue,
+    }),
+    dispatch => bindActionCreators({
+      addIssueCC,
+      addIssueComment,
+      resetIssue,
+      setIssueType,
+      setIssueState,
+      setIssueSummary,
+      setIssueDescription,
+      setCustomField,
+    }, dispatch)
+)(IssueCompose)));
