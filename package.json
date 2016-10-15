@@ -9,6 +9,7 @@
     "client-build": "cd client && webpack",
     "start": "pm2 --node-args=\"--harmony\" start process.json",
     "stop": "pm2 kill",
+    "debug": "node --inspect --harmony server",
     "build-container": "docker build -t viridia/klendathu .",
     "start-container": "docker run --rm -it -u app -p 49160:8080 --name klendathu -v $(pwd):/usr/src/app viridia/klendathu",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -55,7 +56,6 @@
     "express-http-proxy": "^0.10.0",
     "express-session": "^1.14.1",
     "file-loader": "^0.9.0",
-    "fs": "0.0.1-security",
     "graphiql": "^0.7.8",
     "graphql": "^0.7.1",
     "graphql-date": "^1.0.2",

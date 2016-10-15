@@ -16,6 +16,7 @@ const issuesActions = require('./actions/issues');
 const workflowsActions = require('./actions/workflows');
 const templatesActions = require('./actions/templates');
 const schema = require('./schema');
+const RootResolver = require('./resolvers/root');
 const logger = require('./common/logger');
 
 // Constants
@@ -64,14 +65,14 @@ mongo.then(db => {
   app.use('/fonts', express.static(path.join(__dirname, '../client/media/fonts')));
   app.use('/favicon', express.static(path.join(__dirname, '../client/media/favicon')));
 
-  // Import routes
+  // Set up AJAX routes.
   const apiRouter = express.Router(); // eslint-disable-line new-cap
 
   // Initialize passport on /api route only.
-  const passportMiddleware = passport.initialize();
-  apiRouter.use(passportMiddleware);
+  apiRouter.use(passport.initialize());
   apiRouter.use(passport.session());
 
+  // TODO: Break passport initialization into it's own module.
   authActions(app, apiRouter);
   labelsActions(app, apiRouter);
   projectsActions(app, apiRouter);
@@ -81,19 +82,17 @@ mongo.then(db => {
   templatesActions(app, apiRouter);
 
   // Register GraphQL middleware
-  apiRouter.use('/gql', graphql(req => {
-    logger.info('user:', req.user);
-    return {
-      schema,
-      graphiql: true,
-      rootValue: { db: req.db, user: req.user },
-      formatError: error => ({
-        message: error.message,
-        locations: error.locations,
-        stack: error.stack,
-      }),
-    };
-  }));
+  apiRouter.use('/gql', graphql(req => ({
+    schema,
+    graphiql: true,
+    // rootValue: { db: req.db, user: req.user },
+    rootValue: new RootResolver(req.db, req.user),
+    formatError: error => ({
+      message: error.message,
+      locations: error.locations,
+      stack: error.stack,
+    }),
+  })));
 
   app.use('/api', apiRouter);
 

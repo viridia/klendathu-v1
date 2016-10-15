@@ -14,23 +14,27 @@ class WorkflowEdit extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.workflow.name !== this.props.name ||
-        this.props.workflow.project !== this.props.project) {
-      this.props.editWorkflow(this.props.workflow);
-    }
+    // const workflow = this.props.project.workflow;
+    // if (workflow.name !== this.props.name ||
+    //     this.props.workflow.project.name !== this.props.project.name) {
+    //   this.props.editWorkflow(this.props.workflow);
+    // }
   }
 
   onSave(e) {
     e.preventDefault();
-    this.props.saveWorkflow(this.props.project, this.props.name);
+    // this.props.saveWorkflow(this.props.project.name, this.props.name);
   }
 
   render() {
     const { name, project } = this.props;
+    if (project) {
+      return <section className="settings-tab-pane" />;
+    }
     return (
       <section className="settings-tab-pane">
         <header>
-          <span className="title">Workflow: {project}/{name}</span>
+          <span className="title">Workflow: {project.name}/{name}</span>
           <Button bsStyle="primary" disabled={!this.props.modified} onClick={this.onSave}>
             Save
           </Button>
@@ -50,7 +54,10 @@ WorkflowEdit.propTypes = {
     project: React.PropTypes.string,
   }),
   name: React.PropTypes.string,
-  project: React.PropTypes.string,
+  project: React.PropTypes.shape({
+    name: React.PropTypes.string.isRequired,
+    workflow: React.PropTypes.shape({}),
+  }).isRequired,
   modified: React.PropTypes.bool,
   editWorkflow: React.PropTypes.func.isRequired,
   saveWorkflow: React.PropTypes.func.isRequired,
@@ -60,7 +67,7 @@ export default connect(
   (state) => ({
     name: state.workflows.$name,
     modified: state.workflows.$modified,
-    project: state.workflows.$project,
+    // project: state.workflows.$project,
   }),
   dispatch => bindActionCreators({ editWorkflow, saveWorkflow }, dispatch),
 )(WorkflowEdit);

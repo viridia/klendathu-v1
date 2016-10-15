@@ -1,5 +1,9 @@
 const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLNonNull } = require('graphql');
 const GraphQLDate = require('graphql-date');
+const templateType = require('./templateType');
+const templateResolver = require('../resolvers/template');
+const workflowType = require('./workflowType');
+const workflowResolver = require('../resolvers/workflow');
 
 module.exports = new GraphQLObjectType({
   name: 'Project',
@@ -21,5 +25,17 @@ module.exports = new GraphQLObjectType({
     owningOrg: { type: GraphQLID },
     created: { type: new GraphQLNonNull(GraphQLDate) },
     updated: { type: new GraphQLNonNull(GraphQLDate) },
+    template: {
+      type: templateType,
+      resolve(project, _, { db, user }) {
+        return templateResolver.template({ project: 'std', name: 'software' }, { db, user });
+      },
+    },
+    workflow: {
+      type: workflowType,
+      resolve(project, _, { db, user }) {
+        return workflowResolver.workflow({ project: 'std', name: 'bugtrack' }, { db, user });
+      },
+    },
   },
 });

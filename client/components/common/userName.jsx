@@ -1,25 +1,11 @@
-import React from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import { fetchUserInfo } from '../../store/userInfo';
+import React, { PropTypes } from 'react';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 
 class UserName extends React.Component {
-  componentDidMount() {
-    const { user } = this.props;
-    if (user) {
-      this.props.fetchUserInfo(user);
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.user && nextProps.user !== this.props.user) {
-      this.props.fetchUserInfo(nextProps.user);
-    }
-  }
-
   render() {
-    const { userInfo } = this.props;
-    if (userInfo && userInfo.loaded) {
+    const userInfo = this.props.data.user;
+    if (userInfo) {
       return <span className="user-name">{userInfo.username}</span>;
     } else {
       return <span className="user-name" />;
@@ -29,14 +15,20 @@ class UserName extends React.Component {
 
 UserName.propTypes = {
   user: React.PropTypes.string.isRequired,
-  userInfo: React.PropTypes.shape({
-    fetching: React.PropTypes.bool,
-    username: React.PropTypes.string,
+  data: PropTypes.shape({
+    user: PropTypes.shape({}),
   }),
-  fetchUserInfo: React.PropTypes.func.isRequired,
 };
 
-export default connect(
-  (state, ownProps) => ({ userInfo: state.userInfo[ownProps.user] }),
-  dispatch => bindActionCreators({ fetchUserInfo }, dispatch),
-)(UserName);
+const UserQuery = gql`query UserQuery($user: ID!) {
+  user(id: $user) {
+    id
+    username
+    fullname
+    photo
+  }
+}`;
+
+export default graphql(UserQuery, {
+  options: ({ user }) => ({ variables: { user } }),
+})(UserName);

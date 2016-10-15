@@ -1,11 +1,11 @@
 import React from 'react';
 import { browserHistory } from 'react-router';
+import { withApollo } from 'react-apollo';
+import ApolloClient from 'apollo-client';
+import axios from 'axios';
 import { LinkContainer } from 'react-router-bootstrap';
 import DropdownButton from 'react-bootstrap/lib/DropdownButton';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import { logout } from '../../store/profile';
 
 class UserMenuButton extends React.Component {
   constructor() {
@@ -15,14 +15,15 @@ class UserMenuButton extends React.Component {
 
   onSignOut(e) {
     e.preventDefault();
-    this.props.logout().then(() => {
+    axios.post('logout').then(() => {
+      this.props.client.resetStore();
       browserHistory.push({ pathname: '/login' });
     });
   }
 
   render() {
-    const { profile } = this.props;
-    if (!profile.id) {
+    const { profile } = this.context;
+    if (!profile) {
       return null;
     }
     return (<DropdownButton bsStyle="primary" title={profile.username} id="user-menu" pullRight>
@@ -30,7 +31,6 @@ class UserMenuButton extends React.Component {
         <MenuItem eventKey="1">Your Profile</MenuItem>
       </LinkContainer>
       <MenuItem eventKey="2">Another action</MenuItem>
-      <MenuItem eventKey="3" active>Active Item</MenuItem>
       <MenuItem divider />
       <MenuItem eventKey="4" onClick={this.onSignOut}>Sign out</MenuItem>
     </DropdownButton>);
@@ -38,14 +38,11 @@ class UserMenuButton extends React.Component {
 }
 
 UserMenuButton.propTypes = {
-  profile: React.PropTypes.shape({
-  }),
-  logout: React.PropTypes.func.isRequired,
+  client: React.PropTypes.instanceOf(ApolloClient).isRequired,
 };
 
-export default connect(
-  (state) => ({
-    profile: state.profile,
-  }),
-  dispatch => bindActionCreators({ logout }, dispatch),
-)(UserMenuButton);
+UserMenuButton.contextTypes = {
+  profile: React.PropTypes.shape({}),
+};
+
+export default withApollo(UserMenuButton);

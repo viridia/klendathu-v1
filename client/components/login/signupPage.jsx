@@ -1,18 +1,18 @@
 import React from 'react';
 import { browserHistory } from 'react-router';
+import { withApollo } from 'react-apollo';
 import Button from 'react-bootstrap/lib/Button';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import FormGroup from 'react-bootstrap/lib/FormGroup';
 import HelpBlock from 'react-bootstrap/lib/HelpBlock';
+import ApolloClient from 'apollo-client';
 import { LinkContainer } from 'react-router-bootstrap';
 import axios from 'axios';
-import Store from '../../store/store';
 import Header from '../common/header.jsx';
-import { login } from '../../store/profile';
 import './login.scss';
 
-export default class SignUpPage extends React.Component {
+class SignUpPage extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -66,8 +66,8 @@ export default class SignUpPage extends React.Component {
           errState.password2Error = 'Confirmation password does not match.';
           break;
         default: {
+          this.props.client.resetStore();
           const { next } = this.props.location.query;
-          Store.dispatch(login(resp.data));
           browserHistory.push({ pathname: next || '/' });
           return;
         }
@@ -182,4 +182,7 @@ SignUpPage.propTypes = {
     }),
   }).isRequired,
   params: React.PropTypes.shape({}),
+  client: React.PropTypes.instanceOf(ApolloClient).isRequired,
 };
+
+export default withApollo(SignUpPage);

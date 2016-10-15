@@ -187,7 +187,7 @@ export default class AutoCompleteChips extends React.Component {
         <a role="menuitem" tabIndex="-1" href="">{onRenderSuggestion(s)}</a>
       </li>);
     });
-    if (menu.length > 0 && suggestionsSuffix) {
+    if (menu.length > 0 && suggestionsSuffix.length > 0) {
       menu.push(<hr key="-hr-" />);
     }
     const suffix = suggestionsSuffix.map((s, index) => {

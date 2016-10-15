@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import DropdownButton from 'react-bootstrap/lib/DropdownButton';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
-import { setCustomField } from '../../store/issues';
+import { setCustomField } from '../../store/actions';
 import './issues.scss';
 
 class CustomEnumField extends React.Component {
@@ -42,7 +42,7 @@ CustomEnumField.propTypes = {
 
 export default connect(
   (state) => ({
-    issue: state.issues.$edit,
+    issue: state.issue,
   }),
   dispatch => bindActionCreators({ setCustomField }, dispatch)
 )(CustomEnumField);

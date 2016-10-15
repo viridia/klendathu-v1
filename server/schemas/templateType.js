@@ -40,6 +40,10 @@ const issueType = new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLString),
       description: 'Unique id of this issue type.',
     },
+    caption: {
+      type: GraphQLString,
+      description: 'Name of this issue type.',
+    },
     abstract: {
       type: GraphQLBoolean,
       description: 'If false, means you cannot create issues of this type.',

@@ -1,5 +1,4 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import Tab from 'react-bootstrap/lib/Tab';
 import Tabs from 'react-bootstrap/lib/Tabs';
 import ProjectInfoEdit from '../projects/projectInfoEdit.jsx';
@@ -7,7 +6,7 @@ import ProjectTemplateEdit from '../projects/projectTemplateEdit.jsx';
 import WorkflowEdit from '../workflow/workflowEdit.jsx';
 import './settings.scss';
 
-class ProjectSettings extends React.Component {
+export default class ProjectSettings extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.state = { selected: 1 };
@@ -19,6 +18,9 @@ class ProjectSettings extends React.Component {
   }
 
   render() {
+    if (!this.props.project) {
+      return <section className="kdt project-settings" />;
+    }
     return (<section className="kdt project-settings">
       <header>Project settings</header>
       <Tabs
@@ -40,11 +42,6 @@ class ProjectSettings extends React.Component {
   }
 }
 
-export default connect(
-  (state, ownProps) => ({
-    project: state.projects.byId.get(ownProps.params.project),
-    workflow: state.workflows['std/bugtrack'],
-    editWorkflow: state.workflows.$edit,
-  }),
-  null,
-)(ProjectSettings);
+ProjectSettings.propTypes = {
+  project: React.PropTypes.shape({}),
+};

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -34,7 +34,8 @@ class ProjectCard extends React.Component {
   }
 
   render() {
-    const { project, profile } = this.props;
+    const { project } = this.props;
+    const { profile } = this.context;
     return (
       <div className="card internal project-card" key={project.name}>
         {this.state.showDelete && (
@@ -52,7 +53,7 @@ class ProjectCard extends React.Component {
           </Modal>
         )}
         <div className="project-info">
-          <Link className="project-link" to={{ pathname: `/issues/${project.name}` }}>
+          <Link className="project-link" to={{ pathname: `/project/${project.name}/issues` }}>
             {project.name}
           </Link>
           <div className="project-owner">
@@ -73,13 +74,14 @@ class ProjectCard extends React.Component {
 }
 
 ProjectCard.propTypes = {
-  project: React.PropTypes.shape({
-    name: React.PropTypes.string.isRequired,
+  project: PropTypes.shape({
+    name: PropTypes.string.isRequired,
   }).isRequired,
-  profile: React.PropTypes.shape({
-    // id: React.PropTypes.string,
-  }),
-  deleteProject: React.PropTypes.func.isRequired,
+  deleteProject: PropTypes.func.isRequired,
+};
+
+ProjectCard.contextTypes = {
+  profile: PropTypes.shape({}).isRequired,
 };
 
 export default connect(

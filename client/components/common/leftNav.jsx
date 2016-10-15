@@ -26,32 +26,39 @@ NavItem.propTypes = {
 
 export default class LeftNav extends React.Component {
   render() {
-    const { project } = this.props.params;
+    const { project } = this.props;
     return (<nav className="kdt left-nav">
       <NavItem icon={<AppsIcon />} title="Dashboard" onlyActiveOnIndex path="/" />
       <NavItem
           icon={<ListIcon />}
           title="All Issues"
-          path={`/issues/${project}`}
+          path={`/project/${project}/issues`}
           query={{ owner: undefined }} />
       <NavItem
           icon={<PersonIcon />}
           title="My Open Issues"
-          path={`/issues/${project}`}
+          path={`/project/${project}/issues`}
           query={{ owner: 'me', status: 'open' }} />
-      <NavItem icon={<LocalOfferIcon />} title="Labels" path="/labels" />
+      <NavItem
+          icon={<LocalOfferIcon />}
+          title="Labels"
+          path={`/project/${project}/labels`} />
       <ul>
-        <li><Link to={`/labels/${project}`}>release-blockers</Link></li>
-        <li><Link to={`/labels/${project}`}>feature-set-1</Link></li>
+        <li><Link to={`/project/${project}/labels/1`}>release-blockers</Link></li>
+        <li><Link to={`/project/${project}/labels/2`}>feature-set-1</Link></li>
       </ul>
-      <NavItem icon={<BookmarkIcon />} title="Saved Queries" path={`/queries/${project}`} />
-      <NavItem icon={<SettingsIcon />} title="Project Settings" path={`/project/${project}`} />
+      <NavItem
+          icon={<BookmarkIcon />}
+          title="Saved Queries"
+          path={`/project/${project}/queries`} />
+      <NavItem
+          icon={<SettingsIcon />}
+          title="Project Settings"
+          path={`/project/${project}/settings`} />
     </nav>);
   }
 }
 
 LeftNav.propTypes = {
-  params: React.PropTypes.shape({
-    project: React.PropTypes.string.isRequired,
-  }),
+  project: React.PropTypes.string.isRequired,
 };

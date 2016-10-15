@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import Button from 'react-bootstrap/lib/Button';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FormControl from 'react-bootstrap/lib/FormControl';
@@ -6,15 +6,29 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { saveProject, updateProject } from '../../store/projects';
 import UserName from '../common/userName.jsx';
+import pick from '../../lib/pick';
 
 class ProjectInfoEdit extends React.Component {
   constructor(props) {
     super();
+    this.onChangeTitle = this.onChangeTitle.bind(this);
     this.onChangeDescription = this.onChangeDescription.bind(this);
     this.onSave = this.onSave.bind(this);
     this.state = {
       description: props.project.description,
+      title: props.project.title || '',
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.project.id !== this.props.project.id) {
+      const { title, description } = nextProps.project;
+      this.setState({ title, description });
+    }
+  }
+
+  onChangeTitle(e) {
+    this.setState({ title: e.target.value });
   }
 
   onChangeDescription(e) {
@@ -24,15 +38,17 @@ class ProjectInfoEdit extends React.Component {
   onSave(e) {
     e.preventDefault();
     e.stopPropagation();
-    this.props.updateProject(this.props.project.name, {
-      description: this.state.description,
+    const state = pick(this.state, ['title', 'description']);
+    this.props.saveProject(this.props.project.id, state).then(resp => {
+      this.setState(pick(resp.data.updateProject, ['title', 'description']));
     });
-    this.props.saveProject(this.props.project.name);
   }
 
   render() {
     const { project } = this.props;
-    const modified = project.description !== this.state.description;
+    const modified =
+        project.title !== this.state.title ||
+        project.description !== this.state.description;
     return (
       <section className="settings-tab-pane">
         <header>
@@ -43,6 +59,17 @@ class ProjectInfoEdit extends React.Component {
         </header>
         <table className="form-table">
           <tbody>
+            <tr>
+              <th className="header"><ControlLabel>Title:</ControlLabel></th>
+              <td>
+                <FormControl
+                    className="title"
+                    type="text"
+                    placeholder="title of the project"
+                    value={this.state.title}
+                    onChange={this.onChangeTitle} />
+              </td>
+            </tr>
             <tr>
               <th className="header"><ControlLabel>Description:</ControlLabel></th>
               <td>
@@ -68,17 +95,19 @@ class ProjectInfoEdit extends React.Component {
 }
 
 ProjectInfoEdit.propTypes = {
-  project: React.PropTypes.shape({
-    name: React.PropTypes.string.isRequired,
-    description: React.PropTypes.string.isRequired,
+  project: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    title: PropTypes.string,
+    description: PropTypes.string.isRequired,
+    owningUser: PropTypes.string,
+    owningOrg: PropTypes.string,
   }),
-  saveProject: React.PropTypes.func.isRequired,
-  updateProject: React.PropTypes.func.isRequired,
+  saveProject: PropTypes.func.isRequired,
+  updateProject: PropTypes.func.isRequired,
 };
 
 export default connect(
-  (state, ownProps) => ({
-    project: state.projects.byId.get(ownProps.params.project),
-  }),
+  null,
   dispatch => bindActionCreators({ saveProject, updateProject }, dispatch),
 )(ProjectInfoEdit);

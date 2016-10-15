@@ -2,8 +2,8 @@ import React from 'react';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import { ApolloProvider } from 'react-apollo';
 import Page from './page.jsx';
+import ProjectPage from './projectPage.jsx';
 import Dashboard from './dashboard/dashboard.jsx';
-import DashboardNav from './dashboard/dashboardNav.jsx';
 import IssueDetails from './issues/issueDetails.jsx';
 import IssueCompose from './issues/issueCompose.jsx';
 import IssueList from './issues/issueList.jsx';
@@ -12,52 +12,26 @@ import ProjectSettings from './settings/projectSettings.jsx';
 import ProfilePage from './profile/profilePage.jsx';
 import LoginPage from './login/loginPage.jsx';
 import SignUpPage from './login/signupPage.jsx';
-import LeftNav from './common/leftNav.jsx';
 import GraphQLPage from './debug/graphiql.jsx';
 import client from '../store/apollo';
 import store from '../store/store';
-import { fetchProfile } from '../store/profile';
-import { fetchProjects } from '../store/projects';
-import { fetchWorkflow } from '../store/workflows';
-import { fetchTemplate } from '../store/templates';
-
-// Make sure we have a user profile before we enter the main part of the app.
-function checkAuth(nextState, replace, callback) {
-  const state = store.getState();
-  if (!state.profile.id) {
-    // TODO: Combine into a single request.
-    store.dispatch(fetchProfile()).then(_resp => {
-      return Promise.all([
-        store.dispatch(fetchProjects()),
-        store.dispatch(fetchWorkflow('std', 'bugtrack')),
-        store.dispatch(fetchTemplate('std', 'software')),
-      ]).then(_resp2 => {
-        callback();
-      });
-    }, reason => {
-      replace({ pathname: '/login', query: { next: nextState.location.pathname } });
-      console.error('Error fetching user profile:', reason);
-      callback();
-    });
-  } else {
-    callback();
-  }
-}
 
 const Routes = (
   <ApolloProvider store={store} client={client}>
     <Router history={browserHistory}>
       <Route component={LoginPage} path="/login" />
       <Route component={SignUpPage} path="/signup" />
-      <Route component={GraphQLPage} path="/gql" onEnter={checkAuth} />
-      <Route component={Page} path="/" onEnter={checkAuth}>
-        <IndexRoute components={{ main: Dashboard, left: DashboardNav }} />
-        <Route components={{ main: ProfilePage }} path="/profile" />
-        <Route components={{ main: IssueCompose, left: LeftNav }} path="/issues/:project/new" />
-        <Route components={{ main: IssueDetails, left: LeftNav }} path="/issues/:project/:id" />
-        <Route components={{ main: IssueList, left: LeftNav }} path="/issues/:project" />
-        <Route components={{ main: LabelList, left: LeftNav }} path="/labels/:project" />
-        <Route components={{ main: ProjectSettings, left: LeftNav }} path="/project/:project" />
+      <Route component={Page} path="/">
+        <Route component={GraphQLPage} path="/gql" />
+        <Route component={ProjectPage} path="/project/:project">
+          <Route component={IssueCompose} path="/project/:project/new" />
+          <Route component={IssueDetails} path="/project/:project/issues/:id" />
+          <Route component={IssueList} path="/project/:project/issues" />
+          <Route component={LabelList} path="/project/:project/labels" />
+          <Route component={ProjectSettings} path="/project/:project/settings" />
+        </Route>
+        <IndexRoute component={Dashboard} />
+        <Route component={ProfilePage} path="/profile" />
       </Route>
     </Router>
   </ApolloProvider>

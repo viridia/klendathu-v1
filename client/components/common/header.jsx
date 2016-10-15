@@ -14,7 +14,7 @@ export default function Header(props) {
       <span> - </span>
       &ldquo;in order to <em>fight</em> the bug, we must <em>understand</em> the bug.&rdquo;
     </span>
-    {project && (<LinkContainer to={{ pathname: `/issues/${project}/new` }}>
+    {project && (<LinkContainer to={{ pathname: `/project/${project}/new` }}>
       <Button bsStyle="primary"><AddBoxIcon />New Issue...</Button>
     </LinkContainer>)}
     <SignInLink {...props} />

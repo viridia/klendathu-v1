@@ -1,13 +1,13 @@
 import React from 'react';
 import Radio from 'react-bootstrap/lib/Radio';
-import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { setIssueType } from '../../store/issues';
+import { connect } from 'react-redux';
+import { setIssueType } from '../../store/actions';
 
 /** Selects the type of the issue. */
 class TypeSelector extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.onChange = this.onChange.bind(this);
   }
 
@@ -35,13 +35,12 @@ class TypeSelector extends React.Component {
 TypeSelector.propTypes = {
   issue: React.PropTypes.shape({}).isRequired,
   template: React.PropTypes.shape({}).isRequired,
-  setIssueType: React.PropTypes.func.isRequired,
+  setIssueType: React.PropTypes.func,
 };
 
 export default connect(
   (state) => ({
-    template: state.templates['std/software'],
-    issue: state.issues.$edit,
+    issue: state.issue,
   }),
   dispatch => bindActionCreators({ setIssueType }, dispatch)
 )(TypeSelector);

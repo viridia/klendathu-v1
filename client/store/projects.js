@@ -1,6 +1,8 @@
 import { createAction, createReducer } from 'redux-act';
 import Immutable from 'immutable';
 import axios from 'axios';
+import gql from 'graphql-tag';
+import client from './apollo';
 
 export const requestProjects = createAction('REQUEST_PROJECTS');
 export const receiveProjects = createAction('RECEIVE_PROJECTS');
@@ -38,12 +40,21 @@ export function deleteProject(id) {
   };
 }
 
-export function saveProject(pid) {
-  return (dispatch, getState) => {
-    const projects = getState().projects;
-    const project = projects.byId.get(pid);
-    return axios.patch(`projects/${pid}`, project).then(() => {
-      dispatch(fetchProjects(true));
+const ProjectUpdate = gql`mutation ProjectUpdate($id: ID!, $title: String, $description: String) {
+  updateProject(id: $id, description: $description, title: $title) {
+    id
+    name
+    description
+    title
+  }
+}`;
+
+// TODO: Do we even need the dispatch?
+export function saveProject(pid, variables) {
+  return (/* dispatch*/) => {
+    return client.mutate({
+      mutation: ProjectUpdate,
+      variables: { ...variables, id: pid },
     });
   };
 }

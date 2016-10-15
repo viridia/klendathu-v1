@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Button from 'react-bootstrap/lib/Button';
@@ -15,8 +15,8 @@ import StateSelector from './stateSelector.jsx';
 import TypeSelector from './typeSelector.jsx';
 import CustomEnumField from './customEnumField.jsx';
 import UserName from '../common/userName.jsx';
-import { setIssueType, setIssueSummary, setIssueDescription, setCustomField, addIssueCC,
-  addIssueComment, resetIssue } from '../../store/issues';
+import { setIssueType, setIssueSummary, setIssueDescription, setCustomField,
+  addIssueCC, addIssueComment, resetIssue } from '../../store/actions';
 import './issues.scss';
 
 class CustomTextField extends React.Component {
@@ -43,13 +43,13 @@ class CustomTextField extends React.Component {
 }
 
 CustomTextField.propTypes = {
-  field: React.PropTypes.shape({
-    id: React.PropTypes.string.isRequired,
-    default: React.PropTypes.string,
-    max_length: React.PropTypes.number,
+  field: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    default: PropTypes.string,
+    max_length: PropTypes.number,
   }).isRequired,
-  issue: React.PropTypes.shape({}),
-  setCustomField: React.PropTypes.func.isRequired,
+  issue: PropTypes.shape({}),
+  setCustomField: PropTypes.func.isRequired,
 };
 
 class CustomSuggestField extends React.Component {
@@ -86,18 +86,18 @@ class CustomSuggestField extends React.Component {
 }
 
 CustomSuggestField.propTypes = {
-  field: React.PropTypes.shape({
-    id: React.PropTypes.string.isRequired,
-    default: React.PropTypes.string,
-    max_length: React.PropTypes.number,
+  field: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    default: PropTypes.string,
+    max_length: PropTypes.number,
   }).isRequired,
-  issue: React.PropTypes.shape({}),
-  setCustomField: React.PropTypes.func.isRequired,
+  issue: PropTypes.shape({}),
+  setCustomField: PropTypes.func.isRequired,
 };
 
 class IssueCompose extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
     this.onChangeSummary = this.onChangeSummary.bind(this);
     this.onChangeDescription = this.onChangeDescription.bind(this);
     this.onChangeReporter = this.onChangeReporter.bind(this);
@@ -110,8 +110,10 @@ class IssueCompose extends React.Component {
     this.onSearchLabels = this.onSearchLabels.bind(this);
     this.onFocusNext = this.onFocusNext.bind(this);
     this.onFocusPrev = this.onFocusPrev.bind(this);
-    this.me = { id: props.profile.username, label: props.profile.username };
+    this.me = { id: context.profile.username, label: context.profile.username };
+    this.templateTypes = new Map();
     this.state = {
+      selectedState: 'new',
       summaryError: '',
       descriptionError: '',
       public: false,
@@ -122,7 +124,15 @@ class IssueCompose extends React.Component {
   }
 
   componentDidMount() {
+    this.buildTypeMap();
     this.reset();
+  }
+
+  componentDidUpdate() {
+    // if (prevProps.issue.id !== this.props.issue.id) {
+    //   this.reset();
+    // }
+    this.buildTypeMap();
   }
 
   onFocusNext() {
@@ -196,17 +206,26 @@ class IssueCompose extends React.Component {
   onAddComment(e) {
     e.preventDefault();
     this.props.addIssueComment({
-      author: this.props.profile.id,
+      author: this.context.profile.id,
       body: this.state.commentText,
     });
     this.setState({ commentText: '' });
   }
 
   reset() {
-    const { template } = this.props;
-    const concreteTypes = template.types.filter(t => !t.abstract);
+    const { project } = this.props;
+    const concreteTypes = project.template.types.filter(t => !t.abstract);
     this.props.resetIssue();
     this.props.setIssueType(concreteTypes[0].id);
+    this.setState({ selectedState: project.workflow.start || project.workflow.states[0].id });
+  }
+
+  buildTypeMap() {
+    this.templateTypes = new Map();
+    const { project } = this.props;
+    for (const type of project.template.types) {
+      this.templateTypes.set(type.id, type);
+    }
   }
 
   navigate(dir) {
@@ -231,9 +250,9 @@ class IssueCompose extends React.Component {
   }
 
   renderCustomFields(schema, result) {
-    const { issue, template } = this.props;
+    const { issue } = this.props;
     if (schema.extends && schema.extends.startsWith('./')) {
-      const parentSchema = template.typesById[schema.extends.slice(2)];
+      const parentSchema = this.templateTypes.get(schema.extends.slice(2));
       if (parentSchema) {
         this.renderCustomFields(parentSchema, result);
       }
@@ -242,14 +261,15 @@ class IssueCompose extends React.Component {
       for (const field of schema.fields) {
         let component = null;
         switch (field.type) {
-          case 'text':
+          case 'TEXT':
             component = (<CustomSuggestField
                 issue={issue} field={field} setCustomField={this.props.setCustomField} />);
             break;
-          case 'enum':
+          case 'ENUM':
             component = (<CustomEnumField field={field} />);
             break;
           default:
+            console.error('invalid field type:', field.type);
             break;
         }
         if (component) {
@@ -264,8 +284,8 @@ class IssueCompose extends React.Component {
   }
 
   renderTemplateFields() {
-    const { template, issue } = this.props;
-    const schema = template.typesById[issue.type];
+    const { issue } = this.props;
+    const schema = this.templateTypes.get(issue.type);
     const result = [];
     if (schema) {
       return this.renderCustomFields(schema, result);
@@ -274,7 +294,7 @@ class IssueCompose extends React.Component {
   }
 
   render() {
-    const { project, workflow, issue } = this.props;
+    const { project, issue } = this.props;
     return (<section className="kdt issue-compose">
       <div className="card">
         <header>New Issue: {project.name}</header>
@@ -285,7 +305,7 @@ class IssueCompose extends React.Component {
                 <tbody>
                   <tr>
                     <th className="header"><ControlLabel>Issue Type:</ControlLabel></th>
-                    <td><TypeSelector /></td>
+                    <td><TypeSelector template={project.template} /></td>
                   </tr>
                   <tr>
                     <th className="header"><ControlLabel>Summary:</ControlLabel></th>
@@ -312,7 +332,7 @@ class IssueCompose extends React.Component {
                   <tr>
                     <th className="header"><ControlLabel>Reporter:</ControlLabel></th>
                     <td className="reporter single-static">
-                      <span>{this.props.profile.username}</span>
+                      <span>{this.context.profile.username}</span>
                     </td>
                   </tr>
                   <tr>
@@ -421,7 +441,10 @@ class IssueCompose extends React.Component {
             </form>
           </div>
           <aside className="right">
-            <StateSelector project={project} workflow={workflow} state="new" />
+            <StateSelector
+                project={project}
+                workflow={project.workflow}
+                state={this.state.selectedState} />
             <ControlLabel>Visbility</ControlLabel>
             <Checkbox checked={this.state.public} onChange={this.onChangePublic}>
               Public
@@ -438,33 +461,33 @@ class IssueCompose extends React.Component {
 }
 
 IssueCompose.propTypes = {
-  profile: React.PropTypes.shape({
-    id: React.PropTypes.string.isRequired,
-    username: React.PropTypes.string.isRequired,
+  issue: PropTypes.shape({}),
+  project: PropTypes.shape({
+    workflow: PropTypes.shape({}),
+    template: PropTypes.shape({}),
+  }).isRequired,
+  params: PropTypes.shape({
+    project: PropTypes.string,
+  }).isRequired,
+  addIssueCC: PropTypes.func.isRequired,
+  addIssueComment: PropTypes.func.isRequired,
+  resetIssue: PropTypes.func.isRequired,
+  setIssueType: PropTypes.func.isRequired,
+  setIssueSummary: PropTypes.func.isRequired,
+  setIssueDescription: PropTypes.func.isRequired,
+  setCustomField: PropTypes.func.isRequired,
+};
+
+IssueCompose.contextTypes = {
+  profile: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
   }),
-  issue: React.PropTypes.shape({}),
-  project: React.PropTypes.shape({}),
-  workflow: React.PropTypes.shape({}),
-  template: React.PropTypes.shape({}),
-  params: React.PropTypes.shape({
-    project: React.PropTypes.string,
-  }),
-  addIssueCC: React.PropTypes.func.isRequired,
-  addIssueComment: React.PropTypes.func.isRequired,
-  resetIssue: React.PropTypes.func.isRequired,
-  setIssueType: React.PropTypes.func.isRequired,
-  setIssueSummary: React.PropTypes.func.isRequired,
-  setIssueDescription: React.PropTypes.func.isRequired,
-  setCustomField: React.PropTypes.func.isRequired,
 };
 
 export default connect(
-  (state, ownProps) => ({
-    profile: state.profile,
-    project: state.projects.byId.get(state.projects.byName.get(ownProps.params.project)),
-    workflow: state.workflows['std/bugtrack'],
-    template: state.templates['std/software'],
-    issue: state.issues.$edit,
+  (state) => ({
+    issue: state.issue,
   }),
   dispatch => bindActionCreators({
     addIssueCC,
