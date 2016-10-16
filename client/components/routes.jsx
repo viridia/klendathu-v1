@@ -13,6 +13,7 @@ import ProfilePage from './profile/profilePage.jsx';
 import LoginPage from './login/loginPage.jsx';
 import SignUpPage from './login/signupPage.jsx';
 import GraphQLPage from './debug/graphiql.jsx';
+import NotFound from './common/notFound.jsx';
 import client from '../store/apollo';
 import store from '../store/store';
 
@@ -32,6 +33,7 @@ const Routes = (
         </Route>
         <IndexRoute component={Dashboard} />
         <Route component={ProfilePage} path="/profile" />
+        <Route component={NotFound} path="*" />
       </Route>
     </Router>
   </ApolloProvider>

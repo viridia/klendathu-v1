@@ -1,9 +1,12 @@
 import React, { PropTypes } from 'react';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
+import { Link } from 'react-router';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import classNames from 'classnames';
 import UserName from '../common/userName.jsx';
+import ErrorDisplay from '../debug/errorDisplay.jsx';
+import './issueList.scss';
 import './issues.scss';
 
 class ColumnRenderer {
@@ -59,7 +62,7 @@ class IssueList extends React.Component {
     return (
       <thead>
         <tr className="heading">
-          <th className="selected"><Checkbox /></th>
+          <th className="selected"><Checkbox bsClass="cbox" /></th>
           <th className="id">#</th>
           <th className="type">Type</th>
           <th className="owner">Owner</th>
@@ -82,34 +85,44 @@ class IssueList extends React.Component {
   }
 
   renderIssue(issue) {
+    const project = this.props.project;
+    const linkTarget = {
+      pathname: `/project/${project.name}/issues/${issue.id}`,
+      state: { back: this.props.location },
+    };
     return (
       <tr key={issue.id}>
-        <td className="selected"><Checkbox /></td>
-        <td className="id">{issue.id}</td>
-        <td className="type">{issue.type}</td>
-        <td className="owner"><UserName user={issue.owner} /></td>
-        <td className="state">{issue.state}</td>
+        <td className="selected"><Checkbox bsClass="cbox" /></td>
+        <td className="id"><Link to={linkTarget}>{issue.id}</Link></td>
+        <td className="type"><Link to={linkTarget}>{issue.type}</Link></td>
+        <td className="owner"><div className="pad"><UserName user={issue.owner} /></div></td>
+        <td className="state"><Link to={linkTarget}>{issue.state}</Link></td>
         {this.state.columns.map(cname => {
           const cr = this.columnRenderers[`custom.${cname}`];
           if (cr) {
             return (<td
                 className={classNames('custom', { center: cr.center })}
                 key={cname}>
-              {cr.render(issue)}
+              <div className="pad">{cr.render(issue)}</div>
             </td>);
           }
           return <td className="custom" key={cname} />;
         })}
-        <td className="summary">
-          {issue.summary}
-          <span className="tag">release-blockers</span>
-          <span className="tag">technical-debt</span>
+        <td className="title">
+          <Link to={linkTarget}>
+            <span className="summary">{issue.summary}</span>
+            <span className="tag">release-blockers</span>
+            <span className="tag">technical-debt</span>
+          </Link>
         </td>
       </tr>);
   }
 
   renderIssueList() {
-    const { issues, loading } = this.props.data;
+    const { issues, loading, error } = this.props.data;
+    if (error) {
+      return <ErrorDisplay error={error} />;
+    }
     if (loading) {
       return null;
     }
@@ -148,7 +161,7 @@ class IssueList extends React.Component {
   }
 }
 
-const IssueQuery = gql`query IssueQuery($project: ID!) {
+const IssueQuery = gql`query IssueListQuery($project: ID!) {
   issues(project: $project) {
     id
     project
@@ -170,6 +183,7 @@ const IssueQuery = gql`query IssueQuery($project: ID!) {
 
 IssueList.propTypes = {
   data: PropTypes.shape({
+    error: PropTypes.shape({}),
     loading: PropTypes.bool,
     issues: PropTypes.arrayOf(PropTypes.shape({})),
   }).isRequired,
@@ -178,6 +192,9 @@ IssueList.propTypes = {
     template: PropTypes.shape({
       types: PropTypes.arrayOf(PropTypes.shape({})),
     }),
+  }).isRequired,
+  location: PropTypes.shape({
+    pathname: PropTypes.string.isRequired,
   }).isRequired,
 };
 

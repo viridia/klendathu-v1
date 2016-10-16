@@ -110,6 +110,7 @@ class IssueCompose extends React.Component {
     this.onChangeCommentText = this.onChangeCommentText.bind(this);
     this.onAddCC = this.onAddCC.bind(this);
     this.onAddComment = this.onAddComment.bind(this);
+    this.onInputKeyDown = this.onInputKeyDown.bind(this);
     this.onFocusNext = this.onFocusNext.bind(this);
     this.onFocusPrev = this.onFocusPrev.bind(this);
     this.onCreate = this.onCreate.bind(this);
@@ -137,6 +138,13 @@ class IssueCompose extends React.Component {
     //   this.reset();
     // }
     this.buildTypeMap();
+  }
+
+  onInputKeyDown(e) {
+    if (e.keyCode === 13) { // ENTER
+      e.preventDefault();
+      this.onFocusNext();
+    }
   }
 
   onFocusNext() {
@@ -332,7 +340,8 @@ class IssueCompose extends React.Component {
                           type="text"
                           value={issue.summary || ''}
                           placeholder="one-line summary of this issue"
-                          onChange={this.onChangeSummary} />
+                          onChange={this.onChangeSummary}
+                          onKeyDown={this.onInputKeyDown} />
                     </td>
                   </tr>
                   <tr>
@@ -374,10 +383,6 @@ class IssueCompose extends React.Component {
                             multiple
                             onFocusNext={this.onFocusNext} />
                       </div>
-                      <ul>
-                        {issue.cc && issue.cc.map(
-                          u => <li key={u}><UserName user={u} /></li>)}
-                      </ul>
                     </td>
                   </tr>
                   {this.renderTemplateFields()}

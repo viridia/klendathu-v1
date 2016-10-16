@@ -1,4 +1,4 @@
-const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLList, GraphQLNonNull }
+const { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLID, GraphQLList, GraphQLNonNull }
     = require('graphql');
 const GraphQLDate = require('graphql-date');
 const relationType = require('./relationType');
@@ -58,7 +58,7 @@ module.exports = new GraphQLObjectType({
   name: 'Issue',
   fields: {
     id: {
-      type: new GraphQLNonNull(GraphQLID),
+      type: new GraphQLNonNull(GraphQLInt),
       description: 'Unique id of this issue.',
     },
     project: {
@@ -80,6 +80,10 @@ module.exports = new GraphQLObjectType({
     description: {
       type: GraphQLString,
       description: 'Detailed description of the issue.',
+    },
+    reporter: {
+      type: GraphQLID,
+      description: 'User that originally reported this issue.',
     },
     owner: {
       type: GraphQLID,

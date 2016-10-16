@@ -1,0 +1,42 @@
+@import '../defines/base';
+
+.kdt.issue-details {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+
+  .card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    header {
+      display: flex;
+      align-items: center;
+      font-size: 110%;
+
+      > .issue-id, > .issue-summary {
+        margin-left: 8px;
+      }
+
+      > .divider {
+        flex: 1;
+      }
+
+      > .issue-type {
+        display: inline-block;
+        background-color: #faf;
+        padding: 2px 8px;
+        border-radius: 3px;
+        margin-left: 8px;
+      }
+    }
+
+    .create-issue-table {
+      td {
+        line-height: 1.9em;
+      }
+    }
+  }
+}

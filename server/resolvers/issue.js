@@ -6,11 +6,11 @@ function serialize(issue) {
 }
 
 module.exports = {
-  isssue({ id }, { db }) {
-    const query = {};
-    if (id) {
-      query._id = new ObjectId(id);
-    }
+  issue({ project, id }, { db }) {
+    const query = {
+      id,
+      project: new ObjectId(project),
+    };
     return db.collection('issues').findOne(query).then(issue => {
       if (!issue) {
         return null;
@@ -56,7 +56,8 @@ module.exports = {
         state: issue.state,
         summary: issue.summary,
         description: issue.description,
-        owner: user._id,
+        reporter: user._id,
+        owner: issue.owner,
         created: now,
         updated: now,
         cc: (issue.cc || []).map(cc => new ObjectId(cc)),

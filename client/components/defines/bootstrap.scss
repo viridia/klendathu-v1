@@ -37,6 +37,8 @@
   }
   .svg-icon {
     position: relative;
+    width: 19px;
+    height: 19px;
     > svg {
       width: 19px;
       height: 19px;
@@ -45,6 +47,13 @@
   }
   .caret {
     margin-left: 6px;
+  }
+
+  // Need more transparency for disabled buttons.
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    @include opacity(.35);
   }
 }
 

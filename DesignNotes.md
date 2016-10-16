@@ -2,10 +2,12 @@ Hot loading?
 New React Router?
 * I think we're going to need tests for the graphql stuff, and the tests will probably need
   a real db.
+* Issue view
+* Hook up label search to apollo.
+* Display labels in issue list.
 * Custom suggest field / enter key support.
   * Will be easier once we have some data
   * Get rid of typeahead
-* Get closer to submitting an issue
 * Search users on both username and fullname.
 * Click on autocomplete menu (in addition to ENTER).
 * Deletion of labels

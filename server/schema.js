@@ -1,5 +1,5 @@
-const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLID, GraphQLNonNull }
-    = require('graphql');
+const { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLList,
+    GraphQLID, GraphQLNonNull } = require('graphql');
 const issueType = require('./schemas/issueType');
 const issueInputType = require('./schemas/issueInputType');
 const labelType = require('./schemas/labelType');
@@ -17,7 +17,8 @@ module.exports = new GraphQLSchema({
       issue: {
         type: issueType,
         args: {
-          id: { type: GraphQLID },
+          project: { type: new GraphQLNonNull(GraphQLID) },
+          id: { type: new GraphQLNonNull(GraphQLInt) },
         },
       },
       issues: {
