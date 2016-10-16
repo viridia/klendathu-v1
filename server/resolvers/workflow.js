@@ -2,8 +2,8 @@ const logger = require('../common/logger');
 const fs = require('fs');
 const path = require('path');
 
-module.exports = {
-  workflow({ project, name }, { db, user }) {
+const resolverMethods = {
+  workflow({ project, name }) {
     if (project === 'std') {
       // Handle built-in workflows
       return new Promise((resolve, reject) => {
@@ -21,7 +21,7 @@ module.exports = {
           }
         });
       });
-    } else if (!user) {
+    } else if (!this.user) {
       return Promise.reject(401);
     } else {
       // TODO: Query projects that user is a member of and user's orgs are members of
@@ -32,7 +32,8 @@ module.exports = {
       //     { owningUser: req.user._id, },
       //   ]
       // }
-      return db.collection('workflows').find({ owningUser: user._id, name }).toArray().then(rows => {
+      return this.db.collection('workflows').find({ owningUser: this.user._id, name })
+      .toArray().then(rows => {
         return rows;
         // return res.json({
         //   projects: rows.map(serializers.project),
@@ -40,4 +41,8 @@ module.exports = {
       });
     }
   },
+};
+
+module.exports = function (rootClass) {
+  Object.assign(rootClass.prototype, resolverMethods);
 };

@@ -5,13 +5,13 @@ function serialize(issue, props = {}) {
   return Object.assign({}, issue, props);
 }
 
-module.exports = {
-  issue({ project, id }, { db }) {
+const resolverMethods = {
+  issue({ project, id }) {
     const query = {
       id,
       project: new ObjectId(project),
     };
-    return db.collection('issues').findOne(query).then(issue => {
+    return this.db.collection('issues').findOne(query).then(issue => {
       if (!issue) {
         return null;
       }
@@ -19,25 +19,28 @@ module.exports = {
     });
   },
 
-  issues({ project, token }, { db }) {
+  issues({ project, token }) {
     const query = {};
     if (!project) {
       return Promise.reject({ status: 401, error: 'missing-project' });
     }
+    if (token) {
+      logger.error('unimplemented: issues(token)');
+    }
     query.project = new ObjectId(project);
-    return db.collection('issues').find(query).sort({ id: -1 }).toArray()
+    return this.db.collection('issues').find(query).sort({ id: -1 }).toArray()
         .then(issues => issues.map(serialize));
   },
 
-  newIssue({ project, issue }, { db, user }) {
-    if (!user) {
+  newIssue({ project, issue }) {
+    if (!this.user) {
       return Promise.reject({ status: 401, error: 'unauthorized' });
     }
     if (!issue.type || !issue.state || !issue.summary) {
       return Promise.reject({ status: 401, error: 'missing-field' });
     }
-    const projects = db.collection('projects');
-    const issues = db.collection('issues');
+    const projects = this.db.collection('projects');
+    const issues = this.db.collection('issues');
     return projects.findOneAndUpdate(
         { _id: new ObjectId(project) },
         { $inc: { issueIdCounter: 1 } })
@@ -55,7 +58,7 @@ module.exports = {
         state: issue.state,
         summary: issue.summary,
         description: issue.description,
-        reporter: user._id,
+        reporter: this.user._id,
         owner: issue.owner,
         created: now,
         updated: now,
@@ -74,4 +77,8 @@ module.exports = {
       });
     });
   },
+};
+
+module.exports = function (rootClass) {
+  Object.assign(rootClass.prototype, resolverMethods);
 };

@@ -9,11 +9,6 @@ const bodyParser = require('body-parser');
 const compression = require('compression');
 const graphql = require('express-graphql');
 const authActions = require('./actions/auth');
-// const labelsActions = require('./actions/labels');
-const projectsActions = require('./actions/projects');
-const issuesActions = require('./actions/issues');
-const workflowsActions = require('./actions/workflows');
-const templatesActions = require('./actions/templates');
 const schema = require('./schema');
 const RootResolver = require('./resolvers/root');
 const logger = require('./common/logger');
@@ -73,11 +68,6 @@ mongo.then(db => {
 
   // TODO: Break passport initialization into it's own module.
   authActions(app, apiRouter);
-  // labelsActions(app, apiRouter);
-  projectsActions(app, apiRouter);
-  issuesActions(app, apiRouter);
-  workflowsActions(app, apiRouter);
-  templatesActions(app, apiRouter);
 
   // Register GraphQL middleware
   apiRouter.use('/gql', graphql(req => ({

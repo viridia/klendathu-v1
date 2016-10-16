@@ -2,8 +2,8 @@ const logger = require('../common/logger');
 const fs = require('fs');
 const path = require('path');
 
-module.exports = {
-  template({ project, name }, { db, user }) {
+const resolverMethods = {
+  template({ project, name }) {
     if (project === 'std') {
       // Handle built-in templates
       return new Promise((resolve, reject) => {
@@ -21,7 +21,7 @@ module.exports = {
           }
         });
       });
-    } else if (!user) {
+    } else if (!this.user) {
       return Promise.reject(401);
     } else {
       // TODO: Query projects that user is a member of and user's orgs are members of
@@ -32,7 +32,8 @@ module.exports = {
       //     { owningUser: req.user._id, },
       //   ]
       // }
-      return db.collection('templates').find({ owningUser: user._id, name }).toArray(rows => {
+      return this.db.collection('templates').find({ owningUser: this.user._id, name })
+      .toArray(rows => {
         // if (error) {
         //   logger.error('Error fetching projects', error);
         //   return res.status(500).json({ err: 'internal', details: error });
@@ -44,4 +45,8 @@ module.exports = {
       });
     }
   },
+};
+
+module.exports = function (rootClass) {
+  Object.assign(rootClass.prototype, resolverMethods);
 };

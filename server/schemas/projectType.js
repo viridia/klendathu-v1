@@ -2,9 +2,7 @@ const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLID, GraphQLNonNull 
     = require('graphql');
 const GraphQLDate = require('graphql-date');
 const templateType = require('./templateType');
-const templateResolver = require('../resolvers/template');
 const workflowType = require('./workflowType');
-const workflowResolver = require('../resolvers/workflow');
 
 const roleType = new GraphQLObjectType({
   name: 'Role',
@@ -36,25 +34,33 @@ module.exports = new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLString),
       description: 'A more detailed description of the project.',
     },
-    owningUser: { type: GraphQLID },
-    owningOrg: { type: GraphQLID },
-    created: { type: new GraphQLNonNull(GraphQLDate) },
-    updated: { type: new GraphQLNonNull(GraphQLDate) },
+    owningUser: {
+      type: GraphQLID,
+      description: 'User that owns this project. Null if owned by an organization.',
+    },
+    owningOrg: {
+      type: GraphQLID,
+      description: 'Organization that owns this project. Null if owned by a user.',
+    },
+    created: {
+      type: new GraphQLNonNull(GraphQLDate),
+      description: 'When this project was created.',
+    },
+    updated: {
+      type: new GraphQLNonNull(GraphQLDate),
+      description: 'When this project was last updated.',
+    },
     role: {
       type: new GraphQLNonNull(roleType),
       description: 'Access level for the current user.',
     },
     template: {
       type: templateType,
-      resolve(project, _, { db, user }) {
-        return templateResolver.template({ project: 'std', name: 'software' }, { db, user });
-      },
+      description: 'Issue template for this project.',
     },
     workflow: {
       type: workflowType,
-      resolve(project, _, { db, user }) {
-        return workflowResolver.workflow({ project: 'std', name: 'bugtrack' }, { db, user });
-      },
+      description: 'Workflow configuration for this project.',
     },
   },
 });

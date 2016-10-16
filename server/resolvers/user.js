@@ -6,9 +6,9 @@ function serialize(user) {
   return { id: _id, username, fullname, photo, verified };
 }
 
-module.exports = {
-  user({ id }, { db }) {
-    return db.collection('users').findOne({ _id: new ObjectId(id) }).then(user => {
+const resolverMethods = {
+  singleUser({ id }) {
+    return this.db.collection('users').findOne({ _id: new ObjectId(id) }).then(user => {
       if (!user) {
         return null;
       }
@@ -16,7 +16,7 @@ module.exports = {
     });
   },
 
-  users({ id, token }, { db }) {
+  users({ id, token }) {
     const query = {};
     if (id) {
       query._id = new ObjectId(id);
@@ -25,7 +25,11 @@ module.exports = {
       const pattern = `\\b${escapeRegExp(token)}`;
       query.fullname = { $regex: pattern, $options: 'i' };
     }
-    return db.collection('users').find(query).sort({ fullname: 1 }).toArray()
+    return this.db.collection('users').find(query).sort({ fullname: 1 }).toArray()
     .then(users => users.map(serialize));
   },
+};
+
+module.exports = function (rootClass) {
+  Object.assign(rootClass.prototype, resolverMethods);
 };

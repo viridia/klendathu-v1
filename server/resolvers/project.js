@@ -19,8 +19,8 @@ function getRole(db, project, user) {
   }
 }
 
-module.exports = {
-  project({ id, name: pname }, { db, user }) {
+const resolverMethods = {
+  project({ id, name: pname }) {
     const query = {
       deleted: false,
     };
@@ -33,17 +33,21 @@ module.exports = {
     if (pname) {
       query.name = pname;
     }
-    return db.collection('projects').findOne(query).then(project => {
+    return this.db.collection('projects').findOne(query).then(project => {
       if (!project) {
         return null;
       }
-      const role = getRole(db, project, user);
+      const role = getRole(this.db, project, this.user);
       // TODO: Visibility test.
-      return serialize(project, { role });
+      return serialize(project, {
+        role,
+        template: this.template({ project: 'std', name: 'software' }),
+        workflow: this.workflow({ project: 'std', name: 'bugtrack' }),
+      });
     });
   },
 
-  projects({ name: pname }, { db, user }) {
+  projects({ name: pname }) {
     const query = {
       // deleted: false,
     };
@@ -53,12 +57,12 @@ module.exports = {
     // if (!user) {
     //   return Promise.reject({ status: 401, error: 'unauthorized' });
     // }
-    return db.collection('projects').find(query).sort({ created: -1 }).toArray()
+    return this.db.collection('projects').find(query).sort({ created: -1 }).toArray()
     .then(projects => {
       const results = [];
       // TODO: Visibility test.
       for (const p of projects) {
-        const role = getRole(db, p, user);
+        const role = getRole(this.db, p, this.user);
         results.push(serialize(p, { role }));
       }
       return results;
@@ -76,7 +80,7 @@ module.exports = {
       // Special characters not allowed
       return Promise.reject({ status: 400, error: 'invalid-name' });
     }
-    const projects = db.collection('projects');
+    const projects = this.db.collection('projects');
     return projects.findOne({ name: project.name }).then(p => {
       // Check if project exists
       if (p) {
@@ -117,12 +121,12 @@ module.exports = {
     });
   },
 
-  update({ id, project }, { db, user }) {
-    if (!user) {
+  updateProject({ id, project }) {
+    if (!this.user) {
       return Promise.reject({ status: 401, error: 'unauthorized' });
     }
     const pid = new ObjectId(id);
-    const projects = db.collection('projects');
+    const projects = this.db.collection('projects');
     return projects.findOne({ _id: pid }).then(proj => {
       if (proj) {
         // TODO: Ownership test and role test.
@@ -158,12 +162,12 @@ module.exports = {
   },
 
   // TODO: Rename this to 'purge', and make delete merely set the delete flag.
-  delete({ id }, { db, user }) {
+  deleteProject({ id }, { user }) {
     if (!user) {
       return Promise.reject({ status: 401, error: 'unauthorized' });
     }
     const pid = new ObjectId(id);
-    const projects = db.collection('projects');
+    const projects = this.db.collection('projects');
     // TODO: Ownership test and role test.
     // Check to see if project exists
     return projects.findOne({ _id: pid }).then(p => {
@@ -175,8 +179,8 @@ module.exports = {
     .then(() => {
       // Delete all isssues and labels
       return Promise.all([
-        db.collection('issues').deleteMany({ project: pid }),
-        db.collection('labels').deleteMany({ project: pid }),
+        this.db.collection('issues').deleteMany({ project: pid }),
+        this.db.collection('labels').deleteMany({ project: pid }),
       ]);
     })
     .then(() => {
@@ -185,11 +189,16 @@ module.exports = {
     })
     .then(() => {
       // Fetch the list of projects
+      // TODO: Avoid this with smart client updating?
       logger.info('Deleted project:', pid.toString());
-      return this.projects({}, { db, user });
+      return this.projects({}, { user });
     }, error => {
       logger.error('Error deleting project:', pid, error);
       return Promise.reject({ status: 500, error: 'internal' });
     });
   },
+};
+
+module.exports = function (rootClass) {
+  Object.assign(rootClass.prototype, resolverMethods);
 };
