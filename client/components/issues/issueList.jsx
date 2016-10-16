@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import classNames from 'classnames';
 import UserName from '../common/userName.jsx';
 import './issues.scss';
 
@@ -12,6 +13,10 @@ class ColumnRenderer {
 
   get title() {
     return this.field.caption;
+  }
+
+  get center() {
+    return this.field.align === 'center';
   }
 
   render(issue) {
@@ -62,9 +67,13 @@ class IssueList extends React.Component {
           {this.state.columns.map(cname => {
             const cr = this.columnRenderers[`custom.${cname}`];
             if (cr) {
-              return <th className="custom" key={cname}>{cr.title}</th>;
+              return (<th
+                  className={classNames('custom', { center: cr.center })}
+                  key={cname}>
+                {cr.title}
+              </th>);
             }
-            return <th className="custom" key={cname}>--</th>;
+            return <th className="custom cener" key={cname}>--</th>;
           })}
           <th className="summary">Summary</th>
         </tr>
@@ -83,7 +92,11 @@ class IssueList extends React.Component {
         {this.state.columns.map(cname => {
           const cr = this.columnRenderers[`custom.${cname}`];
           if (cr) {
-            return <td className="custom" key={cname}>{cr.render(issue)}</td>;
+            return (<td
+                className={classNames('custom', { center: cr.center })}
+                key={cname}>
+              {cr.render(issue)}
+            </td>);
           }
           return <td className="custom" key={cname} />;
         })}
@@ -109,6 +122,7 @@ class IssueList extends React.Component {
       );
     }
 
+    // console.log(JSON.stringify(issues, null, 2));
     return (
       <div className="card">
         <table className="issue">

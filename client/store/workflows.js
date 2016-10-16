@@ -1,6 +1,5 @@
 import { createAction, createReducer } from 'redux-act';
 import Immutable from 'immutable';
-import axios from 'axios';
 import { toastr } from 'react-redux-toastr';
 
 const requestWorkflow = createAction('REQUEST_WORKFLOW');
@@ -10,20 +9,6 @@ export const updateWorkflowState = createAction('UPDATE_WORKFLOW_STATE');
 export const updateWorkflowStateList = createAction('UPDATE_WORKFLOW_STATE_LIST');
 export const addTransition = createAction('ADD_TRANSITION', (fromId, toId) => [fromId, toId]);
 export const removeTransition = createAction('REMOVE_TRANSITION', (fromId, toId) => [fromId, toId]);
-
-export function fetchWorkflow(project, name, force = false) {
-  return (dispatch, getState) => {
-    const qname = `${project}/${name}`;
-    const workflow = getState().workflows[qname];
-    if (workflow && (workflow.loading || workflow.loaded) && !force) {
-      return Promise.resolve();
-    }
-    dispatch(requestWorkflow(qname));
-    return axios.get(`workflows/${qname}`).then(resp => {
-      dispatch(receiveWorkflow({ qname, workflow: resp.data.workflow }));
-    });
-  };
-}
 
 export function saveWorkflow(project, name) {
   return (dispatch, getState) => {

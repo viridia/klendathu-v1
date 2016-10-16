@@ -9,6 +9,6 @@ const networkInterface = createNetworkInterface({
 
 export default new ApolloClient({
   networkInterface,
-  dataIdFromObject: o => `${o.__typename}:${o.id},`,
+  dataIdFromObject: o => o.id && `${o.__typename}:${o.id},`,
   shouldBatch: true,
 });

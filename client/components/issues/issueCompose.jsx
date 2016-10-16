@@ -193,9 +193,21 @@ class IssueCompose extends React.Component {
 
   onCreate(e) {
     e.preventDefault();
+    const issue = Object.assign({}, this.props.issue, { custom: [] });
+    const issueType = this.templateTypes.get(issue.type);
+    const fields = this.customFieldList(issueType);
+    for (const field of fields) {
+      const fieldValue = issue.custom[field.id] || field.default;
+      if (fieldValue) {
+        issue.custom.push({
+          name: field.id,
+          value: fieldValue,
+        });
+      }
+    }
     this.props.newIssue({
       variables: {
-        issue: this.props.issue,
+        issue,
         project: this.props.project.id,
       },
     }).then(resp => {
@@ -247,35 +259,42 @@ class IssueCompose extends React.Component {
     }
   }
 
-  renderCustomFields(schema, result) {
-    const { issue } = this.props;
-    if (schema.extends && schema.extends.startsWith('./')) {
-      const parentSchema = this.templateTypes.get(schema.extends.slice(2));
-      if (parentSchema) {
-        this.renderCustomFields(parentSchema, result);
+  customFieldList(issueType) {
+    let fields = [];
+    if (issueType.extends && issueType.extends.startsWith('./')) {
+      const parentType = this.templateTypes.get(issueType.extends.slice(2));
+      if (parentType) {
+        fields = this.customFieldList(parentType);
       }
     }
-    if (schema.fields) {
-      for (const field of schema.fields) {
-        let component = null;
-        switch (field.type) {
-          case 'TEXT':
-            component = (<CustomSuggestField
-                issue={issue} field={field} setCustomField={this.props.setCustomField} />);
-            break;
-          case 'ENUM':
-            component = (<CustomEnumField field={field} />);
-            break;
-          default:
-            console.error('invalid field type:', field.type);
-            break;
-        }
-        if (component) {
-          result.push(<tr key={field.id}>
-            <th>{field.caption}:</th>
-            <td>{component}</td>
-          </tr>);
-        }
+    if (issueType.fields) {
+      fields = fields.concat(issueType.fields);
+    }
+    return fields;
+  }
+
+  renderCustomFields(issueType, result) {
+    const { issue } = this.props;
+    const fields = this.customFieldList(issueType);
+    for (const field of fields) {
+      let component = null;
+      switch (field.type) {
+        case 'TEXT':
+          component = (<CustomSuggestField
+              issue={issue} field={field} setCustomField={this.props.setCustomField} />);
+          break;
+        case 'ENUM':
+          component = (<CustomEnumField field={field} />);
+          break;
+        default:
+          console.error('invalid field type:', field.type);
+          break;
+      }
+      if (component) {
+        result.push(<tr key={field.id}>
+          <th>{field.caption}:</th>
+          <td>{component}</td>
+        </tr>);
       }
     }
     return result;
@@ -283,10 +302,10 @@ class IssueCompose extends React.Component {
 
   renderTemplateFields() {
     const { issue } = this.props;
-    const schema = this.templateTypes.get(issue.type);
+    const issueType = this.templateTypes.get(issue.type);
     const result = [];
-    if (schema) {
-      return this.renderCustomFields(schema, result);
+    if (issueType) {
+      return this.renderCustomFields(issueType, result);
     }
     return result;
   }

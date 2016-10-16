@@ -26,6 +26,10 @@ const fieldType = new GraphQLObjectType({
       type: GraphQLString,
       description: 'Default value for this field.',
     },
+    align: {
+      type: GraphQLString,
+      description: 'Whether this field should be center-aligned in the issue list column.',
+    },
     values: {
       type: new GraphQLList(GraphQLString),
       description: 'List of valid values for this type.',

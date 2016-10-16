@@ -13,7 +13,8 @@
           "type": "enum",
           "default": "P2",
           "values": [ "P0", "P1", "P2", "P3", "P4" ],
-          "position": "top"
+          "position": "top",
+          "align": "center"
         }
       ]
     },
@@ -28,7 +29,8 @@
           "type": "enum",
           "default": "S2",
           "values": [ "S0", "S1", "S2", "S3", "S4" ],
-          "position": "top"
+          "position": "top",
+          "align": "center"
         },
         {
           "id": "hardware_os",

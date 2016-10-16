@@ -50,7 +50,7 @@ const ProjectQuery = gql`query ProjectQuery($project: String!) {
       name project
       types {
         id caption abstract extends
-        fields { id type caption default values }
+        fields { id type caption align default values }
       }
     }
     workflow {
