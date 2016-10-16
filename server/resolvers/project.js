@@ -53,11 +53,11 @@ const resolverMethods = {
 
   project({ id, name }) {
     return this.getProjectAndRole({ projectId: id, projectName: name }).then(([project, role]) => {
-      if (!project || (role.level === Role.NONE.level && !project.public)) {
+      if (!project || (role === Role.NONE && !project.public)) {
         return null;
       }
       return serialize(project, {
-        role: role.rank,
+        role,
         template: this.template({ project: 'std', name: 'software' }),
         workflow: this.workflow({ project: 'std', name: 'bugtrack' }),
       });

@@ -21,6 +21,10 @@ New React Router?
 * return key to navigate between fields
 * escape to dismiss menus
 * make note about hash tags and @mentions
+* Additional roles
+  * Project membership
+  * Create organizations
+  * Org membership
 * option to add label to hot list when creating it
   * Need project settings
 

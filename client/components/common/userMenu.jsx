@@ -27,11 +27,11 @@ class UserMenuButton extends React.Component {
       return null;
     }
     return (<DropdownButton bsStyle="primary" title={profile.username} id="user-menu" pullRight>
-      <LinkContainer to={{ pathname: '/profile' }}>
-        <MenuItem eventKey="profile">Your Profile</MenuItem>
-      </LinkContainer>
       <LinkContainer to={{ pathname: '/' }} onlyActiveOnIndex>
         <MenuItem eventKey="dashboard">Dashboard</MenuItem>
+      </LinkContainer>
+      <LinkContainer to={{ pathname: '/profile' }}>
+        <MenuItem eventKey="profile">Your Profile</MenuItem>
       </LinkContainer>
       <MenuItem divider />
       <MenuItem eventKey="4" onClick={this.onSignOut}>Sign out</MenuItem>

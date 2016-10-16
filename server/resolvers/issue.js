@@ -9,7 +9,7 @@ function serialize(issue, props = {}) {
 const resolverMethods = {
   issue({ project, id }) {
     return this.getProjectAndRole({ projectId: project }).then(([proj, role]) => {
-      if (proj === null || (!proj.public && role.level < Role.VIEWER)) {
+      if (proj === null || (!proj.public && role < Role.VIEWER)) {
         return Promise.reject({ status: 404, error: 'missing-project' });
       }
       const query = {
@@ -27,7 +27,7 @@ const resolverMethods = {
 
   issues({ project, token }) {
     return this.getProjectAndRole({ projectId: project }).then(([proj, role]) => {
-      if (proj === null || (!proj.public && role.level < Role.VIEWER)) {
+      if (proj === null || (!proj.public && role < Role.VIEWER)) {
         return Promise.reject({ status: 404, error: 'missing-project' });
       }
       const query = {};
@@ -42,7 +42,7 @@ const resolverMethods = {
 
   newIssue({ project, issue }) {
     return this.getProjectAndRole({ projectId: project, mutation: true }).then(([proj, role]) => {
-      if (proj === null || (!proj.public && role.level < Role.REPORTER)) {
+      if (proj === null || (!proj.public && role < Role.REPORTER)) {
         return Promise.reject({ status: 404, error: 'missing-project' });
       }
 

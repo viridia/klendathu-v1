@@ -44,7 +44,7 @@ const ProjectsQuery = gql`query {
     description
     owningUser
     owningOrg
-    role { rank level }
+    role
     created
     updated
   }

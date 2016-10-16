@@ -32,10 +32,7 @@ const UpdateProject = gql`mutation UpdateProject($id: ID!, $title: String, $desc
       title
       owningUser
       owningOrg
-      role {
-        level
-        rank
-      }
+      role
     }
   }
 }`;

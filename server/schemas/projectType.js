@@ -4,20 +4,6 @@ const GraphQLDate = require('graphql-date');
 const templateType = require('./templateType');
 const workflowType = require('./workflowType');
 
-const roleType = new GraphQLObjectType({
-  name: 'Role',
-  fields: {
-    level: {
-      type: new GraphQLNonNull(GraphQLInt),
-      description: 'Numeric representation of this role.',
-    },
-    rank: {
-      type: new GraphQLNonNull(GraphQLString),
-      description: 'Text representation of this role.',
-    },
-  },
-});
-
 module.exports = new GraphQLObjectType({
   name: 'Project',
   fields: {
@@ -51,7 +37,7 @@ module.exports = new GraphQLObjectType({
       description: 'When this project was last updated.',
     },
     role: {
-      type: new GraphQLNonNull(roleType),
+      type: new GraphQLNonNull(GraphQLInt),
       description: 'Access level for the current user.',
     },
     template: {

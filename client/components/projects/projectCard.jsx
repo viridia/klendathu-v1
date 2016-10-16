@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import Button from 'react-bootstrap/lib/Button';
 import Modal from 'react-bootstrap/lib/Modal';
 import UserName from '../common/userName.jsx';
+import roleName from '../../lib/role.js';
 import { deleteProject } from '../../store/projects';
 import './projectCard.scss';
 
@@ -59,7 +60,7 @@ export default class ProjectCard extends React.Component {
             <div className="owned-by">
               Owned by: <UserName user={project.owningUser} />
             </div>
-            <div className="role">Role: {project.role.rank.toLowerCase()}</div>
+            <div className="role">Role: {roleName(project.role).toLowerCase()}</div>
           </div>
           <div>
             <Button bsStyle="primary" onClick={this.onShowDelete}>Delete</Button>
