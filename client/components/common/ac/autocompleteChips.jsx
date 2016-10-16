@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import classNames from 'classnames';
@@ -21,7 +21,6 @@ export default class AutoCompleteChips extends React.Component {
       suggestionsSuffix: [],
       suggestionIndex: -1,
       value: '',
-      selection: [],
     };
     this.suggestionMap = new Map();
     this.searchValue = null;
@@ -35,7 +34,7 @@ export default class AutoCompleteChips extends React.Component {
   onValueChange(e) {
     let value = e.target.value;
     // Don't allow typing if it's a non-multiple and we already have a value.
-    if (!this.props.multiple && this.state.selection.length > 0) {
+    if (!this.props.multiple && this.selection().length > 0) {
       value = '';
     }
     this.setState({ value });
@@ -67,7 +66,7 @@ export default class AutoCompleteChips extends React.Component {
   }
 
   onReceiveSuggestions(suggestions, suggestionsSuffix = []) {
-    const alreadySelected = new Set(this.state.selection.map(s => this.props.onGetValue(s)));
+    const alreadySelected = new Set(this.selection().map(s => this.props.onGetValue(s)));
     const uniqueSuggestions =
       suggestions.filter(s => !alreadySelected.has(this.props.onGetValue(s)));
     const suggestionCount = uniqueSuggestions.length + suggestionsSuffix.length;
@@ -136,7 +135,7 @@ export default class AutoCompleteChips extends React.Component {
           // Remove the last chip from the selection.
           const inputEl = ReactDOM.findDOMNode(this.input); // eslint-disable-line
           if (inputEl.selectionStart === 0 && inputEl.selectionEnd === 0) {
-            this.setState({ selection: this.state.selection.slice(0, -1) });
+            this.deleteLastSelectedItem();
           }
         }
         break;
@@ -145,6 +144,10 @@ export default class AutoCompleteChips extends React.Component {
       default:
         break;
     }
+  }
+
+  deleteLastSelectedItem() {
+    this.updateSelection(this.selection().slice(0, -1));
   }
 
   chooseSuggestion(suggestion) {
@@ -156,7 +159,7 @@ export default class AutoCompleteChips extends React.Component {
   }
 
   addToSelection(item) {
-    let selection = this.state.selection;
+    let selection = this.selection();
     for (let i = 0; i < selection.length; i += 1) {
       // Value is already in the list.
       if (this.props.onGetValue(item) === this.props.onGetValue(selection[i])) {
@@ -171,7 +174,27 @@ export default class AutoCompleteChips extends React.Component {
       if (aKey < bKey) { return 1; }
       return 0;
     });
-    this.setState({ selection });
+    this.updateSelection(selection);
+  }
+
+  updateSelection(selection) {
+    if (this.props.multiple) {
+      this.props.onSelectionChange(selection);
+    } else if (selection.length > 0) {
+      this.props.onSelectionChange(selection[0]);
+    } else {
+      this.props.onSelectionChange(null);
+    }
+  }
+
+  selection() {
+    if (Array.isArray(this.props.selection)) {
+      return this.props.selection;
+    } else if (this.props.selection === null) {
+      return [];
+    } else {
+      return [this.props.selection];
+    }
   }
 
   renderSuggestions() {
@@ -204,7 +227,7 @@ export default class AutoCompleteChips extends React.Component {
   }
 
   renderSelection() {
-    const { selection } = this.state;
+    const selection = this.selection();
     const result = [];
     for (let i = 0; i < selection.length; i += 1) {
       const item = selection[i];
@@ -222,7 +245,8 @@ export default class AutoCompleteChips extends React.Component {
 
   render() {
     const { className, maxLength, placeholder } = this.props;
-    const { value, valid, open, selection, focused } = this.state;
+    const { value, valid, open, focused } = this.state;
+    const selection = this.selection();
     const editing = value.length > 0;
     return (
       <div
@@ -253,17 +277,22 @@ export default class AutoCompleteChips extends React.Component {
 }
 
 AutoCompleteChips.propTypes = {
-  className: React.PropTypes.string,
-  placeholder: React.PropTypes.string,
-  maxLength: React.PropTypes.number,
-  multiple: React.PropTypes.bool,
-  onSearch: React.PropTypes.func.isRequired,
-  onChooseSuggestion: React.PropTypes.func,
-  onRenderSuggestion: React.PropTypes.func,
-  onRenderSelection: React.PropTypes.func,
-  onGetValue: React.PropTypes.func,
-  onGetSortKey: React.PropTypes.func,
-  onFocusNext: React.PropTypes.func,
+  selection: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.any.isRequired),
+    PropTypes.any,
+  ]),
+  className: PropTypes.string,
+  placeholder: PropTypes.string,
+  maxLength: PropTypes.number,
+  multiple: PropTypes.bool,
+  onSearch: PropTypes.func.isRequired,
+  onChooseSuggestion: PropTypes.func,
+  onRenderSuggestion: PropTypes.func,
+  onRenderSelection: PropTypes.func,
+  onGetValue: PropTypes.func,
+  onGetSortKey: PropTypes.func,
+  onFocusNext: PropTypes.func,
+  onSelectionChange: PropTypes.func.isRequired,
 };
 
 AutoCompleteChips.defaultProps = {

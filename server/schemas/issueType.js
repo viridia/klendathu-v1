@@ -3,6 +3,7 @@ const { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLID, GraphQLList, Gr
 const GraphQLDate = require('graphql-date');
 const relationType = require('./relationType');
 const changeType = require('./changeType');
+const labelType = require('./labelType');
 
 const linkedIssueType = new GraphQLObjectType({
   name: 'LinkedIssue',
@@ -102,7 +103,7 @@ module.exports = new GraphQLObjectType({
       description: 'Date and time when the issue was last changed.',
     },
     labels: {
-      type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
+      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
       description: 'Labels associated with this issue.',
     },
     linked: {

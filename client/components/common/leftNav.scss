@@ -30,7 +30,12 @@
     }
   }
 
-  > ul > li > a {
-    color: $leftNavFg;
+  .label-list {
+    margin: 4px;
+    padding-left: 26px;
+  }
+
+  li.label-item {
+    margin: 4px 0;
   }
 }

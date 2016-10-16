@@ -5,6 +5,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import classNames from 'classnames';
 import UserName from '../common/userName.jsx';
+import LabelName from '../common/labelName.jsx';
 import ErrorDisplay from '../debug/errorDisplay.jsx';
 import './issueList.scss';
 import './issues.scss';
@@ -93,10 +94,22 @@ class IssueList extends React.Component {
     return (
       <tr key={issue.id}>
         <td className="selected"><Checkbox bsClass="cbox" /></td>
-        <td className="id"><Link to={linkTarget}>{issue.id}</Link></td>
-        <td className="type"><Link to={linkTarget}>{issue.type}</Link></td>
-        <td className="owner"><div className="pad"><UserName user={issue.owner} /></div></td>
-        <td className="state"><Link to={linkTarget}>{issue.state}</Link></td>
+        <td className="id">
+          <Link to={linkTarget}>{issue.id}</Link>
+        </td>
+        <td className="type">
+          <Link to={linkTarget}>{issue.type}</Link>
+        </td>
+        <td className="owner">
+          <div className="pad">
+            {issue.owner
+              ? <UserName user={issue.owner} />
+            : <div className="unassigned">unassigned</div>}
+          </div>
+        </td>
+        <td className="state">
+          <Link to={linkTarget}>{issue.state}</Link>
+        </td>
         {this.state.columns.map(cname => {
           const cr = this.columnRenderers[`custom.${cname}`];
           if (cr) {
@@ -111,8 +124,7 @@ class IssueList extends React.Component {
         <td className="title">
           <Link to={linkTarget}>
             <span className="summary">{issue.summary}</span>
-            <span className="tag">release-blockers</span>
-            <span className="tag">technical-debt</span>
+            {issue.labels.map(l => <LabelName label={l} key={l} />)}
           </Link>
         </td>
       </tr>);

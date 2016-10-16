@@ -1,5 +1,3 @@
-const { ObjectId } = require('mongodb');
-const escapeRegExp = require('../lib/escapeRegExp');
 const issueResolver = require('../resolvers/issue');
 const projectResolver = require('../resolvers/project');
 const templateResolver = require('../resolvers/template');
@@ -11,26 +9,6 @@ class RootResolver {
   constructor(db, user) {
     this.db = db;
     this.user = user;
-  }
-
-  labels({ id, project: pid, token }) {
-    const query = {};
-    if (id) {
-      query._id = new ObjectId(id);
-    }
-    if (pid) {
-      query.project = new ObjectId(pid);
-    }
-    if (token) {
-      const pattern = `\\b${escapeRegExp(token)}`;
-      query.name = { $regex: pattern, $options: 'i' };
-    }
-    return this.db.collection('labels').find(query).toArray().then(labels => {
-      return labels.map(label => {
-        const { _id, name, color, project, creator, created, updated } = label;
-        return { id: _id, name, color, project, creator, created, updated };
-      });
-    });
   }
 
   profile() {
@@ -53,5 +31,7 @@ Object.assign(RootResolver.prototype, {
   users: userResolver.users,
   workflow: workflowResolver.workflow,
 });
+
+require('../resolvers/label')(RootResolver);
 
 module.exports = RootResolver;

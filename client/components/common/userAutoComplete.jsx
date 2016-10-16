@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { withApollo } from 'react-apollo';
 import ApolloClient from 'apollo-client';
 import gql from 'graphql-tag';
@@ -73,16 +73,21 @@ class UserAutoComplete extends React.Component {
 }
 
 UserAutoComplete.propTypes = {
-  value: React.PropTypes.string,
-  className: React.PropTypes.string,
-  placeholder: React.PropTypes.string,
-  project: React.PropTypes.shape({
-    id: React.PropTypes.string,
+  value: PropTypes.string,
+  className: PropTypes.string,
+  placeholder: PropTypes.string,
+  project: PropTypes.shape({
+    id: PropTypes.string,
   }),
-  multiple: React.PropTypes.bool,
-  onSelect: React.PropTypes.func,
-  onFocusNext: React.PropTypes.func,
-  client: React.PropTypes.instanceOf(ApolloClient).isRequired,
+  multiple: PropTypes.bool,
+  onSelect: PropTypes.func,
+  onFocusNext: PropTypes.func,
+  client: PropTypes.instanceOf(ApolloClient).isRequired,
+  selection: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.any.isRequired),
+    PropTypes.any,
+  ]),
+  onSelectionChange: PropTypes.func.isRequired,
 };
 
 export default withApollo(UserAutoComplete);

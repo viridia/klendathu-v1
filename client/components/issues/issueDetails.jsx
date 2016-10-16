@@ -100,6 +100,10 @@ class IssueDetails extends React.Component {
               <td>Comments
               </td>
             </tr>
+            <tr>
+              <th className="header">Changes:</th>
+              <td>Created: {issue.created}</td>
+            </tr>
           </tbody>
         </table>
       </section>

@@ -1,6 +1,6 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import { withApollo } from 'react-apollo';
+import ApolloClient from 'apollo-client';
 import Button from 'react-bootstrap/lib/Button';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FormControl from 'react-bootstrap/lib/FormControl';
@@ -8,10 +8,20 @@ import FormGroup from 'react-bootstrap/lib/FormGroup';
 import Modal from 'react-bootstrap/lib/Modal';
 import classNames from 'classnames';
 import { toastr } from 'react-redux-toastr';
-import { createLabel } from '../../store/labels';
+import gql from 'graphql-tag';
 import LABEL_COLORS from '../common/labelColors';
 import './labelSelector.scss';
 import '../common/ac/chip.scss';
+
+const NewLabelMutation = gql`mutation NewLabelMutation($project: ID!, $label: LabelInput!) {
+  newLabel(project: $project, label: $label) {
+    id
+    name
+    color
+  }
+}`;
+
+// UpdateLabelMutation
 
 class LabelDialog extends React.Component {
   constructor() {
@@ -46,8 +56,15 @@ class LabelDialog extends React.Component {
   onCreateLabel() {
     const { name, color } = this.state;
     this.setState({ busy: true });
-    this.props.createLabel(this.props.project.id, name, color).then(resp => {
-      this.props.onInsertLabel(resp.data);
+    this.props.client.mutate({
+      mutation: NewLabelMutation,
+      variables: {
+        project: this.props.project.id,
+        label: { name, color },
+      },
+    })
+    .then(resp => {
+      this.props.onInsertLabel(resp.data.newLabel);
       this.setState({ busy: false });
       this.props.onHide();
     }, error => {
@@ -117,7 +134,7 @@ class LabelDialog extends React.Component {
           </FormGroup>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.onHide}>Cancel</Button>
+          <Button onClick={this.props.onHide}>Cancel</Button>
           <Button
               onClick={this.onCreateLabel}
               disabled={this.state.name.length < 3 && !this.state.busy}
@@ -132,13 +149,9 @@ LabelDialog.propTypes = {
     id: React.PropTypes.string.isRequired,
   }).isRequired,
   onHide: React.PropTypes.func.isRequired,
-  createLabel: React.PropTypes.func.isRequired,
+  // createLabel: React.PropTypes.func.isRequired,
   onInsertLabel: React.PropTypes.func.isRequired,
+  client: React.PropTypes.instanceOf(ApolloClient).isRequired,
 };
 
-export default connect(
-  null,
-  dispatch => bindActionCreators({
-    createLabel,
-  }, dispatch)
-)(LabelDialog);
+export default withApollo(LabelDialog);

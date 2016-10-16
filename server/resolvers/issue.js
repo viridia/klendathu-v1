@@ -1,8 +1,8 @@
 const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
 
-function serialize(issue) {
-  return Object.assign({}, issue);
+function serialize(issue, props = {}) {
+  return Object.assign({}, issue, props);
 }
 
 module.exports = {
@@ -22,7 +22,7 @@ module.exports = {
   issues({ project, token }, { db }) {
     const query = {};
     if (!project) {
-      return Promise.reject(400);
+      return Promise.reject({ status: 401, error: 'missing-project' });
     }
     query.project = new ObjectId(project);
     return db.collection('issues').find(query).sort({ id: -1 }).toArray()
@@ -31,11 +31,10 @@ module.exports = {
 
   newIssue({ project, issue }, { db, user }) {
     if (!user) {
-      return Promise.reject(401);
+      return Promise.reject({ status: 401, error: 'unauthorized' });
     }
     if (!issue.type || !issue.state || !issue.summary) {
-      // TODO: Need a better error code format.
-      return Promise.reject(400);
+      return Promise.reject({ status: 401, error: 'missing-field' });
     }
     const projects = db.collection('projects');
     const issues = db.collection('issues');
@@ -71,7 +70,7 @@ module.exports = {
         return { id: result.ops[0].id };
       }, error => {
         logger.error('Error creating issue', issue, error);
-        return Promise.reject(500);
+        return Promise.reject({ status: 500, error: 'internal' });
       });
     });
   },

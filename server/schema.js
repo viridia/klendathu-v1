@@ -3,6 +3,7 @@ const { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLList
 const issueType = require('./schemas/issueType');
 const issueInputType = require('./schemas/issueInputType');
 const labelType = require('./schemas/labelType');
+const labelInputType = require('./schemas/labelInputType');
 const userType = require('./schemas/userType');
 const projectType = require('./schemas/projectType');
 const projectInputType = require('./schemas/projectInputType');
@@ -22,7 +23,7 @@ module.exports = new GraphQLSchema({
         },
       },
       issues: {
-        type: new GraphQLNonNull(new GraphQLList(issueType)),
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(issueType))),
         args: {
           project: { type: GraphQLID },
           token: { type: GraphQLString },
@@ -36,16 +37,21 @@ module.exports = new GraphQLSchema({
         },
       },
       projects: {
-        type: new GraphQLNonNull(new GraphQLList(projectType)),
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(projectType))),
         args: {
           id: { type: GraphQLID },
           name: { type: GraphQLString },
         },
       },
-      labels: {
-        type: new GraphQLNonNull(new GraphQLList(labelType)),
+      label: {
+        type: labelType,
         args: {
           id: { type: GraphQLID },
+        },
+      },
+      labels: {
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(labelType))),
+        args: {
           project: { type: GraphQLID },
           token: { type: GraphQLString },
         },
@@ -121,6 +127,41 @@ module.exports = new GraphQLSchema({
           id: {
             type: new GraphQLNonNull(GraphQLID),
             description: 'Id of the issue to delete.',
+          },
+        },
+      },
+      newLabel: {
+        type: new GraphQLNonNull(labelType),
+        args: {
+          project: {
+            type: new GraphQLNonNull(GraphQLID),
+            description: 'Id of the project the new label is being added to.',
+          },
+          label: {
+            type: labelInputType,
+            description: 'Contents of the label to be created.',
+          },
+        },
+      },
+      updateLabel: {
+        type: new GraphQLNonNull(labelType),
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLID),
+            description: 'Id of the label to update.',
+          },
+          label: {
+            type: labelInputType,
+            description: 'Contents of the label to be created.',
+          },
+        },
+      },
+      deleteLabel: {
+        type: new GraphQLNonNull(new GraphQLList(labelType)),
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLID),
+            description: 'Id of the label to delete.',
           },
         },
       },

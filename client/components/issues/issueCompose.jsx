@@ -105,10 +105,11 @@ class IssueCompose extends React.Component {
     this.onChangeDescription = this.onChangeDescription.bind(this);
     this.onChangeReporter = this.onChangeReporter.bind(this);
     this.onChangeOwner = this.onChangeOwner.bind(this);
+    this.onChangeCC = this.onChangeCC.bind(this);
+    this.onChangeLabels = this.onChangeLabels.bind(this);
     this.onChangePublic = this.onChangePublic.bind(this);
     this.onChangeAnother = this.onChangeAnother.bind(this);
     this.onChangeCommentText = this.onChangeCommentText.bind(this);
-    this.onAddCC = this.onAddCC.bind(this);
     this.onAddComment = this.onAddComment.bind(this);
     this.onInputKeyDown = this.onInputKeyDown.bind(this);
     this.onFocusNext = this.onFocusNext.bind(this);
@@ -123,6 +124,8 @@ class IssueCompose extends React.Component {
       public: false,
       reporter: this.me,
       owner: null,
+      cc: [],
+      labels: [],
       commentText: '',
       another: false,
     };
@@ -169,9 +172,16 @@ class IssueCompose extends React.Component {
     this.setState({ reporter: e });
   }
 
-  onChangeOwner(e) {
-    console.log(e);
-    this.setState({ owner: e });
+  onChangeOwner(selection) {
+    this.setState({ owner: selection });
+  }
+
+  onChangeCC(selection) {
+    this.setState({ cc: selection });
+  }
+
+  onChangeLabels(selection) {
+    this.setState({ labels: selection });
   }
 
   onChangePublic(e) {
@@ -180,10 +190,6 @@ class IssueCompose extends React.Component {
 
   onChangeAnother(e) {
     this.setState({ another: e.target.checked });
-  }
-
-  onAddCC(e) {
-    this.props.addIssueCC(e.id);
   }
 
   onChangeCommentText(e) {
@@ -201,7 +207,12 @@ class IssueCompose extends React.Component {
 
   onCreate(e) {
     e.preventDefault();
-    const issue = Object.assign({}, this.props.issue, { custom: [] });
+    const issue = Object.assign({}, this.props.issue, {
+      owner: this.state.owner ? this.state.owner.id : undefined,
+      cc: this.state.cc.map(cc => cc.id),
+      labels: this.state.labels.map(label => label.id),
+      custom: [],
+    });
     const issueType = this.templateTypes.get(issue.type);
     const fields = this.customFieldList(issueType);
     for (const field of fields) {
@@ -368,8 +379,8 @@ class IssueCompose extends React.Component {
                           className="assignee ac-single"
                           project={project}
                           placeholder="(unassigned)"
-                          value={this.state.owner}
-                          onChange={this.onChangeOwner}
+                          selection={this.state.owner}
+                          onSelectionChange={this.onChangeOwner}
                           onFocusNext={this.onFocusNext} />
                     </td>
                   </tr>
@@ -381,6 +392,8 @@ class IssueCompose extends React.Component {
                             className="assignee ac-multi"
                             project={project}
                             multiple
+                            selection={this.state.cc}
+                            onSelectionChange={this.onChangeCC}
                             onFocusNext={this.onFocusNext} />
                       </div>
                     </td>
@@ -394,18 +407,9 @@ class IssueCompose extends React.Component {
                             id="labels"
                             className="labels ac-multi"
                             project={project}
+                            selection={this.state.labels}
+                            onSelectionChange={this.onChangeLabels}
                             onFocusNext={this.onFocusNext} />
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th className="header"><ControlLabel>Keywords:</ControlLabel></th>
-                    <td>
-                      <div className="ac-multi-group">
-                        <Typeahead
-                            className="keywords ac-multi"
-                            options={['(unassigned)', 'me']} />
-                        <Button bsSize="small">Add</Button>
                       </div>
                     </td>
                   </tr>

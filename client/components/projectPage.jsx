@@ -17,7 +17,7 @@ class ProjectPage extends React.Component {
     const child = React.Children.only(children);
     const main = React.cloneElement(child, { project, params });
     return (<div className="content">
-      <LeftNav project={params.project} />
+      <LeftNav project={project} />
       {main}
     </div>);
   }
