@@ -2,6 +2,7 @@ Hot loading?
 New React Router?
 * I think we're going to need tests for the graphql stuff, and the tests will probably need
   a real db.
+* Errors
 * Flesh out issue details
 * Edit existing issue (with permissions for various fields).
 * Should be able to comment on a bug without going to edit page.
@@ -11,9 +12,12 @@ New React Router?
   * Get rid of typeahead
 * Search users on both username and fullname.
 * Click on autocomplete menu (in addition to ENTER).
-* Deletion of labels
+* Label view
 * Editing of labels
+* Deletion of labels
 * Simplify rendering of suggestionsSuffix
+* Make 'back' url params invisible.
+* Make next / prev issue buttons work.
 * return key to navigate between fields
 * escape to dismiss menus
 * make note about hash tags and @mentions

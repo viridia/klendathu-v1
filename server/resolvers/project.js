@@ -1,5 +1,6 @@
 const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
+const Role = require('../common/role');
 
 function serialize(project, props = {}) {
   return Object.assign({}, project, {
@@ -11,36 +12,52 @@ function serialize(project, props = {}) {
 // TODO: Move to a roles file.
 function getRole(db, project, user) {
   if (!user) {
-    return { rank: 'NONE', level: 0 };
+    return Role.NONE;
   } else if (project.owningUser && project.owningUser.equals(user._id)) {
-    return { rank: 'OWNER', level: 100 };
+    return Role.OWNER;
   } else {
-    return { rank: 'NONE', level: 0 };
+    return Role.NONE;
   }
 }
 
 const resolverMethods = {
-  project({ id, name: pname }) {
+  /** Look up a single project and return a promise that resolves to both the project and the
+      current user's role.
+  */
+  getProjectAndRole({ projectId, projectName, mutation = false }) {
     const query = {
       deleted: false,
     };
-    // if (!user) {
-    //   return Promise.reject({ status: 401, error: 'unauthorized' });
-    // }
-    if (id) {
-      query._id = new ObjectId(id);
+    if (projectId) {
+      query._id = new ObjectId(projectId);
+    } else if (projectName) {
+      query.name = projectName;
+    } else {
+      return Promise.reject({ status: 400, error: 'no-project-id' });
     }
-    if (pname) {
-      query.name = pname;
+    // If this is a mutation and the user is not logged in, then don't even bother doing a
+    // database lookup for the project, since they won't be able to do anything.
+    if (mutation && !this.user) {
+      return Promise.resolve([null, Role.NONE]);
     }
     return this.db.collection('projects').findOne(query).then(project => {
       if (!project) {
+        return [null, Role.NONE];
+      }
+      if (this.user._id.equals(project.owningUser)) {
+        return [project, Role.OWNER];
+      }
+      return [project, Role.NONE];
+    });
+  },
+
+  project({ id, name }) {
+    return this.getProjectAndRole({ projectId: id, projectName: name }).then(([project, role]) => {
+      if (!project || (role.level === Role.NONE.level && !project.public)) {
         return null;
       }
-      const role = getRole(this.db, project, this.user);
-      // TODO: Visibility test.
       return serialize(project, {
-        role,
+        role: role.rank,
         template: this.template({ project: 'std', name: 'software' }),
         workflow: this.workflow({ project: 'std', name: 'bugtrack' }),
       });
@@ -54,14 +71,13 @@ const resolverMethods = {
     if (pname) {
       query.name = pname;
     }
-    // if (!user) {
-    //   return Promise.reject({ status: 401, error: 'unauthorized' });
-    // }
+    // TODO: Only return projects which this user is a member of.
     return this.db.collection('projects').find(query).sort({ created: -1 }).toArray()
     .then(projects => {
       const results = [];
       // TODO: Visibility test.
       for (const p of projects) {
+        // TODO: Need a specialized version of lookup role
         const role = getRole(this.db, p, this.user);
         results.push(serialize(p, { role }));
       }
@@ -125,39 +141,41 @@ const resolverMethods = {
     if (!this.user) {
       return Promise.reject({ status: 401, error: 'unauthorized' });
     }
-    const pid = new ObjectId(id);
     const projects = this.db.collection('projects');
-    return projects.findOne({ _id: pid }).then(proj => {
-      if (proj) {
-        // TODO: Ownership test and role test.
-        const updates = {
-          updated: new Date(),
-        };
-        if (project.title) {
-          updates.title = project.title;
-        }
-        if (project.description) {
-          updates.description = project.description;
-        }
-        // TODO: owning user, owning org, template name, workflow name
-        // All of which need validation
-        return projects.updateOne({ _id: pid }, {
-          $set: updates,
-        }).then(() => {
-          return projects.findOne({ _id: pid }).then(result => {
-            return serialize(result);
-          });
-        }, error => {
-          logger.error('Error updating project', id, proj.name, error);
-          return Promise.reject(500);
-        });
-      } else {
-        logger.error('Error updating non-existent project', id);
-        return Promise.reject(404);
+    return this.getProjectAndRole({ projectId: id }).then(([proj, role]) => {
+      if (!proj) {
+        logger.error('Error updating non-existent project', id, this.user);
+        return Promise.reject({ status: 404, error: 'project-not-found' });
+      } else if (role < Role.ADMINISTRATOR) {
+        logger.error('Access denied updating project', id, this.user);
+        return Promise.reject({ status: 401, error: 'update-not-permitted' });
       }
+
+      // TODO: Ownership test and role test.
+      const updates = {
+        updated: new Date(),
+      };
+      if (project.title) {
+        updates.title = project.title;
+      }
+      if (project.description) {
+        updates.description = project.description;
+      }
+      // TODO: owning user, owning org, template name, workflow name
+      // All of which need validation
+      return projects.updateOne({ _id: proj._id }, {
+        $set: updates,
+      }).then(() => {
+        return projects.findOne({ _id: proj._id }).then(result => {
+          return serialize(result);
+        });
+      }, error => {
+        logger.error('Error updating project', id, proj.name, error);
+        return Promise.reject({ status: 500, error: 'internal' });
+      });
     }, err => {
       logger.error('Error finding project to update', err);
-      return Promise.reject(500);
+      return Promise.reject({ status: 500, error: 'internal' });
     });
   },
 
@@ -168,16 +186,20 @@ const resolverMethods = {
     }
     const pid = new ObjectId(id);
     const projects = this.db.collection('projects');
-    // TODO: Ownership test and role test.
     // Check to see if project exists
-    return projects.findOne({ _id: pid }).then(p => {
-      if (!p) {
-        return Promise.reject({ status: 404, error: 'not-found' });
+    return this.getProjectAndRole({ projectId: id }).then(([proj, role]) => {
+      // Make sure we have permissions to do this.
+      if (!proj) {
+        logger.error('Error updating non-existent project', id, this.user);
+        return Promise.reject({ status: 404, error: 'project-not-found' });
+      } else if (role < Role.ADMINISTRATOR) {
+        logger.error('Access denied updating project', id, this.user);
+        return Promise.reject({ status: 401, error: 'update-not-permitted' });
       }
-      return p;
+      return proj;
     })
     .then(() => {
-      // Delete all isssues and labels
+      // Delete all isssues and labels associated with this project
       return Promise.all([
         this.db.collection('issues').deleteMany({ project: pid }),
         this.db.collection('labels').deleteMany({ project: pid }),
@@ -190,6 +212,7 @@ const resolverMethods = {
     .then(() => {
       // Fetch the list of projects
       // TODO: Avoid this with smart client updating?
+      // TODO: Only return projects which are visible to this user.
       logger.info('Deleted project:', pid.toString());
       return this.projects({}, { user });
     }, error => {
