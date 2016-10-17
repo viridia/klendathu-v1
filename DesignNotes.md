@@ -2,11 +2,11 @@ Hot loading?
 New React Router?
 * I think we're going to need tests for the graphql stuff, and the tests will probably need
   a real db.
-* Errors
 * Flesh out issue details
+* Figure out how to do refetch on project creation / deletion
 * Edit existing issue (with permissions for various fields).
 * Should be able to comment on a bug without going to edit page.
-* Show change log
+* Show issue change log
 * Custom suggest field / enter key support.
   * Will be easier once we have some data
   * Get rid of typeahead
@@ -21,6 +21,7 @@ New React Router?
 * return key to navigate between fields
 * escape to dismiss menus
 * make note about hash tags and @mentions
+* Errors
 * Additional roles
   * Project membership
   * Create organizations

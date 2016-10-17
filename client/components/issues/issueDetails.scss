@@ -38,5 +38,18 @@
         line-height: 1.9em;
       }
     }
+
+    .user-name {
+      display: block;
+      .full {
+        font-weight: bold;
+      }
+    }
+
+    .label-name {
+      display: inline-block;
+      line-height: 1.3em;
+      margin: 4px 4px 4px 0;
+    }
   }
 }

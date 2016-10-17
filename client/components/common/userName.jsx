@@ -6,7 +6,11 @@ class UserName extends React.Component {
   render() {
     const userInfo = this.props.data.user;
     if (userInfo) {
-      return <span className="user-name">{userInfo.username}</span>;
+      return (<span className="user-name">
+        {this.props.full && userInfo.fullname &&
+          <span className="full">{userInfo.fullname} - </span>}
+        {userInfo.username}
+      </span>);
     } else {
       return <span className="user-name" />;
     }
@@ -14,10 +18,11 @@ class UserName extends React.Component {
 }
 
 UserName.propTypes = {
-  user: React.PropTypes.string.isRequired,
+  user: PropTypes.string.isRequired,
   data: PropTypes.shape({
     user: PropTypes.shape({}),
   }),
+  full: PropTypes.bool,
 };
 
 const UserQuery = gql`query UserQuery($user: ID!) {

@@ -4,7 +4,7 @@ module.exports = {
   NONE: 0,
   // Viewers can see issues but not mutate anything.
   VIEWER: 10,
-  // Reporters can report bugs but cannot edit them.
+  // Reporters can report bugs but cannot edit them (except for adding comments).
   REPORTER: 25,
   // Updaters can update bugs.
   UPDATER: 40,

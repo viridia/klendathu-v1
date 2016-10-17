@@ -9,6 +9,7 @@ import ArrowForwardIcon from 'icons/ic_arrow_forward_black_24px.svg';
 import ArrowUpIcon from 'icons/ic_arrow_upward_black_24px.svg';
 import ErrorDisplay from '../debug/errorDisplay.jsx';
 import UserName from '../common/userName.jsx';
+import LabelName from '../common/labelName.jsx';
 import './issueDetails.scss';
 
 class IssueDetails extends React.Component {
@@ -51,7 +52,7 @@ class IssueDetails extends React.Component {
               <th className="header">Reporter:</th>
               <td className="reporter">
                 {issue.reporter
-                  ? <UserName user={issue.reporter} />
+                  ? <UserName user={issue.reporter} full />
                   : <span className="unassigned">unassigned</span>}
               </td>
             </tr>
@@ -59,25 +60,21 @@ class IssueDetails extends React.Component {
               <th className="header">Owner:</th>
               <td>
                 {issue.owner
-                  ? <UserName user={issue.owner} />
+                  ? <UserName user={issue.owner} full />
                   : <span className="unassigned">unassigned</span>}
               </td>
             </tr>
             <tr>
               <th className="header">CC:</th>
-              <td>{issue.cc}
+              <td>{issue.cc.map(user => <UserName user={user} key={user} full />)}
               </td>
             </tr>
             {this.renderTemplateFields()}
             <tr>
               <th className="header">Labels:</th>
               <td>
-                {issue.labels}
+                {issue.labels.map(label => <LabelName label={label} key={label} />)}
               </td>
-            </tr>
-            <tr>
-              <th className="header">Keywords:</th>
-              <td>{issue.keywords}</td>
             </tr>
             <tr>
               <th className="header">Attachments:</th>

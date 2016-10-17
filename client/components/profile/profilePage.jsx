@@ -30,9 +30,14 @@ export default class ProfilePage extends React.Component {
             <CreateProjectPanel {...this.props} />
           </div>
         </Tab>
-        <Tab eventKey={2} title="Organizations">
+        <Tab eventKey={2} title="Account">
           <div className="settings-tab-pane">
-            Issue templates go here.
+            Account details.
+          </div>
+        </Tab>
+        <Tab eventKey={3} title="Organizations">
+          <div className="settings-tab-pane">
+            Organizations.
           </div>
         </Tab>
       </Tabs>
