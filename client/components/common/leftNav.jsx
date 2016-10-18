@@ -50,7 +50,7 @@ class LeftNav extends React.Component {
       <ul className="label-list">
         {labels && labels.map(label => (
           <li className="label-item" key={label.id}>
-            <Link to={`/project/${project.name}/labels/${label.id}`}>
+            <Link to={{ pathname: `/project/${project.name}/issues`, query: { label: label.id } }}>
               <LabelName label={label.id} />
             </Link>
           </li>

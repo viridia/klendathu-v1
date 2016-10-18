@@ -1,8 +1,12 @@
 Hot loading?
 New React Router?
+Check out Strider? (Means we'd have to write some tests)
+* UpdateQueries
 * I think we're going to need tests for the graphql stuff, and the tests will probably need
   a real db.
 * Flesh out issue details
+* Delete issues
+* Delete labels
 * Figure out how to do refetch on project creation / deletion
 * Edit existing issue (with permissions for various fields).
 * Should be able to comment on a bug without going to edit page.
@@ -76,13 +80,6 @@ collections:
        -- after description
        -- after keywords
        -- after state
-  workflows
-  templates
-  labels
-    - project.id
-    - owner.id
-    - name
-    - color
   project.settings:
     - user
     - labels
@@ -95,9 +92,6 @@ collections:
     - members[]:
       - user
       - access
-
-VIEWER, REPORTER, UPDATER, DEVELOPER, MANAGER and ADMINISTRATOR
-10:viewer, 25:reporter, 40:updater, 55:developer, 70:manager, 90:administrator
 
 client-side state:
   list of projects - for top-level menu
@@ -142,45 +136,17 @@ Things to experiment with:
   -- minimal babel conversions
   -- Nginx config and https
 
-
-  query ProfileQuery($project: String) {
-    labels(token: "opt") {
-      project
-      name
-    }
-    projects {
-      id
-      name
-    }
-    users {
-      fullname
-    }
-    workflow(project: "std", name: "bugtrack") {
-      name
-      project
-      extends
-      start
-      states {
-        id
-        caption
-        closed
-        transitions
-      }
-    }
-    template(project: "std", name: "software") {
-      name
-      project
-      types {
-        id
-        abstract
-        extends
-        fields {
-          id
-          caption
-          type
-          default
-          values
-        }
-      }
-    }
-  }
+Filter rows:
+  [field][op][value][x]
+  Row types:
+    * string
+      * contains [text]
+      * matches [text]
+      * does not contain [text]
+      * does not match [text]
+    * enum (checkboxes?)
+    * set (state, type) (checkboxes?)
+    * users
+      * contains any of (list of users)
+      * contains all of (list of users)
+      * contains none of (list of users)

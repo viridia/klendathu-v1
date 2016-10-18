@@ -1,0 +1,65 @@
+@import '../defines/base';
+
+.filter-params {
+  background-color: lighten($b1, 5%);
+
+  > header {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    background-color: $b2;
+    color: $textDarkAccent;
+
+    > .separator {
+      flex: 2;
+    }
+
+    > .search {
+      flex: 1;
+      background-color: lighten($b1, 5%);
+      border-color: $b3;
+      padding: 2px 8px;
+      height: 28px;
+    }
+  }
+
+  > .term-list {
+    > .filter-term {
+      margin: 4px;
+      display: flex;
+
+      .dropdown-toggle {
+        min-width: 12em;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-right: 8px;
+      }
+
+      > .match-text {
+        padding: 4px 8px;
+        height: 32px;
+      }
+
+      > .flex {
+        flex: 4;
+      }
+
+      > .remove {
+        border: none;
+        background: none;
+        opacity: 0.5;
+        outline: none;
+        &:hover {
+          opacity: 1;
+        }
+        > .svg-icon {
+          > svg {
+            width: 16;
+            height: 16;
+          }
+        }
+      }
+    }
+  }
+}

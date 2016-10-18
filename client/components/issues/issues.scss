@@ -3,22 +3,6 @@
 @import '../common/table';
 
 // Move this.
-.kdt.expander {
-  position: relative;
-  top: -1px;
-  display: inline-block;
-  width: 0;
-  height: 0;
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-  border-left: 8px solid $textDarkAccent;
-  margin-right: 5px;
-  transition: transform .3s ease;
-  &.active {
-    transform: rotate(90deg);
-  }
-}
-
 .kdt.issue-compose {
   flex: 1;
   display: flex;
@@ -33,15 +17,6 @@
     > .content {
       padding: 8px;
     }
-  }
-}
-
-// Move this.
-.card {
-  > .filters {
-    padding: 8px;
-    background-color: $b2;
-    color: $textDarkAccent;
   }
 }
 

@@ -4,9 +4,10 @@ import { Link } from 'react-router';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import classNames from 'classnames';
-import UserName from '../common/userName.jsx';
 import LabelName from '../common/labelName.jsx';
+import UserName from '../common/userName.jsx';
 import ErrorDisplay from '../debug/errorDisplay.jsx';
+import FilterParams from './filterParams.jsx';
 import './issueList.scss';
 import './issues.scss';
 
@@ -38,12 +39,17 @@ class IssueList extends React.Component {
     super(props);
     this.state = {
       columns: ['priority', 'severity'],
+      search: '',
     };
     this.buildColumns(props.project);
   }
 
   componentWillReceiveProps(nextProps) {
     this.buildColumns(nextProps.project);
+  }
+
+  onChangeSearch(e) {
+    this.setState({ search: e.target.value });
   }
 
   buildColumns(project) {
@@ -162,12 +168,7 @@ class IssueList extends React.Component {
 
   render() {
     return (<section className="kdt issue-list">
-      <div className="card">
-        <div className="filters">
-          <div className="kdt expander" />
-          Filters
-        </div>
-      </div>
+      <FilterParams {...this.props} />
       {this.renderIssueList()}
     </section>);
   }
@@ -208,8 +209,14 @@ IssueList.propTypes = {
   location: PropTypes.shape({
     pathname: PropTypes.string.isRequired,
   }).isRequired,
+  params: PropTypes.shape({
+    label: PropTypes.string,
+  }).isRequired,
 };
 
 export default graphql(IssueQuery, {
-  options: ({ project }) => ({ variables: { project: project.id } }),
+  options: ({ project, params: { label } }) => ({ variables: {
+    project: project.id,
+    label,
+  } }),
 })(IssueList);

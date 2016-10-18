@@ -25,7 +25,7 @@ const resolverMethods = {
     });
   },
 
-  issues({ project, token }) {
+  issues({ project, token, label }) {
     return this.getProjectAndRole({ projectId: project }).then(([proj, role]) => {
       if (proj === null || (!proj.public && role < Role.VIEWER)) {
         return Promise.reject({ status: 404, error: 'missing-project' });
@@ -34,6 +34,23 @@ const resolverMethods = {
       if (token) {
         logger.error('unimplemented: issues(token)');
       }
+      if (label) {
+        // TODO: Need an array membership test.
+        logger.info('unimplemented: issues(label)');
+      }
+      // Other things we might want to search for:
+      // summary
+      // description
+      // owner
+      // cc
+      // reporter
+      // keywords
+      // custom fields (hardware, etc)
+      // comments / commenter
+      // states
+      // linked
+      // created
+      // updated
       query.project = new ObjectId(project);
       return this.db.collection('issues').find(query).sort({ id: -1 }).toArray()
           .then(issues => issues.map(serialize));

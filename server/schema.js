@@ -33,6 +33,7 @@ module.exports = new GraphQLSchema({
         args: {
           project: { type: GraphQLID },
           token: { type: GraphQLString },
+          label: { type: GraphQLString },
         },
       },
       project: {
