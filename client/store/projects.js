@@ -2,24 +2,50 @@ import gql from 'graphql-tag';
 import client from './apollo';
 
 const NewProject = gql`mutation NewProjectMutation($project: ProjectInput) {
-  newProject(project: $project) { id }
+  newProject(project: $project) {
+    id
+    name
+    title
+    description
+    owningUser
+    owningOrg
+    role
+    created
+    updated
+  }
 }`;
 
 export function createProject(project) {
   return client.mutate({
     mutation: NewProject,
     variables: { project },
+    updateQueries: {
+      projectListQuery: (previousQueryResult, { mutationResult }) => {
+        return {
+          projects: [mutationResult.data.newProject, ...previousQueryResult.projects],
+        };
+      },
+    },
   });
 }
 
 const DeleteProject = gql`mutation DeleteProjectMutation($id: ID!) {
-  deleteProject(id: $id) { id }
+  deleteProject(id: $id)
 }`;
 
 export function deleteProject(id) {
   return client.mutate({
     mutation: DeleteProject,
     variables: { id },
+    updateQueries: {
+      projectListQuery: (previousQueryResult, { mutationResult }) => {
+        console.log(mutationResult);
+        return {
+          projects: previousQueryResult.projects.filter(
+            p => p.id !== mutationResult.data.deleteProject),
+        };
+      },
+    },
   });
 }
 
@@ -28,11 +54,13 @@ const UpdateProject = gql`mutation UpdateProject($id: ID!, $title: String, $desc
     projects {
       id
       name
-      description
       title
+      description
       owningUser
       owningOrg
       role
+      created
+      updated
     }
   }
 }`;

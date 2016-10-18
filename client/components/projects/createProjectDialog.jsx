@@ -43,6 +43,7 @@ export default class CreateProjectDialog extends React.Component {
       newState.projectTitle = '';
       newState.owner = '';
       this.setState(newState);
+      this.props.onHide();
     }, error => {
       if (error.graphQLErrors) {
         for (const e of error.graphQLErrors) {
@@ -93,7 +94,7 @@ export default class CreateProjectDialog extends React.Component {
       <Modal
           show
           onHide={this.props.onHide}
-          dialogClassName="create-label">
+          dialogClassName="create-project">
         <Modal.Header closeButton>
           <Modal.Title>Create Label</Modal.Title>
         </Modal.Header>
@@ -104,6 +105,7 @@ export default class CreateProjectDialog extends React.Component {
                 validationState={this.state.projectNameError && 'error'}>
               <ControlLabel>Project Id</ControlLabel>
               <FormControl
+                  autoFocus
                   type="text"
                   label="Project Name"
                   value={this.state.projectName}
@@ -137,7 +139,7 @@ export default class CreateProjectDialog extends React.Component {
         <Modal.Footer>
           <Button onClick={this.props.onHide}>Cancel</Button>
           <Button
-              onClick={this.onCreateProject}
+              onClick={this.onCreate}
               disabled={this.state.projectName.length === 0 && !this.state.busy}
               bsStyle="primary">
             <AddBoxIcon />

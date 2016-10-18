@@ -17,6 +17,13 @@ const projectInputType = require('./schemas/projectInputType');
 const templateType = require('./schemas/templateType');
 const workflowType = require('./schemas/workflowType');
 
+// const deletionResult = new GraphQLObjectType({
+//   name: 'DeleteionResult',
+//   fields: {
+//     id: { type: new GraphQLNonNull(GraphQLID) },
+//   },
+// });
+
 module.exports = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: 'Query',
@@ -129,7 +136,7 @@ module.exports = new GraphQLSchema({
         },
       },
       deleteIssue: {
-        type: new GraphQLNonNull(new GraphQLList(issueType)),
+        type: new GraphQLNonNull(GraphQLID),
         args: {
           id: {
             type: new GraphQLNonNull(GraphQLID),
@@ -164,7 +171,7 @@ module.exports = new GraphQLSchema({
         },
       },
       deleteLabel: {
-        type: new GraphQLNonNull(new GraphQLList(labelType)),
+        type: new GraphQLNonNull(GraphQLID),
         args: {
           id: {
             type: new GraphQLNonNull(GraphQLID),
@@ -195,7 +202,7 @@ module.exports = new GraphQLSchema({
         },
       },
       deleteProject: {
-        type: new GraphQLNonNull(new GraphQLList(projectType)),
+        type: new GraphQLNonNull(GraphQLID),
         args: {
           id: {
             type: new GraphQLNonNull(GraphQLID),

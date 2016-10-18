@@ -1,8 +1,6 @@
 import React from 'react';
 import Tab from 'react-bootstrap/lib/Tab';
 import Tabs from 'react-bootstrap/lib/Tabs';
-import CreateProjectPanel from '../projects/createProjectPanel.jsx';
-import ProjectList from '../projects/projectList.jsx';
 import './profile.scss';
 
 export default class ProfilePage extends React.Component {
@@ -24,18 +22,12 @@ export default class ProfilePage extends React.Component {
           onSelect={this.handleSelect}
           id="project-panel"
           animation={false}>
-        <Tab eventKey={1} title="Projects">
-          <div className="settings-tab-pane">
-            <ProjectList {...this.props} />
-            <CreateProjectPanel {...this.props} />
-          </div>
-        </Tab>
-        <Tab eventKey={2} title="Account">
+        <Tab eventKey={1} title="Account">
           <div className="settings-tab-pane">
             Account details.
           </div>
         </Tab>
-        <Tab eventKey={3} title="Organizations">
+        <Tab eventKey={2} title="Organizations">
           <div className="settings-tab-pane">
             Organizations.
           </div>

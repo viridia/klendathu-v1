@@ -29,9 +29,7 @@ export default class ProjectCard extends React.Component {
   onConfirmDelete(ev) {
     ev.preventDefault();
     this.setState({ showDelete: false });
-    deleteProject(this.props.project.id).then(() => {
-      this.props.onChange();
-    });
+    deleteProject(this.props.project.id);
   }
 
   render() {
@@ -53,14 +51,21 @@ export default class ProjectCard extends React.Component {
           </Modal>
         )}
         <div className="project-info">
-          <Link className="project-link" to={{ pathname: `/project/${project.name}/issues` }}>
-            {project.name}
-          </Link>
+          <div className="project-name">
+            <Link className="project-link" to={{ pathname: `/project/${project.name}/issues` }}>
+              {project.name}
+            </Link>
+            <div className="description">{project.title}</div>
+          </div>
           <div className="project-owner">
             <div className="owned-by">
-              Owned by: <UserName user={project.owningUser} />
+              <span className="title">Owned by: </span>
+              <UserName user={project.owningUser} />
             </div>
-            <div className="role">Role: {roleName(project.role).toLowerCase()}</div>
+            <div className="role">
+              <span className="title">Role: </span>
+              {roleName(project.role).toLowerCase()}
+            </div>
           </div>
           <div>
             <Button bsStyle="primary" onClick={this.onShowDelete}>Delete</Button>
@@ -76,5 +81,4 @@ ProjectCard.propTypes = {
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
   }).isRequired,
-  onChange: PropTypes.func.isRequired,
 };

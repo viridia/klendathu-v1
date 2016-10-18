@@ -116,6 +116,8 @@ const resolverMethods = {
           newProject.owningUser = user._id;
           newProject.owningOrg = null;
         } else {
+          // TODO: Make the user an administrator
+          // TODO: Make sure the org exists.
           logger.error('Custom owners not supported.');
           return Promise.reject({ status: 400, error: 'unimplemented' });
         }
@@ -123,8 +125,13 @@ const resolverMethods = {
         return projects.insertOne(newProject).then(result => {
           logger.info('Created project', project.name);
           return projects.findOne({ _id: result.insertedId }).then(np => {
+            // TODO: Since we just created the project, we should not need to look up the role.
             const role = getRole(db, np, user);
-            return serialize(np, { role });
+            return serialize(np, {
+              role,
+              template: this.template({ project: 'std', name: 'software' }),
+              workflow: this.workflow({ project: 'std', name: 'bugtrack' }),
+            });
           });
         }, error => {
           logger.error('Error creating project', error);
@@ -214,7 +221,7 @@ const resolverMethods = {
       // TODO: Avoid this with smart client updating?
       // TODO: Only return projects which are visible to this user.
       logger.info('Deleted project:', pid.toString());
-      return this.projects({}, { user });
+      return pid;
     }, error => {
       logger.error('Error deleting project:', pid, error);
       return Promise.reject({ status: 500, error: 'internal' });
