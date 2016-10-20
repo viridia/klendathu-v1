@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/lib/Button';
 export default function SignInLink(props, context) {
   if (!context.profile) {
     return (
-      <LinkContainer to={{ pathname: '/login', query: { next: props.location.pathname } }}>
+      <LinkContainer to={{ pathname: '/login', state: { next: props.location } }}>
         <Button className="header-link" bsStyle="link">Sign In</Button>
       </LinkContainer>
     );

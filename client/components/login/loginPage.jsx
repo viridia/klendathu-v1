@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { browserHistory } from 'react-router';
 import { withApollo } from 'react-apollo';
 import axios from 'axios';
@@ -41,8 +41,8 @@ class LoginPage extends React.Component {
         case 'incorrect-password': errState.passwordError = 'Incorrect password.'; break;
         default: {
           this.props.client.resetStore();
-          const { next } = this.props.location.query;
-          browserHistory.push({ pathname: next || '/' });
+          const { next } = this.props.location.state || {};
+          browserHistory.push(next || { pathname: '/' });
           return;
         }
       }
@@ -62,7 +62,7 @@ class LoginPage extends React.Component {
 
   render() {
     const canSubmit = this.state.userName.length > 1 && this.state.password.length > 1;
-    const { next } = this.props.location.query;
+    const { next } = this.props.location.state || {};
     return (<div className="kdt page">
       <Header location={this.props.location} params={this.props.params} />
       <div className="login-content">
@@ -90,10 +90,10 @@ class LoginPage extends React.Component {
               <HelpBlock>{this.state.passwordError}</HelpBlock>
             </FormGroup>
             <div className="button-row">
-              <LinkContainer to={{ pathname: '/signup', query: this.props.location.query }}>
+              <LinkContainer to={{ pathname: '/signup', state: { next: this.props.location } }}>
                 <Button bsStyle="link">Create Account</Button>
               </LinkContainer>
-              <LinkContainer to={{ pathname: next || '/' }}>
+              <LinkContainer to={next || { pathname: '/' }}>
                 <Button bsStyle="default">Cancel</Button>
               </LinkContainer>
               <Button bsStyle="primary" type="submit" disabled={!canSubmit}>Sign In</Button>
@@ -113,13 +113,13 @@ class LoginPage extends React.Component {
 }
 
 LoginPage.propTypes = {
-  location: React.PropTypes.shape({
-    query: React.PropTypes.shape({
-      next: React.PropTypes.string,
-    }).isRequired,
+  location: PropTypes.shape({
+    state: PropTypes.shape({
+      next: PropTypes.object,
+    }),
   }).isRequired,
-  params: React.PropTypes.shape({}),
-  client: React.PropTypes.instanceOf(ApolloClient).isRequired,
+  params: PropTypes.shape({}),
+  client: PropTypes.instanceOf(ApolloClient).isRequired,
 };
 
 export default withApollo(LoginPage);

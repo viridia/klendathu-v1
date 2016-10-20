@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { browserHistory } from 'react-router';
 import { withApollo } from 'react-apollo';
 import Button from 'react-bootstrap/lib/Button';
@@ -67,8 +67,8 @@ class SignUpPage extends React.Component {
           break;
         default: {
           this.props.client.resetStore();
-          const { next } = this.props.location.query;
-          browserHistory.push({ pathname: next || '/' });
+          const { next } = this.props.location.state;
+          browserHistory.push(next || { pathname: '/' });
           return;
         }
       }
@@ -99,7 +99,7 @@ class SignUpPage extends React.Component {
   }
 
   render() {
-    const { next } = this.props.location.query;
+    const { next } = this.props.location.state;
     return (<div className="kdt page">
       <Header location={this.props.location} params={this.props.params} />
       <div className="login-content">
@@ -159,10 +159,10 @@ class SignUpPage extends React.Component {
               <HelpBlock>{this.state.password2Error}</HelpBlock>
             </FormGroup>
             <div className="button-row">
-              <LinkContainer to={{ pathname: '/login', query: this.props.location.query }}>
+              <LinkContainer to={{ pathname: '/login', state: { next: this.props.location } }}>
                 <Button bsStyle="link">Sign In</Button>
               </LinkContainer>
-              <LinkContainer to={{ pathname: next || '/' }}>
+              <LinkContainer to={next || { pathname: '/' }}>
                 <Button bsStyle="default">Cancel</Button>
               </LinkContainer>
               <Button bsStyle="primary" type="submit">Create Account</Button>
@@ -176,13 +176,13 @@ class SignUpPage extends React.Component {
 }
 
 SignUpPage.propTypes = {
-  location: React.PropTypes.shape({
-    query: React.PropTypes.shape({
-      next: React.PropTypes.string,
+  location: PropTypes.shape({
+    state: PropTypes.shape({
+      next: PropTypes.object,
     }),
   }).isRequired,
-  params: React.PropTypes.shape({}),
-  client: React.PropTypes.instanceOf(ApolloClient).isRequired,
+  params: PropTypes.shape({}),
+  client: PropTypes.instanceOf(ApolloClient).isRequired,
 };
 
 export default withApollo(SignUpPage);

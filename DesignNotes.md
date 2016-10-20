@@ -1,7 +1,9 @@
 Hot loading?
 New React Router?
 Check out Strider? (Means we'd have to write some tests)
+* Make next / prev issue buttons work.
 * A way to delete a bug
+* Use TypeScript on the backend.
 * UpdateQueries
   * Issue list
   * Label list
@@ -24,7 +26,6 @@ Check out Strider? (Means we'd have to write some tests)
 * Editing of labels
 * Deletion of labels
 * Make 'back' url params invisible.
-* Make next / prev issue buttons work.
 * return key to navigate between fields
 * escape to dismiss menus
 * make note about #hash tags and @mentions

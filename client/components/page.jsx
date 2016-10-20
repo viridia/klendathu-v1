@@ -24,7 +24,7 @@ class Page extends React.Component {
     const { data: { loading, errors, profile }, location } = props;
     if (!profile && !loading && !errors) {
       console.log('checkAuth:', loading, errors, profile, location);
-      browserHistory.replace({ pathname: '/login', query: { next: location.pathname } });
+      browserHistory.replace({ pathname: '/login', state: { next: location } });
     }
   }
 
