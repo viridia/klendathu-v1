@@ -5,7 +5,8 @@ import Page from './page.jsx';
 import ProjectPage from './projectPage.jsx';
 import Dashboard from './dashboard/dashboard.jsx';
 import IssueDetails from './issues/issueDetails.jsx';
-import IssueCompose from './issues/issueCompose.jsx';
+import IssueCreate from './issues/issueCreate.jsx';
+import IssueEdit from './issues/issueEdit.jsx';
 import IssueList from './issues/issueList.jsx';
 import LabelList from './issues/labelList.jsx';
 import ProjectSettings from './settings/projectSettings.jsx';
@@ -25,7 +26,8 @@ const Routes = (
       <Route component={Page} path="/">
         <Route component={GraphQLPage} path="/gql" />
         <Route component={ProjectPage} path="/project/:project">
-          <Route component={IssueCompose} path="/project/:project/new" />
+          <Route component={IssueCreate} path="/project/:project/new" />
+          <Route component={IssueEdit} path="/project/:project/edit/:id" />
           <Route component={IssueDetails} path="/project/:project/issues/:id" />
           <Route component={IssueList} path="/project/:project/issues" />
           <Route component={LabelList} path="/project/:project/labels" />

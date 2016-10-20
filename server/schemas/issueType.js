@@ -3,6 +3,7 @@ const { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLID, GraphQLList, Gr
 const GraphQLDate = require('graphql-date');
 const relationType = require('./relationType');
 const changeType = require('./changeType');
+const userType = require('./userType');
 const labelType = require('./labelType');
 
 const linkedIssueType = new GraphQLObjectType({
@@ -90,9 +91,23 @@ module.exports = new GraphQLObjectType({
       type: GraphQLID,
       description: 'Current owner of this issue.',
     },
+    ownerData: {
+      type: userType,
+      description: 'Current owner of this issue, as a User object.',
+      resolve(issue, args, context, options) {
+        return options.rootValue.singleUser({ id: issue.owner });
+      },
+    },
     cc: {
       type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
       description: 'Users who wish to be informed when this issue is updated.',
+    },
+    ccData: {
+      type: new GraphQLList(new GraphQLNonNull(userType)),
+      description: 'Users who wish to be informed when this issue is updated (as User objects).',
+      resolve(issue, args, context, options) {
+        return issue.cc.map(cc => options.rootValue.singleUser({ id: cc }));
+      },
     },
     created: {
       type: new GraphQLNonNull(GraphQLDate),
@@ -105,6 +120,13 @@ module.exports = new GraphQLObjectType({
     labels: {
       type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
       description: 'Labels associated with this issue.',
+    },
+    labelsData: {
+      type: new GraphQLList(new GraphQLNonNull(labelType)),
+      description: 'Labels associated with this issue (expanded).',
+      resolve(issue, args, context, options) {
+        return issue.labels.map(l => options.rootValue.label({ id: l }));
+      },
     },
     linked: {
       type: new GraphQLList(new GraphQLNonNull(linkedIssueType)),

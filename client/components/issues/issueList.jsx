@@ -174,7 +174,7 @@ class IssueList extends React.Component {
   }
 }
 
-const IssueQuery = gql`query IssueListQuery($project: ID!) {
+const IssueListQuery = gql`query IssueListQuery($project: ID!) {
   issues(project: $project) {
     id
     project
@@ -214,7 +214,7 @@ IssueList.propTypes = {
   }).isRequired,
 };
 
-export default graphql(IssueQuery, {
+export default graphql(IssueListQuery, {
   options: ({ project, params: { label } }) => ({ variables: {
     project: project.id,
     label,

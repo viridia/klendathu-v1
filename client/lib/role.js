@@ -1,14 +1,24 @@
+export const Role = {
+  NONE: 0,
+  VIEWER: 10,
+  REPORTER: 25,
+  UPDATER: 40,
+  DEVELOPER: 55,
+  MANAGER: 70,
+  ADMINISTRATOR: 90,
+  OWNER: 100,
+};
+
 /** Given a role level, return a role name. */
 export default function roleName(level) {
   switch (true) {
-    case (level < 10): { return 'NONE'; }
-    case (level < 25): { return 'VIEWER'; }
-    case (level < 40): { return 'REPORTER'; }
-    case (level < 55): { return 'UPDATER'; }
-    case (level < 70): { return 'DEVELOPER'; }
-    case (level < 90): { return 'MANAGER'; }
-    case (level < 100): { return 'ADMINISTRATOR'; }
-    default:
-      return 'OWNER';
+    case (level < Role.VIEWER): return 'NONE';
+    case (level < Role.REPORTER): return 'VIEWER';
+    case (level < Role.UPDATER): return 'REPORTER';
+    case (level < Role.DEVELOPER): return 'UPDATER';
+    case (level < Role.MANAGER): return 'DEVELOPER';
+    case (level < Role.ADMINISTRATOR): return 'MANAGER';
+    case (level < Role.OWNER): return 'ADMINISTRATOR';
+    default: return 'OWNER';
   }
 }

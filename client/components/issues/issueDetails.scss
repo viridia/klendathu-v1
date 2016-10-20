@@ -15,6 +15,11 @@
       display: flex;
       align-items: center;
       font-size: 110%;
+      padding: 6px;
+
+      > .issue-up {
+        align-self: stretch;
+      }
 
       > .issue-id, > .issue-summary {
         margin-left: 8px;
@@ -22,6 +27,13 @@
 
       > .divider {
         flex: 1;
+      }
+
+      > .issue-actions, .issue-nav {
+        margin-left: 6px;
+        display: flex;
+        align-items: stretch;
+        align-self: stretch;
       }
 
       > .issue-type {
@@ -50,6 +62,11 @@
       display: inline-block;
       line-height: 1.3em;
       margin: 4px 4px 4px 0;
+    }
+
+    .unassigned {
+      font-style: italic;
+      color: $textDarkDisabled;
     }
   }
 }

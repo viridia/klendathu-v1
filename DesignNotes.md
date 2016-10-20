@@ -1,7 +1,12 @@
 Hot loading?
 New React Router?
 Check out Strider? (Means we'd have to write some tests)
+* A way to delete a bug
+* A way to edit a bug
 * UpdateQueries
+  * Issue list
+  * Label list
+  * User list
 * I think we're going to need tests for the graphql stuff, and the tests will probably need
   a real db.
 * Flesh out issue details
@@ -19,13 +24,13 @@ Check out Strider? (Means we'd have to write some tests)
 * Label view
 * Editing of labels
 * Deletion of labels
-* Simplify rendering of suggestionsSuffix
 * Make 'back' url params invisible.
 * Make next / prev issue buttons work.
 * return key to navigate between fields
 * escape to dismiss menus
-* make note about hash tags and @mentions
+* make note about #hash tags and @mentions
 * Errors
+* Simplify rendering of suggestionsSuffix in autocomplete
 * Additional roles
   * Project membership
   * Create organizations

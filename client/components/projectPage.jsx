@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react';
 import 'react-redux-toastr/src/less/index.less';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 import LeftNav from './common/leftNav.jsx';
+import { ProjectQuery } from '../store/queries';
 import './page.scss';
 
 class ProjectPage extends React.Component {
@@ -38,27 +38,6 @@ ProjectPage.contextTypes = {
     username: React.PropTypes.string.isRequired,
   }),
 };
-
-const ProjectQuery = gql`query ProjectQuery($project: String!) {
-  project(name: $project) {
-    id name title
-    description
-    owningUser
-    owningOrg
-    created updated
-    template {
-      name project
-      types {
-        id caption abstract extends
-        fields { id type caption align default values }
-      }
-    }
-    workflow {
-      name project extends start
-      states { id caption closed transitions }
-    }
-  }
-}`;
 
 export default graphql(ProjectQuery, {
   options: ({ params }) => ({ variables: { project: params.project } }),

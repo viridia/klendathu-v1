@@ -39,7 +39,7 @@ export default class FilterParams extends React.Component {
     this.setState({ terms: this.state.terms.remove(index) });
   }
 
-  renderFilterInputs() {
+  renderFilterTerms() {
     if (!this.state.expanded) {
       return null;
     }
@@ -50,9 +50,13 @@ export default class FilterParams extends React.Component {
               index={index}
               key={index}
               term={term}
+              project={this.props.project}
               onRemove={this.onRemoveTerm}
               onChange={this.onChangeTerm} />))}
-        <FilterTerm onRemove={this.onRemoveTerm} onChange={this.onChangeTerm} />
+        <FilterTerm
+            project={this.props.project}
+            onRemove={this.onRemoveTerm}
+            onChange={this.onChangeTerm} />
       </section>
     );
   }
@@ -70,7 +74,7 @@ export default class FilterParams extends React.Component {
               value={this.state.search}
               onChange={this.onChangeSearch} />
         </header>
-        {this.renderFilterInputs()}
+        {this.renderFilterTerms()}
       </section>);
   }
 }
@@ -80,6 +84,9 @@ FilterParams.propTypes = {
     id: PropTypes.string.isRequired,
     template: PropTypes.shape({
       types: PropTypes.arrayOf(PropTypes.shape({})),
+    }),
+    workflow: PropTypes.shape({
+      states: PropTypes.arrayOf(PropTypes.shape({})),
     }),
   }).isRequired,
   location: PropTypes.shape({

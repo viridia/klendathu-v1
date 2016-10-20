@@ -1,24 +1,55 @@
-import { createReducer } from 'redux-act';
-import Immutable from 'immutable';
-import * as actions from './actions';
+import gql from 'graphql-tag';
+import client from './apollo';
 
-export default createReducer({
-  [actions.resetIssue]: () => ({}),
-  [actions.setIssueType]: (state, type) => ({ ...state, type }),
-  [actions.setIssueState]: (state, st) => ({ ...state, state: st }),
-  [actions.setIssueSummary]: (state, summary) => ({ ...state, summary }),
-  [actions.setIssueDescription]: (state, description) => ({ ...state, description }),
-  [actions.setCustomField]: (state, [key, value]) => {
-    const customFields = state.custom || Immutable.Map.of();
-    return { ...state, custom: customFields.set(key, value) };
-  },
-  [actions.addIssueCC]: (state, user) => {
-    const ccList = state.cc || Immutable.OrderedSet.of();
-    return { ...state, cc: ccList.add(user) };
-  },
-  [actions.addIssueComment]: (state, comment) => {
-    // console.log(comment);
-    const commentList = state.comments || Immutable.List.of();
-    return { ...state, comments: commentList.push(comment) };
-  },
-}, {});
+const NewIssueMutation = gql`mutation NewIssueMutation($project: ID!, $issue: IssueInput!) {
+  newIssue(project: $project, issue: $issue) {
+    id
+  }
+}`;
+
+export function createIssue(project, issue) {
+  return client.mutate({
+    mutation: NewIssueMutation,
+    variables: { project, issue },
+    // updateQueries: {
+    //   projectListQuery: (previousQueryResult, { mutationResult }) => {
+    //     return {
+    //       projects: [mutationResult.data.newProject, ...previousQueryResult.projects],
+    //     };
+    //   },
+    // },
+  });
+}
+
+const UpdateIssueMutation = gql`mutation UpdateIssueMutation($id: ID!, $issue: IssueInput!) {
+  updateIssue(id: $id, issue: $issue) {
+    id
+  }
+}`;
+
+export function updateIssue(id, issue) {
+  return client.mutate({
+    mutation: UpdateIssueMutation,
+    variables: { id, issue },
+  });
+}
+
+const DeleteIssue = gql`mutation DeleteIssueMutation($id: ID!) {
+  deleteIssue(id: $id)
+}`;
+
+export function deleteIssue(id) {
+  return client.mutate({
+    mutation: DeleteIssue,
+    variables: { id },
+    // updateQueries: {
+    //   projectListQuery: (previousQueryResult, { mutationResult }) => {
+    //     console.log(mutationResult);
+    //     return {
+    //       projects: previousQueryResult.projects.filter(
+    //         p => p.id !== mutationResult.data.deleteProject),
+    //     };
+    //   },
+    // },
+  });
+}

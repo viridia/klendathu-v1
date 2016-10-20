@@ -7,9 +7,9 @@ import Chip from './ac/chip.jsx';
 
 const UserQuery = gql`query UsersQuery($token:String!) {
   users(token: $token) {
+    id
     username
     fullname
-    id
     photo
   }
 }`;
@@ -74,20 +74,15 @@ class UserAutoComplete extends React.Component {
 
 UserAutoComplete.propTypes = {
   value: PropTypes.string,
-  className: PropTypes.string,
-  placeholder: PropTypes.string,
   project: PropTypes.shape({
     id: PropTypes.string,
   }),
-  multiple: PropTypes.bool,
-  onSelect: PropTypes.func,
   onFocusNext: PropTypes.func,
   client: PropTypes.instanceOf(ApolloClient).isRequired,
   selection: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.any.isRequired),
     PropTypes.any,
   ]),
-  onSelectionChange: PropTypes.func.isRequired,
 };
 
 export default withApollo(UserAutoComplete);

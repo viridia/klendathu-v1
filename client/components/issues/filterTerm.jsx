@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
+import Checkbox from 'react-bootstrap/lib/Checkbox';
 import DropdownButton from 'react-bootstrap/lib/DropdownButton';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
@@ -67,6 +68,17 @@ export default class FilterTerm extends React.Component {
     this.props.onRemove(this.props.index);
   }
 
+  defaultValueForType(fieldInfo) {
+    const { project } = this.props;
+    if (fieldInfo.type === 'issueState') {
+      return new Immutable.Set(project.workflow.states.filter(st => st.open).map(st => st.id));
+    } else if (fieldInfo.type === 'issueType') {
+      return new Immutable.Set(project.template.types.map(t => t.id));
+    } else {
+      return '';
+    }
+  }
+
   renderOpSelector(fieldInfo) {
     if (!fieldInfo) {
       return null;
@@ -94,6 +106,7 @@ export default class FilterTerm extends React.Component {
     if (!fieldInfo) {
       return null;
     }
+    const { project } = this.props;
     switch (fieldInfo.type) {
       case 'text':
         return (
@@ -103,6 +116,24 @@ export default class FilterTerm extends React.Component {
               value={this.props.term.value}
               onChange={this.onChangeValue} />
         );
+      case 'issueState': {
+        return (
+          <div className="states">
+            {project.workflow.states.map(st => (
+              <Checkbox key={st.id} checked={false} onChange={this.onChangePublic}>
+                {st.caption}
+              </Checkbox>))}
+          </div>);
+      }
+      case 'issueType': {
+        return (
+          <div className="types">
+            {project.template.types.map(t => (
+              !t.abstract && <Checkbox key={t.id} checked={false} onChange={this.onChangePublic}>
+                {t.caption}
+              </Checkbox>))}
+          </div>);
+      }
       default:
         return null;
     }
@@ -140,6 +171,15 @@ FilterTerm.propTypes = {
     value: PropTypes.string,
   }),
   index: PropTypes.number,
+  project: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    template: PropTypes.shape({
+      types: PropTypes.arrayOf(PropTypes.shape({})),
+    }),
+    workflow: PropTypes.shape({
+      states: PropTypes.arrayOf(PropTypes.shape({})),
+    }),
+  }).isRequired,
   onChange: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
 };

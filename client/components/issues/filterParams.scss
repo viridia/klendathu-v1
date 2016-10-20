@@ -41,6 +41,22 @@
         height: 32px;
       }
 
+      > .types {
+        white-space: nowrap;
+        display: flex;
+        flex-wrap: wrap;
+        > .checkbox {
+          margin: 4px 1em 4px 0;
+        }
+      }
+
+      > .states {
+        columns: 4;
+        > .checkbox {
+          margin: 4px 1em 4px 0;
+        }
+      }
+
       > .flex {
         flex: 4;
       }

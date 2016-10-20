@@ -2,13 +2,10 @@ import React, { PropTypes } from 'react';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FormGroup from 'react-bootstrap/lib/FormGroup';
 import Radio from 'react-bootstrap/lib/Radio';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { setIssueState } from '../../store/actions';
 
 /** Selects the state of the issue. */
-class StateSelector extends React.Component {
+export default class StateSelector extends React.Component {
   constructor(props) {
     super(props);
     this.onChange = this.onChange.bind(this);
@@ -20,7 +17,7 @@ class StateSelector extends React.Component {
   }
 
   onChange(e) {
-    this.props.setIssueState(e.target.dataset.state);
+    this.props.onStateChanged(e.target.dataset.state);
   }
 
   render() {
@@ -33,7 +30,7 @@ class StateSelector extends React.Component {
     }
 
     const state = this.stateMap.get(this.props.state);
-    const selectedState = this.props.issue.state || state.id;
+    const selectedState = this.props.startingState || state.id;
     return (<FormGroup controlId="state">
       <ControlLabel>State</ControlLabel>
       <Radio
@@ -53,18 +50,11 @@ class StateSelector extends React.Component {
 }
 
 StateSelector.propTypes = {
-  issue: PropTypes.shape({
-    state: PropTypes.string,
-  }),
   state: PropTypes.string.isRequired,
+  startingState: PropTypes.string,
   project: PropTypes.shape({}),
   workflow: PropTypes.shape({
     states: PropTypes.arrayOf(PropTypes.shape({}).isRequired).isRequired,
   }).isRequired,
-  setIssueState: PropTypes.func,
+  onStateChanged: PropTypes.func.isRequired,
 };
-
-export default connect(
-  (state) => ({ issue: state.issue }),
-  dispatch => bindActionCreators({ setIssueState }, dispatch)
-)(StateSelector);
