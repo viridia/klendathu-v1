@@ -27,6 +27,7 @@ if (hot) {
 }
 
 module.exports = {
+  context: path.resolve(__dirname, 'client'),
   entry: {
     main: hot ? [
       'webpack-dev-server/client?http://0.0.0.0:8081', // WebpackDevServer host and port
@@ -47,10 +48,12 @@ module.exports = {
       'node_modules',
       'media',
     ],
+    extensions: ['.js', '.jsx'],
   },
   plugins,
   devtool: debug ? 'cheap-eval-source-map' : 'hidden-source-map',
   devServer: {
+    contentBase: path.resolve(__dirname, 'client'),
     historyApiFallback: true,
     stats: 'errors-only',
   },
@@ -59,7 +62,7 @@ module.exports = {
       {
         // Compile JS with Babel.
         test: /\.jsx?$/,
-        include: __dirname,
+        include: path.resolve(__dirname, 'client'),
         loaders: [
           {
             loader: 'babel',
@@ -105,7 +108,7 @@ module.exports = {
       },
       {
         // Inline SVG icons
-        include: path.join(__dirname, 'media/icons'),
+        include: path.join(__dirname, 'client/media/icons'),
         test: /\.svg$/i,
         loader: 'react-svg-inline-loader',
       },

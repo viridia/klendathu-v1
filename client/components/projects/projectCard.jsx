@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import Button from 'react-bootstrap/lib/Button';
 import Modal from 'react-bootstrap/lib/Modal';
 import UserName from '../common/userName.jsx';
-import roleName from '../../lib/role.js';
+import roleName from '../../lib/role';
 import { deleteProject } from '../../store/projects';
 import './projectCard.scss';
 

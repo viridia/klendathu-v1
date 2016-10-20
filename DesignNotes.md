@@ -2,15 +2,14 @@ Hot loading?
 New React Router?
 Check out Strider? (Means we'd have to write some tests)
 * A way to delete a bug
-* A way to edit a bug
 * UpdateQueries
   * Issue list
   * Label list
   * User list
-* I think we're going to need tests for the graphql stuff, and the tests will probably need
-  a real db.
+  * Filtering and sorting?
+* I think we're going to need tests for the graphql stuff, and the tests will probably
+  need a real db.
 * Flesh out issue details
-* Delete issues
 * Delete labels
 * Figure out how to do refetch on project creation / deletion
 * Edit existing issue (with permissions for various fields).
@@ -136,9 +135,7 @@ Future:
 
 Things to experiment with:
   -- TypeScript
-  -- Webpack 2
   -- React hot loading
-  -- minimal babel conversions
   -- Nginx config and https
 
 Filter rows:
