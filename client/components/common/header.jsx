@@ -17,7 +17,7 @@ export default function Header(props) {
     {project && (<LinkContainer
         to={{
           pathname: `/project/${project}/new`,
-          state: { back: this.props.location },
+          state: { back: props.location },
         }}>
       <Button bsStyle="primary"><AddBoxIcon />New Issue...</Button>
     </LinkContainer>)}
