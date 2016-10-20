@@ -9,7 +9,7 @@ export default class IssueCreate extends React.Component {
     this.onSave = this.onSave.bind(this);
   }
 
-  onSave(issue) {
+  onSave(issueId, issue) {
     return createIssue(this.props.project.id, issue).then(resp => {
       toastr.success(`Issue #${resp.data.newIssue.id} created.`);
     });
@@ -26,5 +26,8 @@ export default class IssueCreate extends React.Component {
 IssueCreate.propTypes = {
   project: PropTypes.shape({
     id: PropTypes.string.isRequired,
+  }).isRequired,
+  location: PropTypes.shape({
+    pathname: PropTypes.string.isRequired,
   }).isRequired,
 };

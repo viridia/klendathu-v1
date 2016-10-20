@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import Button from 'react-bootstrap/lib/Button';
 import { LinkContainer } from 'react-router-bootstrap';
 import AddBoxIcon from 'icons/ic_add_box_black_24px.svg';
@@ -14,7 +14,11 @@ export default function Header(props) {
       <span> - </span>
       &ldquo;in order to <em>fight</em> the bug, we must <em>understand</em> the bug.&rdquo;
     </span>
-    {project && (<LinkContainer to={{ pathname: `/project/${project}/new` }}>
+    {project && (<LinkContainer
+        to={{
+          pathname: `/project/${project}/new`,
+          state: { back: this.props.location },
+        }}>
       <Button bsStyle="primary"><AddBoxIcon />New Issue...</Button>
     </LinkContainer>)}
     <SignInLink {...props} />
@@ -23,7 +27,10 @@ export default function Header(props) {
 }
 
 Header.propTypes = {
-  params: React.PropTypes.shape({
+  params: PropTypes.shape({
     // project: React.PropTypes.string.isRequired,
   }),
+  location: PropTypes.shape({
+    pathname: PropTypes.string.isRequired,
+  }).isRequired,
 };

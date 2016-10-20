@@ -1,7 +1,6 @@
 import React from 'react';
 import DropdownButton from 'react-bootstrap/lib/DropdownButton';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
-import './issues.scss';
 
 export default class CustomEnumField extends React.Component {
   constructor() {

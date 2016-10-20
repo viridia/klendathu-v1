@@ -12,6 +12,7 @@ import UserName from '../common/userName.jsx';
 import LabelName from '../common/labelName.jsx';
 import { Role } from '../../lib/role';
 import { IssueQuery } from '../../store/queries';
+import { IssueContent } from '../../store/fragments';
 import './issueDetails.scss';
 
 class IssueDetails extends React.Component {
@@ -40,7 +41,11 @@ class IssueDetails extends React.Component {
           <div className="issue-type">{issue.type}</div>
           <div className="divider" />
           <ButtonGroup className="issue-actions">
-            <LinkContainer to={{ pathname: `/project/${project.name}/edit/${issue.id}` }}>
+            <LinkContainer
+                to={{
+                  pathname: `/project/${project.name}/edit/${issue.id}`,
+                  state: { back: this.props.location },
+                }}>
               <Button title="Edit issue" disabled={project.role < Role.UPDATER}>Edit</Button>
             </LinkContainer>
             <Button title="Delete issue" disabled={project.role < Role.MANAGER}>Delete</Button>
@@ -145,5 +150,6 @@ IssueDetails.propTypes = {
 export default graphql(IssueQuery, {
   options: ({ project, params }) => ({
     variables: { project: project.id, id: parseInt(params.id, 10) },
+    fragments: [IssueContent],
   }),
 })(IssueDetails);

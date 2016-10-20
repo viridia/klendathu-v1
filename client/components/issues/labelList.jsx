@@ -1,5 +1,4 @@
 import React from 'react';
-import './issues.scss';
 
 export default class LabelList extends React.Component {
   render() {

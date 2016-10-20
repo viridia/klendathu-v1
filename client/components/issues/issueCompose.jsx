@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
+import { LinkContainer } from 'react-router-bootstrap';
 import Button from 'react-bootstrap/lib/Button';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
@@ -13,7 +14,9 @@ import StateSelector from './stateSelector.jsx';
 import TypeSelector from './typeSelector.jsx';
 import CustomEnumField from './customEnumField.jsx';
 import UserName from '../common/userName.jsx';
-import './issues.scss';
+import './issueCompose.scss';
+import '../common/card.scss';
+import '../common/table.scss';
 
 class CustomTextField extends React.Component {
   constructor() {
@@ -224,14 +227,18 @@ export default class IssueCompose extends React.Component {
 
   onCreate(e) {
     e.preventDefault();
-    const issue = Object.assign({}, this.props.issue, {
+    const issue = {
       state: this.state.issueState,
       type: this.state.type,
+      summary: this.state.summary,
+      description: this.state.description,
       owner: this.state.owner ? this.state.owner.id : undefined,
       cc: this.state.cc.map(cc => cc.id),
       labels: this.state.labels.map(label => label.id),
       custom: [],
-    });
+      // public: false,
+      // comments
+    };
     const issueType = this.templateTypes.get(issue.type);
     const fields = this.customFieldList(issueType);
     for (const field of fields) {
@@ -243,7 +250,7 @@ export default class IssueCompose extends React.Component {
         });
       }
     }
-    return this.props.onSave(issue).then(() => {
+    return this.props.onSave(this.props.issue ? this.props.issue.id : undefined, issue).then(() => {
       this.reset();
     });
   }
@@ -371,7 +378,9 @@ export default class IssueCompose extends React.Component {
   }
 
   render() {
-    const { project, issue } = this.props;
+    const { project, issue, location } = this.props;
+    const backLink = (location.state && location.state.back) || { pathname: '..' };
+    console.log(backLink);
     return (<section className="kdt issue-compose">
       <div className="card">
         <header>New Issue: {project.name}</header>
@@ -526,10 +535,12 @@ export default class IssueCompose extends React.Component {
           </aside>
         </section>
         <footer className="submit-buttons">
-          <Checkbox checked={this.state.another} onChange={this.onChangeAnother}>
+          {!issue && (<Checkbox checked={this.state.another} onChange={this.onChangeAnother}>
             Create another
-          </Checkbox>
-          <Button>Cancel</Button>
+          </Checkbox>)}
+          <LinkContainer to={backLink}>
+            <Button>Cancel</Button>
+          </LinkContainer>
           {issue
             ? (<Button
                 bsStyle="primary"
@@ -553,6 +564,9 @@ IssueCompose.propTypes = {
     id: PropTypes.string.isRequired,
     workflow: PropTypes.shape({}),
     template: PropTypes.shape({}),
+  }).isRequired,
+  location: PropTypes.shape({
+    pathname: PropTypes.string.isRequired,
   }).isRequired,
   onSave: PropTypes.func.isRequired,
 };

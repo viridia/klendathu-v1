@@ -9,7 +9,6 @@ import UserName from '../common/userName.jsx';
 import ErrorDisplay from '../debug/errorDisplay.jsx';
 import FilterParams from './filterParams.jsx';
 import './issueList.scss';
-import './issues.scss';
 
 class ColumnRenderer {
   constructor(field) {

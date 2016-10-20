@@ -2,10 +2,6 @@ const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
 const Role = require('../common/role');
 
-function serialize(issue, props = {}) {
-  return Object.assign({}, issue, props);
-}
-
 const resolverMethods = {
   issue({ project, id }) {
     return this.getProjectAndRole({ projectId: project }).then(([proj, role]) => {
@@ -20,7 +16,7 @@ const resolverMethods = {
         if (!issue) {
           return null;
         }
-        return serialize(issue);
+        return issue;
       });
     });
   },
@@ -52,8 +48,7 @@ const resolverMethods = {
       // created
       // updated
       query.project = new ObjectId(project);
-      return this.db.collection('issues').find(query).sort({ id: -1 }).toArray()
-          .then(issues => issues.map(serialize));
+      return this.db.collection('issues').find(query).sort({ id: -1 }).toArray();
     });
   },
 
@@ -99,6 +94,86 @@ const resolverMethods = {
           return { id: result.ops[0].id };
         }, error => {
           logger.error('Error creating issue', issue, error);
+          return Promise.reject({ status: 500, error: 'internal' });
+        });
+      });
+    });
+  },
+
+  updateIssue({ id, project, issue }) {
+    if (!this.user) {
+      return Promise.reject({ status: 401, error: 'unauthorized' });
+    }
+    return this.getProjectAndRole({ projectId: project }).then(([proj, role]) => {
+      if (!proj) {
+        logger.error('Error updating non-existent project', id, this.user);
+        return Promise.reject({ status: 404, error: 'project-not-found' });
+      } else if (role < Role.UPDATER) {
+        logger.error('Access denied updating issue', id, this.user);
+        return Promise.reject({ status: 401, error: 'update-not-permitted' });
+      }
+
+      const query = {
+        id,
+        project: proj._id,
+      };
+
+      const issues = this.db.collection('issues');
+      return issues.findOne(query).then(existing => {
+        if (!existing) {
+          logger.error('Error updating non-existent issue', id, this.user);
+          return Promise.reject({ status: 404, error: 'issue-not-found' });
+        }
+
+        const record = {
+          updated: new Date(),
+        };
+
+        if (issue.type) {
+          record.type = issue.type;
+        }
+
+        if (issue.state) {
+          record.state = issue.state;
+        }
+
+        if (issue.summary) {
+          record.summary = issue.summary;
+        }
+
+        if (issue.description) {
+          record.description = issue.description;
+        }
+
+        if (issue.owner) {
+          record.owner = issue.owner;
+        }
+
+        if (issue.cc) {
+          record.cc = issue.cc.map(cc => new ObjectId(cc));
+        }
+
+        if (issue.labels) {
+          record.labels = issue.labels.map(lb => new ObjectId(lb));
+        }
+
+        if (issue.linked) {
+          record.linked = issue.linked.map(
+              ln => ({ to: new ObjectId(ln.to), relation: ln.relation }));
+        }
+
+        if (issue.custom !== undefined) {
+          record.custom = issue.custom;
+        }
+
+        // TODO: owning user, owning org, template name, workflow name
+        // All of which need validation
+        return issues.updateOne(query, {
+          $set: record,
+        }).then(() => {
+          return issues.findOne(query);
+        }, error => {
+          logger.error('Error updating project', id, proj.name, error);
           return Promise.reject({ status: 500, error: 'internal' });
         });
       });

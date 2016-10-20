@@ -126,8 +126,12 @@ module.exports = new GraphQLSchema({
         type: new GraphQLNonNull(issueType),
         args: {
           id: {
-            type: new GraphQLNonNull(GraphQLID),
+            type: new GraphQLNonNull(GraphQLInt),
             description: 'Id of the issue to update.',
+          },
+          project: {
+            type: new GraphQLNonNull(GraphQLID),
+            description: 'Project containing the issue.',
           },
           issue: {
             type: issueInputType,
@@ -136,11 +140,15 @@ module.exports = new GraphQLSchema({
         },
       },
       deleteIssue: {
-        type: new GraphQLNonNull(GraphQLID),
+        type: new GraphQLNonNull(GraphQLInt),
         args: {
           id: {
-            type: new GraphQLNonNull(GraphQLID),
+            type: new GraphQLNonNull(GraphQLInt),
             description: 'Id of the issue to delete.',
+          },
+          project: {
+            type: new GraphQLNonNull(GraphQLID),
+            description: 'Project containing the issue.',
           },
         },
       },

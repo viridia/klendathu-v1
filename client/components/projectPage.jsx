@@ -3,6 +3,7 @@ import 'react-redux-toastr/src/less/index.less';
 import { graphql } from 'react-apollo';
 import LeftNav from './common/leftNav.jsx';
 import { ProjectQuery } from '../store/queries';
+import { ProjectContent } from '../store/fragments';
 import './page.scss';
 
 class ProjectPage extends React.Component {
@@ -40,5 +41,8 @@ ProjectPage.contextTypes = {
 };
 
 export default graphql(ProjectQuery, {
-  options: ({ params }) => ({ variables: { project: params.project } }),
+  options: ({ params }) => ({
+    variables: { project: params.project },
+    fragments: [ProjectContent],
+  }),
 })(ProjectPage);

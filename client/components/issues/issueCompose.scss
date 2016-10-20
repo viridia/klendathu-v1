@@ -1,8 +1,5 @@
 @import '../defines/base';
-@import '../common/card';
-@import '../common/table';
 
-// Move this.
 .kdt.issue-compose {
   flex: 1;
   display: flex;
@@ -105,7 +102,7 @@
 .submit-buttons {
   display: flex;
   justify-content: flex-end;
-  > button {
+  > button, > a {
     margin-left: 8px;
   }
 }
