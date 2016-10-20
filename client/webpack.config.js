@@ -17,6 +17,11 @@ plugins.push(
     },
   }));
 
+plugins.push(new webpack.LoaderOptionsPlugin({
+  minimize: !debug,
+  debug,
+}));
+
 if (hot) {
   plugins.push(new webpack.HotModuleReplacementPlugin());
 }
@@ -32,51 +37,46 @@ module.exports = {
     ],
   },
   output: {
-    path: 'builds',
+    path: path.resolve(__dirname, 'builds'),
     publicPath: '/builds/',
     filename: '[name].bundle.js',
     chunkFilename: '[name]-[chunkhash].js',
   },
   resolve: {
-    modulesDirectories: [
+    modules: [
       'node_modules',
       'media',
     ],
   },
   plugins,
-  debug,
-  devtool: debug ? 'cheap-eval-source-map' : false,
+  devtool: debug ? 'cheap-eval-source-map' : 'hidden-source-map',
   devServer: {
     historyApiFallback: true,
     stats: 'errors-only',
   },
   module: {
-    preLoaders: debug ? [
-      {
-        // Lint
-        test: /\.jsx?$/,
-        include: __dirname,
-        exclude: [],
-        loader: 'eslint',
-      },
-    ] : [],
     loaders: [
       {
         // Compile JS with Babel.
         test: /\.jsx?$/,
         include: __dirname,
-        loader: 'babel',
-        query: {
-          plugins: [
-            'transform-runtime',
-            'transform-object-rest-spread',
-            'react-hot-loader/babel',
-          ],
-          presets: [
-            'es2015',
-            'react',
-          ],
-        },
+        loaders: [
+          {
+            loader: 'babel',
+            query: {
+              plugins: [
+                'transform-runtime',
+                'transform-object-rest-spread',
+                'react-hot-loader/babel',
+              ],
+              presets: [
+                ['es2015', { modules: false }],
+                'react',
+              ],
+            },
+          },
+          'eslint',
+        ],
       },
       {
         // SASS

@@ -1,7 +1,7 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
+// import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { updateWorkflow } from '../../store/workflows';
+// import { updateWorkflow } from '../../store/workflows';
 import StateCard from './stateCard.jsx';
 import './workflow.scss';
 
@@ -21,5 +21,6 @@ export default connect(
   (state) => ({
     stateList: (state.workflows.$stateIds || []).map(sid => state.workflows.$stateMap.get(sid)),
   }),
-  dispatch => bindActionCreators({ updateWorkflow }, dispatch),
+  null,
+  // dispatch => bindActionCreators({ updateWorkflow }, dispatch),
 )(WorkflowList);
