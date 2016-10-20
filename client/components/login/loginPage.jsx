@@ -90,7 +90,7 @@ class LoginPage extends React.Component {
               <HelpBlock>{this.state.passwordError}</HelpBlock>
             </FormGroup>
             <div className="button-row">
-              <LinkContainer to={{ pathname: '/signup', state: { next: this.props.location } }}>
+              <LinkContainer to={{ ...this.props.location, pathname: '/signup' }}>
                 <Button bsStyle="link">Create Account</Button>
               </LinkContainer>
               <LinkContainer to={next || { pathname: '/' }}>
