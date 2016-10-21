@@ -12,7 +12,7 @@ export function createIssue(project, issue) {
   return client.mutate({
     mutation: NewIssueMutation,
     variables: { project, issue },
-    fragments: [IssueContent],
+    fragments: IssueContent,
     // updateQueries: {
     //   projectListQuery: (previousQueryResult, { mutationResult }) => {
     //     return {
@@ -23,8 +23,9 @@ export function createIssue(project, issue) {
   });
 }
 
-const UpdateIssueMutation = gql`mutation UpdateIssueMutation($id: ID!, $issue: IssueInput!) {
-  updateIssue(id: $id, issue: $issue) {
+const UpdateIssueMutation = gql`mutation UpdateIssueMutation(
+    $project: ID!, $id: Int!, $issue: IssueInput!) {
+  updateIssue(id: $id, project: $project, issue: $issue) {
     ...issueContent
   }
 }`;
@@ -33,7 +34,7 @@ export function updateIssue(id, project, issue) {
   return client.mutate({
     mutation: UpdateIssueMutation,
     variables: { id, project, issue },
-    fragments: [IssueContent],
+    fragments: IssueContent,
   });
 }
 

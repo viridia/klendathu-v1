@@ -19,10 +19,10 @@ class IssueEdit extends React.Component {
   }
 
   render() {
-    return (this.props.data.issue && <IssueCompose
+    return (this.props.data.issue ? <IssueCompose
         {...this.props}
         issue={this.props.data.issue}
-        onSave={this.onSave} />);
+        onSave={this.onSave} /> : null);
   }
 }
 

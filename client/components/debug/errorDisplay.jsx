@@ -33,6 +33,7 @@ export default class ErrorDisplay extends React.Component {
 
   render() {
     const { error } = this.props;
+    console.error(error);
     if (error.networkError) {
       return this.renderError(error.networkError);
     } else if (error.graphQLErrors) {

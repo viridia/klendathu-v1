@@ -380,7 +380,6 @@ export default class IssueCompose extends React.Component {
   render() {
     const { project, issue, location } = this.props;
     const backLink = (location.state && location.state.back) || { pathname: '..' };
-    console.log(backLink);
     return (<section className="kdt issue-compose">
       <div className="card">
         <header>New Issue: {project.name}</header>

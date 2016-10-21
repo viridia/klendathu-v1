@@ -7,6 +7,7 @@ Check out Strider? (Means we'd have to write some tests)
   * Label list
   * User list
   * Filtering and sorting?
+* How to sort by user?
 * Use TypeScript on the backend?
 * I think we're going to need tests for the graphql stuff, and the tests will probably
   need a real db.

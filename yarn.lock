@@ -4090,9 +4090,9 @@ rc@~1.1.0:
     minimist "^1.2.0"
     strip-json-comments "~1.0.4"
 
-react-apollo@^0.5.8:
-  version "0.5.10"
-  resolved "https://registry.yarnpkg.com/react-apollo/-/react-apollo-0.5.10.tgz#1f44a6048c7e426095de3df57987e8bf5f67e8aa"
+react-apollo@latest:
+  version "0.5.13"
+  resolved "https://registry.yarnpkg.com/react-apollo/-/react-apollo-0.5.13.tgz#5156323fd969ec0477e1e28e94ddb76b8ee4531a"
   dependencies:
     hoist-non-react-statics "^1.2.0"
     invariant "^2.2.1"

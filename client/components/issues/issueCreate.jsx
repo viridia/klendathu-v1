@@ -4,8 +4,8 @@ import IssueCompose from './issueCompose.jsx';
 import { createIssue } from '../../store/issue';
 
 export default class IssueCreate extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.onSave = this.onSave.bind(this);
   }
 
@@ -26,7 +26,7 @@ export default class IssueCreate extends React.Component {
 IssueCreate.propTypes = {
   project: PropTypes.shape({
     id: PropTypes.string.isRequired,
-  }).isRequired,
+  }),
   location: PropTypes.shape({
     pathname: PropTypes.string.isRequired,
   }).isRequired,

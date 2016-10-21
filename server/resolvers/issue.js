@@ -174,7 +174,7 @@ const resolverMethods = {
         };
         // Insert new user into the database.
         return this.db.collection('issues').insertOne(record).then(result => {
-          return { id: result.ops[0].id };
+          return result.ops[0];
         }, error => {
           logger.error('Error creating issue', issue, error);
           return Promise.reject({ status: 500, error: 'internal' });
