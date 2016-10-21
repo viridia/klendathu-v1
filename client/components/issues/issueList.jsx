@@ -41,10 +41,12 @@ class IssueList extends React.Component {
       search: '',
     };
     this.buildColumns(props.project);
+    this.buildIssueIdList(props);
   }
 
   componentWillReceiveProps(nextProps) {
     this.buildColumns(nextProps.project);
+    this.buildIssueIdList(nextProps);
   }
 
   onChangeSearch(e) {
@@ -61,6 +63,15 @@ class IssueList extends React.Component {
           }
         }
       }
+    }
+  }
+
+  buildIssueIdList(props) {
+    const { issues } = props.data;
+    if (!issues) {
+      this.issueIds = [];
+    } else {
+      this.issueIds = issues.map(i => i.id);
     }
   }
 
@@ -94,7 +105,10 @@ class IssueList extends React.Component {
     const project = this.props.project;
     const linkTarget = {
       pathname: `/project/${project.name}/issues/${issue.id}`,
-      state: { back: this.props.location },
+      state: {
+        back: this.props.location,
+        idList: this.issueIds,
+      },
     };
     return (
       <tr key={issue.id}>
@@ -173,8 +187,40 @@ class IssueList extends React.Component {
   }
 }
 
-const IssueListQuery = gql`query IssueListQuery($project: ID!) {
-  issues(project: $project) {
+// linked: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
+// custom: new GraphQLList(new GraphQLNonNull(customSearch)),
+const IssueListQuery = gql`query IssueListQuery(
+    $project: ID!,
+    $search: String,
+    $type: [String!],
+    $state: [String!],
+    $summary: String,
+    $summaryPred: PREDICATE,
+    $description: String,
+    $descriptionPred: PREDICATE,
+    $owner: [ID!],
+    $reporter: [ID!],
+    $cc: [ID!],
+    $labels: [ID!],
+    $comment: String,
+    $commentPred: PREDICATE,
+    $sort: [String!]) {
+  issues(
+      project: $project,
+      search: $search,
+      type: $type,
+      state: $state,
+      summary: $summary,
+      summaryPred: $summaryPred,
+      description: $description,
+      descriptionPred: $descriptionPred,
+      owner: $owner,
+      reporter: $reporter,
+      cc: $cc,
+      labels: $labels,
+      comment: $comment,
+      commentPred: $commentPred,
+      sort: $sort) {
     id
     project
     type
@@ -207,15 +253,40 @@ IssueList.propTypes = {
   }).isRequired,
   location: PropTypes.shape({
     pathname: PropTypes.string.isRequired,
+    query: PropTypes.shape({
+      type: PropTypes.string,
+      state: PropTypes.string,
+      summary: PropTypes.string,
+      description: PropTypes.string,
+      labels: PropTypes.string,
+    }),
   }).isRequired,
   params: PropTypes.shape({
-    label: PropTypes.string,
+    project: PropTypes.string,
   }).isRequired,
 };
 
 export default graphql(IssueListQuery, {
-  options: ({ project, params: { label } }) => ({ variables: {
-    project: project.id,
-    label,
-  } }),
+  options: ({ project, location: { query } }) => {
+    const { type, state, summary, description, label } = query || {};
+    return {
+      variables: {
+        project: project.id,
+        search: undefined,
+        type: type && type.split(','),
+        state: state && state.split(','),
+        summary,
+        summaryPred: undefined,
+        description,
+        descriptionPred: undefined,
+        reporter: undefined,
+        owner: undefined,
+        cc: undefined,
+        labels: label && label.split(','),
+        comment: undefined,
+        commentPred: undefined,
+        sort: ['-updated'],
+      },
+    };
+  },
 })(IssueList);

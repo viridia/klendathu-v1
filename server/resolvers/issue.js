@@ -1,6 +1,36 @@
 const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
 const Role = require('../common/role');
+const escapeRegExp = require('../lib/escapeRegExp');
+
+function stringPredicate(pred, value) {
+  switch (pred) {
+    case 'in':
+      return { $regex: escapeRegExp(value), $options: 'i' };
+    case 'eq':
+      return value;
+    case '!in':
+      return { $not: new RegExp(escapeRegExp(value), 'i') };
+    case '!eq':
+      return { $ne: value };
+    case 'sw':
+      return { $regex: `^${escapeRegExp(value)}`, $options: 'i' };
+    case 'ew':
+      return { $regex: `${escapeRegExp(value)}$`, $options: 'i' };
+    default:
+      logger.error('Invalid string predicate:', pred);
+      return null;
+  }
+}
+
+const VALID_SORT_KEYS = new Set([
+  'id',
+  'type',
+  'description',
+  'created',
+  'updated',
+  // How to do author and reporter?
+]);
 
 const resolverMethods = {
   issue({ project, id }) {
@@ -21,34 +51,87 @@ const resolverMethods = {
     });
   },
 
-  issues({ project, token, label }) {
-    return this.getProjectAndRole({ projectId: project }).then(([proj, role]) => {
+  issues(req) {
+    return this.getProjectAndRole({ projectId: req.project }).then(([proj, role]) => {
       if (proj === null || (!proj.public && role < Role.VIEWER)) {
         return Promise.reject({ status: 404, error: 'missing-project' });
       }
-      const query = {};
-      if (token) {
-        logger.error('unimplemented: issues(token)');
+
+      // Build the query expression
+      const query = {
+        project: new ObjectId(req.project),
+      };
+
+      if (req.search) {
+        logger.error('unimplemented: issues(search)');
       }
-      if (label) {
-        // TODO: Need an array membership test.
-        logger.info('unimplemented: issues(label)');
+
+      if (req.type) {
+        query.type = { $in: req.type };
       }
-      // Other things we might want to search for:
-      // summary
-      // description
-      // owner
+
+      if (req.state) {
+        query.state = { $in: req.state };
+      }
+
+      if (req.summary) {
+        query.summary = stringPredicate(req.summaryPred, req.summary);
+        if (!query.summary) {
+          return Promise.reject({ status: 400, error: 'invalid-predicate' });
+        }
+      }
+
+      if (req.description) {
+        query.description = stringPredicate(req.descriptionPred, req.description);
+        if (!query.description) {
+          return Promise.reject({ status: 400, error: 'invalid-predicate' });
+        }
+      }
+
+      if (req.reporter) {
+        query.reporter = { $in: req.reporter.map(id => new ObjectId(id)) };
+      }
+
+      if (req.owner) {
+        query.owner = { $in: req.owner.map(id => new ObjectId(id)) };
+      }
+
       // cc
-      // reporter
+
+      // Must match *all* labels
+      if (req.labels) {
+        query.labels = { $all: req.labels.map(id => new ObjectId(id)) };
+      }
+
+      // Other things we might want to search by:
       // keywords
-      // custom fields (hardware, etc)
+      // custom fields
       // comments / commenter
-      // states
       // linked
       // created
       // updated
-      query.project = new ObjectId(project);
-      return this.db.collection('issues').find(query).sort({ id: -1 }).toArray();
+
+      let sort = ['id', -1];
+      if (req.sort) {
+        // console.info(req.sort);
+        sort = [];
+        for (let sortKey of req.sort) {
+          let dir = 1;
+          if (sortKey.startsWith('-')) {
+            sortKey = sortKey.slice(1);
+            dir = -1;
+          }
+          if (!VALID_SORT_KEYS.has(sortKey)) {
+            if (sortKey.startsWith('custom.')) {
+              return Promise.reject({ status: 400, error: 'not-implemmented' });
+            }
+            return Promise.reject({ status: 400, error: 'invalid-sort-key' });
+          }
+          sort.push([sortKey, dir]);
+        }
+      }
+
+      return this.db.collection('issues').find(query).sort(sort).toArray();
     });
   },
 

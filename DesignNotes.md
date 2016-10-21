@@ -1,14 +1,13 @@
 Hot loading?
 New React Router?
 Check out Strider? (Means we'd have to write some tests)
-* Make next / prev issue buttons work.
 * A way to delete a bug
-* Use TypeScript on the backend.
 * UpdateQueries
   * Issue list
   * Label list
   * User list
   * Filtering and sorting?
+* Use TypeScript on the backend?
 * I think we're going to need tests for the graphql stuff, and the tests will probably
   need a real db.
 * Flesh out issue details
@@ -25,7 +24,6 @@ Check out Strider? (Means we'd have to write some tests)
 * Label view
 * Editing of labels
 * Deletion of labels
-* Make 'back' url params invisible.
 * return key to navigate between fields
 * escape to dismiss menus
 * make note about #hash tags and @mentions

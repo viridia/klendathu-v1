@@ -16,6 +16,31 @@ import { IssueContent } from '../../store/fragments';
 import './issueDetails.scss';
 
 class IssueDetails extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = this.navState(props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState(this.navState(nextProps));
+  }
+
+  navState(props) {
+    const { location: { state }, data: { issue } } = props;
+    let prevIssue = null;
+    let nextIssue = null;
+    if (issue && state.idList && state.idList.length > 0) {
+      const index = Math.max(0, state.idList.indexOf(issue.id));
+      if (index > 0) {
+        prevIssue = state.idList[index - 1];
+      }
+      if (index < state.idList.length - 1) {
+        nextIssue = state.idList[index + 1];
+      }
+    }
+    return { prevIssue, nextIssue };
+  }
+
   renderTemplateFields() {
     return null;
   }
@@ -23,6 +48,7 @@ class IssueDetails extends React.Component {
   render() {
     const { location, project } = this.props;
     const { issue, error } = this.props.data;
+    const { prevIssue, nextIssue } = this.state;
     if (error) {
       return <ErrorDisplay error={error} />;
     }
@@ -44,15 +70,27 @@ class IssueDetails extends React.Component {
             <LinkContainer
                 to={{
                   pathname: `/project/${project.name}/edit/${issue.id}`,
-                  state: { back: this.props.location },
+                  state: { ...location.state, back: this.props.location },
                 }}>
               <Button title="Edit issue" disabled={project.role < Role.UPDATER}>Edit</Button>
             </LinkContainer>
             <Button title="Delete issue" disabled={project.role < Role.MANAGER}>Delete</Button>
           </ButtonGroup>
           <ButtonGroup className="issue-nav">
-            <Button title="Previous issue"><ArrowBackIcon /></Button>
-            <Button title="Next issue" disabled><ArrowForwardIcon /></Button>
+            <LinkContainer
+                to={{ ...location, pathname: `/project/${project.name}/issues/${prevIssue}` }}
+                disabled={prevIssue === null}>
+              <Button title="Previous issue">
+                <ArrowBackIcon />
+              </Button>
+            </LinkContainer>
+            <LinkContainer
+                to={{ ...location, pathname: `/project/${project.name}/issues/${nextIssue}` }}
+                disabled={nextIssue === null}>
+              <Button title="Next issue">
+                <ArrowForwardIcon />
+              </Button>
+            </LinkContainer>
           </ButtonGroup>
         </header>
         <table className="create-issue-table form-table">
@@ -144,6 +182,9 @@ IssueDetails.propTypes = {
   }),
   location: PropTypes.shape({
     pathname: PropTypes.string.isRequired,
+    state: PropTypes.shape({
+      idList: PropTypes.arrayOf(PropTypes.number),
+    }),
   }).isRequired,
 };
 

@@ -5,6 +5,7 @@ import gql from 'graphql-tag';
 import ReduxToastr from 'react-redux-toastr';
 import 'react-redux-toastr/src/less/index.less';
 import Header from './common/header.jsx';
+import ErrorDisplay from './debug/errorDisplay.jsx';
 import './page.scss';
 
 class Page extends React.Component {
@@ -21,17 +22,17 @@ class Page extends React.Component {
   }
 
   checkAuth(props) {
-    const { data: { loading, errors, profile }, location } = props;
-    if (!profile && !loading && !errors) {
-      console.log('checkAuth:', loading, errors, profile, location);
+    const { data: { loading, error, profile }, location } = props;
+    if (!profile && !loading && !error) {
+      console.log('checkAuth:', props.data, location);
       browserHistory.replace({ pathname: '/login', state: { next: location } });
     }
   }
 
   render() {
-    const { children, location, params, data: { errors, profile } } = this.props;
-    if (errors) {
-      return <p>{JSON.stringify(errors)}</p>;
+    const { children, location, params, data: { error, profile } } = this.props;
+    if (error) {
+      return <ErrorDisplay error={error} />;
     }
     const child = React.Children.only(children);
     const main = React.cloneElement(child, { params, profile });

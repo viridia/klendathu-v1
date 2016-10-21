@@ -1,6 +1,7 @@
 const {
     GraphQLSchema,
     GraphQLObjectType,
+    GraphQLInputObjectType,
     GraphQLInt,
     GraphQLString,
     GraphQLList,
@@ -16,13 +17,17 @@ const projectType = require('./schemas/projectType');
 const projectInputType = require('./schemas/projectInputType');
 const templateType = require('./schemas/templateType');
 const workflowType = require('./schemas/workflowType');
+const predicateType = require('./schemas/predicateType');
 
-// const deletionResult = new GraphQLObjectType({
-//   name: 'DeleteionResult',
-//   fields: {
-//     id: { type: new GraphQLNonNull(GraphQLID) },
-//   },
-// });
+const customSearch = new GraphQLInputObjectType({
+  name: 'CustomSearch',
+  fields: {
+    name: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'Name of the custom field we are searching for.',
+    },
+  },
+});
 
 module.exports = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -39,8 +44,70 @@ module.exports = new GraphQLSchema({
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(issueType))),
         args: {
           project: { type: GraphQLID },
-          token: { type: GraphQLString },
-          label: { type: GraphQLString },
+          search: { type: GraphQLString },
+          type: {
+            type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+            description: 'Query term that restricts the issue search to a set of types.',
+          },
+          state: {
+            type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+            description: 'Query term that restricts the issue search to a set of states.',
+          },
+          owner: {
+            type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
+            description: 'Query term that restricts the issue search to a set of owners.',
+          },
+          reporter: {
+            type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
+            description: 'Query term that restricts the issue search to a set of reporters.',
+          },
+          cc: {
+            type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
+            description: 'Query term that restricts the issue search to a set of ccs.',
+          },
+          summary: {
+            type: GraphQLString,
+            description: 'Query term that searches the summary field.',
+          },
+          summaryPred: {
+            type: predicateType,
+            description: 'Search predicate for the summary field.',
+            defaultValue: 'in',
+          },
+          description: {
+            type: GraphQLString,
+            description: 'Query term that searches the description field.',
+          },
+          descriptionPred: {
+            type: predicateType,
+            description: 'Search predicate for the description field.',
+            defaultValue: 'in',
+          },
+          labels: {
+            type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
+            description: 'Query term that restricts the issue search to a set of label ids.',
+          },
+          linked: {
+            type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
+            description: 'Specifies a list of linked issues to search for.',
+          },
+          comment: {
+            type: GraphQLString,
+            description: 'Query term that searches the issue comments.',
+          },
+          commentPred: {
+            type: predicateType,
+            description: 'Search predicate for the comments.',
+            defaultValue: 'in',
+          },
+          custom: {
+            type: new GraphQLList(new GraphQLNonNull(customSearch)),
+            description: 'Query term that searches custom fields.',
+          },
+          sort: {
+            type: new GraphQLList(GraphQLString),
+            description: 'Query term that specifies the field sort order.',
+          },
         },
       },
       project: {
