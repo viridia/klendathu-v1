@@ -1,13 +1,14 @@
 {
   "extends": "airbnb-base",
   "rules": {
-    // Our existing code uses anonymous functions a lot, so disable these rules.
-    "func-names": "off",
     "new-cap": ["error", { "capIsNewExceptionPattern": "^Sequelize\\.." }],
-    "no-param-reassign": ["error", { "props": false }],
     "arrow-body-style": "off",
     "arrow-parens": "off",
+    "func-names": "off",
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": ["**/*.tests.js"]}],
     "no-else-return": "off",
-    "no-underscore-dangle": "off"
+    "no-param-reassign": ["error", { "props": false }],
+    "no-underscore-dangle": "off",
+    "prefer-arrow-callback": "off"
   }
 }

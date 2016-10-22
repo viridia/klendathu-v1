@@ -1,9 +1,14 @@
 Hot loading?
 New React Router?
 Check out Strider? (Means we'd have to write some tests)
-* Adding label to issues doesn't invalidate query.
 * Convert user references to usernames.
-* A way to delete a bug
+* Per-user project settings
+  * Label hot list
+  * Stored queries
+* Adding label to issues doesn't invalidate query.
+  * More generally, invalidating issue queries doesn't work.
+* Get rid of typeahead
+* A way to delete an issue
 * UpdateQueries
   * Issue list
   * User list
@@ -33,8 +38,10 @@ Check out Strider? (Means we'd have to write some tests)
   * Project membership
   * Create organizations
   * Org membership
+* Check roles client-side when editing / deleting labels
 * option to add label to hot list when creating it
   * Need project settings
+* Undo mode (set deleted flag) for issues, labels, projects.
 
 URLS:
   https://github.com/mlabieniec/complexity

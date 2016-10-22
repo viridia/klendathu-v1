@@ -89,8 +89,8 @@ const resolverMethods = {
     });
   },
 
-  newProject({ project }, { db, user }) {
-    if (!user) {
+  newProject({ project }) {
+    if (!this.user) {
       return Promise.reject(new Unauthorized());
     }
     //   const { name, owner } = req.body;
@@ -118,7 +118,7 @@ const resolverMethods = {
           deleted: false,
         };
         if (!project.owningUser) {
-          newProject.owningUser = user._id;
+          newProject.owningUser = this.user._id;
           newProject.owningOrg = null;
         } else {
           // TODO: Make the user an administrator
@@ -131,7 +131,7 @@ const resolverMethods = {
           logger.info('Created project', project.name);
           return projects.findOne({ _id: result.insertedId }).then(np => {
             // TODO: Since we just created the project, we should not need to look up the role.
-            const role = getRole(db, np, user);
+            const role = getRole(this.db, np, this.user);
             return serialize(np, {
               role,
               template: this.template({ project: 'std', name: 'software' }),

@@ -12,7 +12,8 @@
     "debug": "node --inspect --harmony server",
     "build-container": "docker build -t viridia/klendathu .",
     "start-container": "docker run --rm -it -u app -p 49160:8080 --name klendathu -v $(pwd):/usr/src/app viridia/klendathu",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test-server": "mocha server/**/*.tests.js"
   },
   "keywords": [
     "bug",
@@ -94,6 +95,8 @@
     "winston": "^2.2.0"
   },
   "devDependencies": {
+    "certainty": "^1.2.1",
+    "mocha": "^3.1.2",
     "react-hot-loader": "^3.0.0-beta.5"
   },
   "repository": {
