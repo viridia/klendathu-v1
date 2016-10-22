@@ -7,7 +7,8 @@
     "client": "webpack-dev-server --inline --port 8081",
     "client-hot": "cd client && REACT_HOT=1 webpack-dev-server --inline --port 8081",
     "client-build": "cd client && webpack",
-    "start": "pm2 --node-args=\"--harmony\" start process.json",
+    "start": "supervisor -w server server",
+    "start-pm2": "pm2 --node-args=\"--harmony\" start process.json",
     "stop": "pm2 kill",
     "debug": "node --inspect --harmony server",
     "build-container": "docker build -t viridia/klendathu .",
@@ -90,6 +91,7 @@
     "sass-loader": "^4.0.2",
     "source-map-support": "^0.4.2",
     "style-loader": "^0.13.1",
+    "supervisor": "^0.11.0",
     "webpack": "v2.1.0-beta.25",
     "webpack-dev-server": "v2.1.0-beta.9",
     "winston": "^2.2.0"

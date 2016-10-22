@@ -1,6 +1,8 @@
 Hot loading?
 New React Router?
 Check out Strider? (Means we'd have to write some tests)
+TypeScript?
+
 * Convert user references to usernames.
 * Per-user project settings
   * Label hot list
@@ -42,6 +44,7 @@ Check out Strider? (Means we'd have to write some tests)
 * option to add label to hot list when creating it
   * Need project settings
 * Undo mode (set deleted flag) for issues, labels, projects.
+* Show linked issues hierarchically
 
 URLS:
   https://github.com/mlabieniec/complexity
@@ -129,6 +132,8 @@ issues: [
   {
     fields: [
       {
+        milestone: ? (Need a way to add to milestones other than via editing template).
+          -- or is it just a label?
         name: 'due by',
         type: 'date',
       }
@@ -136,22 +141,12 @@ issues: [
   }
 ]
 
-Future:
-  Server needs json schemas to ensure requests are not malicious.
-
 Things to experiment with:
-  -- TypeScript
-  -- React hot loading
   -- Nginx config and https
 
 Filter rows:
   [field][op][value][x]
   Row types:
-    * string
-      * contains [text]
-      * matches [text]
-      * does not contain [text]
-      * does not match [text]
     * enum (checkboxes?)
     * set (state, type) (checkboxes?)
     * users
