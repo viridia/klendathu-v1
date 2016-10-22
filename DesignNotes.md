@@ -1,6 +1,9 @@
 Hot loading?
 New React Router?
 Check out Strider? (Means we'd have to write some tests)
+* Adding label to issues doesn't invalidate query.
+* Convert user references to usernames.
+* Convert label references to numeric ids.
 * A way to delete a bug
 * UpdateQueries
   * Issue list
@@ -8,6 +11,9 @@ Check out Strider? (Means we'd have to write some tests)
   * User list
   * Filtering and sorting?
 * How to sort by user?
+  * Option 1: Store references to users by user name.
+    (Might as well store labels by id while we are at it).
+  * Option 2: Store denorm usernames along with user ids.
 * Use TypeScript on the backend?
 * I think we're going to need tests for the graphql stuff, and the tests will probably
   need a real db.

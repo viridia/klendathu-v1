@@ -1,11 +1,12 @@
-const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLNonNull } = require('graphql');
+const { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLID, GraphQLNonNull } =
+    require('graphql');
 const GraphQLDate = require('graphql-date');
 
 module.exports = new GraphQLObjectType({
   name: 'Label',
   fields: {
     id: {
-      type: new GraphQLNonNull(GraphQLID),
+      type: new GraphQLNonNull(GraphQLInt),
       description: 'Database id for this label.',
     },
     name: { type: new GraphQLNonNull(GraphQLString) },

@@ -1,6 +1,8 @@
 const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
 const Role = require('../common/role');
+const { NotFound, Forbidden, BadRequest, NotImplemented, InternalError, Unauthorized, Errors } =
+    require('../common/errors');
 const escapeRegExp = require('../lib/escapeRegExp');
 
 function stringPredicate(pred, value) {
@@ -36,7 +38,7 @@ const resolverMethods = {
   issue({ project, id }) {
     return this.getProjectAndRole({ projectId: project }).then(([proj, role]) => {
       if (proj === null || (!proj.public && role < Role.VIEWER)) {
-        return Promise.reject({ status: 404, error: 'missing-project' });
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
       }
       const query = {
         id,
@@ -54,7 +56,7 @@ const resolverMethods = {
   issues(req) {
     return this.getProjectAndRole({ projectId: req.project }).then(([proj, role]) => {
       if (proj === null || (!proj.public && role < Role.VIEWER)) {
-        return Promise.reject({ status: 404, error: 'missing-project' });
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
       }
 
       // Build the query expression
@@ -77,14 +79,14 @@ const resolverMethods = {
       if (req.summary) {
         query.summary = stringPredicate(req.summaryPred, req.summary);
         if (!query.summary) {
-          return Promise.reject({ status: 400, error: 'invalid-predicate' });
+          return Promise.reject(new BadRequest(Errors.INVALID_PREDICATE));
         }
       }
 
       if (req.description) {
         query.description = stringPredicate(req.descriptionPred, req.description);
         if (!query.description) {
-          return Promise.reject({ status: 400, error: 'invalid-predicate' });
+          return Promise.reject(new BadRequest(Errors.INVALID_PREDICATE));
         }
       }
 
@@ -100,7 +102,7 @@ const resolverMethods = {
 
       // Must match *all* labels
       if (req.labels) {
-        query.labels = { $all: req.labels.map(id => new ObjectId(id)) };
+        query.labels = { $all: req.labels };
       }
 
       // Other things we might want to search by:
@@ -123,9 +125,9 @@ const resolverMethods = {
           }
           if (!VALID_SORT_KEYS.has(sortKey)) {
             if (sortKey.startsWith('custom.')) {
-              return Promise.reject({ status: 400, error: 'not-implemmented' });
+              return Promise.reject(new NotImplemented());
             }
-            return Promise.reject({ status: 400, error: 'invalid-sort-key' });
+            return Promise.reject(new BadRequest(Errors.INVALID_SORT_KEY));
           }
           sort.push([sortKey, dir]);
         }
@@ -137,12 +139,12 @@ const resolverMethods = {
 
   newIssue({ project, issue }) {
     return this.getProjectAndRole({ projectId: project, mutation: true }).then(([proj, role]) => {
-      if (proj === null || (!proj.public && role < Role.REPORTER)) {
-        return Promise.reject({ status: 404, error: 'missing-project' });
-      }
-
-      if (!issue.type || !issue.state || !issue.summary) {
-        return Promise.reject({ status: 401, error: 'missing-field' });
+      if (proj === null || (!proj.public && role < Role.VIEWER)) {
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
+      } else if (role < Role.REPORTER) {
+        return Promise.reject(new Forbidden(Errors.INSUFFICIENT_ACCESS));
+      } else if (!issue.type || !issue.state || !issue.summary) {
+        return Promise.reject(new BadRequest(Errors.MISSING_FIELD));
       }
 
       // Increment the issue id counter.
@@ -152,7 +154,7 @@ const resolverMethods = {
       .then(p => {
         if (!p) {
           logger.error('Non-existent project', project);
-          return Promise.reject({ status: 404, error: 'missing-project' });
+          return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
         }
         const now = new Date();
         const record = {
@@ -167,7 +169,7 @@ const resolverMethods = {
           created: now,
           updated: now,
           cc: (issue.cc || []).map(cc => new ObjectId(cc)),
-          labels: (issue.labels || []).map(lb => new ObjectId(lb)),
+          labels: issue.labels || [],
           linked: (issue.linked || []).map(
               ln => ({ to: new ObjectId(ln.to), relation: ln.relation })),
           custom: issue.custom || [],
@@ -177,7 +179,7 @@ const resolverMethods = {
           return result.ops[0];
         }, error => {
           logger.error('Error creating issue', issue, error);
-          return Promise.reject({ status: 500, error: 'internal' });
+          return Promise.reject(new InternalError());
         });
       });
     });
@@ -185,15 +187,15 @@ const resolverMethods = {
 
   updateIssue({ id, project, issue }) {
     if (!this.user) {
-      return Promise.reject({ status: 401, error: 'unauthorized' });
+      return Promise.reject(new Unauthorized());
     }
     return this.getProjectAndRole({ projectId: project }).then(([proj, role]) => {
       if (!proj) {
         logger.error('Error updating non-existent project', id, this.user);
-        return Promise.reject({ status: 404, error: 'project-not-found' });
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
       } else if (role < Role.UPDATER) {
         logger.error('Access denied updating issue', id, this.user);
-        return Promise.reject({ status: 401, error: 'update-not-permitted' });
+        return Promise.reject(new Forbidden(Errors.INSUFFICIENT_ACCESS));
       }
 
       const query = {
@@ -205,7 +207,7 @@ const resolverMethods = {
       return issues.findOne(query).then(existing => {
         if (!existing) {
           logger.error('Error updating non-existent issue', id, this.user);
-          return Promise.reject({ status: 404, error: 'issue-not-found' });
+          return Promise.reject(new NotFound(Errors.ISSUE_NOT_FOUND));
         }
 
         const record = {
@@ -237,7 +239,7 @@ const resolverMethods = {
         }
 
         if (issue.labels) {
-          record.labels = issue.labels.map(lb => new ObjectId(lb));
+          record.labels = issue.labels;
         }
 
         if (issue.linked) {
@@ -257,7 +259,7 @@ const resolverMethods = {
           return issues.findOne(query);
         }, error => {
           logger.error('Error updating project', id, proj.name, error);
-          return Promise.reject({ status: 500, error: 'internal' });
+          return Promise.reject(new InternalError());
         });
       });
     });

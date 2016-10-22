@@ -118,14 +118,17 @@ module.exports = new GraphQLObjectType({
       description: 'Date and time when the issue was last changed.',
     },
     labels: {
-      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+      type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
       description: 'Labels associated with this issue.',
     },
     labelsData: {
       type: new GraphQLList(new GraphQLNonNull(labelType)),
       description: 'Labels associated with this issue (expanded).',
       resolve(issue, args, context, options) {
-        return issue.labels.map(l => options.rootValue.label({ id: l }));
+        if (issue.labels.length === 0) {
+          return [];
+        }
+        return options.rootValue.labelsById({ project: issue.project, idList: issue.labels });
       },
     },
     linked: {

@@ -129,7 +129,8 @@ class IssueDetails extends React.Component {
               <tr>
                 <th className="header">Labels:</th>
                 <td>
-                  {issue.labels.map(label => <LabelName label={label} key={label} />)}
+                  {issue.labels.map(label =>
+                    <LabelName label={label} project={project.id} key={label} />)}
                 </td>
               </tr>
             )}

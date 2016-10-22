@@ -51,7 +51,7 @@ class LeftNav extends React.Component {
         {labels && labels.map(label => (
           <li className="label-item" key={label.id}>
             <Link to={{ pathname: `/project/${project.name}/issues`, query: { label: label.id } }}>
-              <LabelName label={label.id} />
+              <LabelName label={label.id} project={project.id} />
             </Link>
           </li>
         ))}
@@ -80,6 +80,7 @@ LeftNav.propTypes = {
 
 const LabelQuery = gql`query LabelQuery($project:ID!) {
   labels(project: $project) {
+    project
     id
     name
     color

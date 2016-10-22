@@ -1,19 +1,13 @@
 const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
 const escapeRegExp = require('../lib/escapeRegExp');
-
-function serialize(issue) {
-  return Object.assign({ id: issue._id }, issue);
-}
+const Role = require('../common/role');
+const { NotFound, Forbidden, BadRequest, Unauthorized, InternalError, Errors } =
+    require('../common/errors');
 
 const resolverMethods = {
-  label({ id }) {
-    return this.db.collection('labels').findOne({ _id: new ObjectId(id) }).then(l => {
-      if (!l) {
-        return null;
-      }
-      return serialize(l);
-    });
+  label({ project, id }) {
+    return this.db.collection('labels').findOne({ id, project: new ObjectId(project) });
   },
 
   labels({ token, project }) {
@@ -25,40 +19,88 @@ const resolverMethods = {
     if (project) {
       query.project = new ObjectId(project);
     }
-    return this.db.collection('labels').find(query).sort({ name: 1 }).toArray()
-        .then(l => l.map(serialize));
+    return this.db.collection('labels').find(query).sort({ name: 1 }).toArray();
+  },
+
+  labelsById({ project, idList }) {
+    const query = {
+      id: { $in: idList },
+      project,
+    };
+    return this.db.collection('labels').find(query).sort({ id: 1 }).toArray();
   },
 
   newLabel({ project, label }) {
     if (!this.user) {
-      return Promise.reject(401);
+      return Promise.reject(new Unauthorized());
     }
-    if (!label.name || !label.color) {
-      return Promise.reject({ status: 401, error: 'unauthorized' });
-    }
-    const projects = this.db.collection('projects');
-    const labels = this.db.collection('labels');
-    return projects.findOne({ _id: new ObjectId(project) }).then(p => {
-      if (!p) {
-        logger.error('Non-existent project', project);
-        return Promise.reject({ status: 404, error: 'project-not-found' });
+    return this.getProjectAndRole({ projectId: project, mutation: true }).then(([proj, role]) => {
+      if (proj === null || (!proj.public && role < Role.VIEWER)) {
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
+      } else if (role < Role.DEVELOPER) {
+        return Promise.reject(new Forbidden(Errors.INSUFFICIENT_ACCESS));
+      } else if (!label.name || !label.color) {
+        return Promise.reject(new BadRequest(Errors.MISSING_FIELD));
       }
-      // TODO: Project role test.
-      const now = new Date();
-      const record = {
-        project: new ObjectId(project),
-        name: label.name,
-        color: label.color,
-        creator: this.user._id,
-        created: now,
-        updated: now,
-      };
-      // Insert new user into the database.
-      return labels.insertOne(record).then(result => {
-        return serialize(result.ops[0]);
+
+      // Increment the issue id counter.
+      return this.db.collection('projects').findOneAndUpdate(
+          { _id: proj._id },
+          { $inc: { labelIdCounter: 1 } })
+      .then(p => {
+        if (!p) {
+          return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
+        }
+
+        const labels = this.db.collection('labels');
+        const now = new Date();
+        const record = {
+          project: new ObjectId(project),
+          id: p.value.labelIdCounter,
+          name: label.name,
+          color: label.color,
+          creator: this.user._id,
+          created: now,
+          updated: now,
+        };
+        // Insert new user into the database.
+        return labels.insertOne(record).then(result => {
+          return result.ops[0];
+        }, error => {
+          logger.error('Error creating label', label, error);
+          return Promise.reject(new InternalError());
+        });
+      });
+    });
+  },
+
+  deleteLabel({ project, label }) {
+    if (!this.user) {
+      return Promise.reject(new Unauthorized());
+    }
+    return this.getProjectAndRole({ projectId: project, mutation: true }).then(([proj, role]) => {
+      if (proj === null || (!proj.public && role < Role.VIEWER)) {
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
+      } else if (role < Role.DEVELOPER) {
+        return Promise.reject(new Forbidden(Errors.INSUFFICIENT_ACCESS));
+      }
+
+      const pid = new ObjectId(project);
+      const issues = this.db.collection('issues');
+      const labels = this.db.collection('labels');
+      const labelQuery = { project: pid, id: label };
+      return labels.findOne(labelQuery).then(l => {
+        if (!l) {
+          return Promise.reject(new NotFound(Errors.LABEL_NOT_FOUND));
+        }
+        return issues.updateMany({ project: pid }, { $pullAll: { labels: [l._id] } });
+      }).then(() => {
+        return labels.deleteOne(labelQuery).then(() => {
+          return label;
+        });
       }, error => {
-        logger.error('Error creating issue', label, error);
-        return Promise.reject({ status: 500, error: 'internal' });
+        logger.error('Error deleting label:', label, error);
+        return Promise.reject(new InternalError());
       });
     });
   },

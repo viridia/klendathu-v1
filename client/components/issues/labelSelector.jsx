@@ -10,6 +10,7 @@ import '../common/ac/chip.scss';
 
 const LabelQuery = gql`query LabelQuery($token:String!) {
   labels(token: $token) {
+    project
     id
     name
     color

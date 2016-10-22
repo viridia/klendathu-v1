@@ -1,4 +1,4 @@
-const { GraphQLInputObjectType, GraphQLString, GraphQLID, GraphQLList,
+const { GraphQLInputObjectType, GraphQLInt, GraphQLString, GraphQLID, GraphQLList,
     GraphQLNonNull } = require('graphql');
 const relationType = require('./relationType');
 
@@ -72,7 +72,7 @@ module.exports = new GraphQLInputObjectType({
       description: 'Users who wish to be informed when this issue is updated.',
     },
     labels: {
-      type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
+      type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
       description: 'Labels associated with this issue.',
     },
     linked: {

@@ -143,7 +143,7 @@ class IssueList extends React.Component {
         <td className="title">
           <Link to={linkTarget}>
             <span className="summary">{issue.summary}</span>
-            {issue.labels.map(l => <LabelName label={l} key={l} />)}
+            {issue.labels.map(l => <LabelName project={project.id} label={l} key={l} />)}
           </Link>
         </td>
       </tr>);
@@ -201,7 +201,7 @@ const IssueListQuery = gql`query IssueListQuery(
     $owner: [ID!],
     $reporter: [ID!],
     $cc: [ID!],
-    $labels: [ID!],
+    $labels: [Int!],
     $comment: String,
     $commentPred: PREDICATE,
     $sort: [String!]) {

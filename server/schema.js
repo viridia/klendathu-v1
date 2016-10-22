@@ -84,7 +84,7 @@ module.exports = new GraphQLSchema({
             defaultValue: 'in',
           },
           labels: {
-            type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
+            type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
             description: 'Query term that restricts the issue search to a set of label ids.',
           },
           linked: {
@@ -127,7 +127,8 @@ module.exports = new GraphQLSchema({
       label: {
         type: labelType,
         args: {
-          id: { type: GraphQLID },
+          id: { type: GraphQLInt },
+          project: { type: GraphQLID },
         },
       },
       labels: {

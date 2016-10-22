@@ -1,6 +1,8 @@
 const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
 const Role = require('../common/role');
+const { BadRequest, NotFound, InternalError, Unauthorized, Forbidden, Unimplemented, Errors } =
+    require('../common/errors');
 
 function serialize(project, props = {}) {
   return Object.assign({}, project, {
@@ -33,7 +35,7 @@ const resolverMethods = {
     } else if (projectName) {
       query.name = projectName;
     } else {
-      return Promise.reject({ status: 400, error: 'no-project-id' });
+      return Promise.reject(new BadRequest('no-project-id'));
     }
     // If this is a mutation and the user is not logged in, then don't even bother doing a
     // database lookup for the project, since they won't be able to do anything.
@@ -47,6 +49,8 @@ const resolverMethods = {
       if (this.user._id.equals(project.owningUser)) {
         return [project, Role.OWNER];
       }
+      // TODO: Lookup user role.
+      // TODO: Return null for project if it's private and user is not a member.
       return [project, Role.NONE];
     });
   },
@@ -87,20 +91,20 @@ const resolverMethods = {
 
   newProject({ project }, { db, user }) {
     if (!user) {
-      return Promise.reject({ status: 401, error: 'unauthorized' });
+      return Promise.reject(new Unauthorized());
     }
     //   const { name, owner } = req.body;
     if (project.name.length < 6) {
-      return Promise.reject({ status: 400, error: 'name-too-short' });
+      return Promise.reject(new BadRequest(Errors.NAME_TOO_SHORT));
     } else if (!project.name.match(/^[a-z0-9\-]+$/)) {
       // Special characters not allowed
-      return Promise.reject({ status: 400, error: 'invalid-name' });
+      return Promise.reject(new BadRequest(Errors.INVALID_NAME));
     }
     const projects = this.db.collection('projects');
     return projects.findOne({ name: project.name }).then(p => {
       // Check if project exists
       if (p) {
-        return Promise.reject({ status: 400, error: 'name-exists' });
+        return Promise.reject(new BadRequest(Errors.NAME_EXISTS));
       } else {
         const now = new Date();
         const newProject = {
@@ -110,6 +114,7 @@ const resolverMethods = {
           created: now,
           updated: now,
           issueIdCounter: 0,
+          labelIdCounter: 0,
           deleted: false,
         };
         if (!project.owningUser) {
@@ -119,7 +124,7 @@ const resolverMethods = {
           // TODO: Make the user an administrator
           // TODO: Make sure the org exists.
           logger.error('Custom owners not supported.');
-          return Promise.reject({ status: 400, error: 'unimplemented' });
+          return Promise.reject(new Unimplemented());
         }
 
         return projects.insertOne(newProject).then(result => {
@@ -135,27 +140,27 @@ const resolverMethods = {
           });
         }, error => {
           logger.error('Error creating project', error);
-          return Promise.reject({ status: 500, error: 'internal' });
+          return Promise.reject(new InternalError());
         });
       }
     }, err => {
       logger.error('Database error checking for project existence', err);
-      return Promise.reject({ status: 500, error: 'internal' });
+      return Promise.reject(new InternalError());
     });
   },
 
   updateProject({ id, project }) {
     if (!this.user) {
-      return Promise.reject({ status: 401, error: 'unauthorized' });
+      return Promise.reject(new Unauthorized());
     }
     const projects = this.db.collection('projects');
     return this.getProjectAndRole({ projectId: id }).then(([proj, role]) => {
       if (!proj) {
         logger.error('Error updating non-existent project', id, this.user);
-        return Promise.reject({ status: 404, error: 'project-not-found' });
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
       } else if (role < Role.ADMINISTRATOR) {
         logger.error('Access denied updating project', id, this.user);
-        return Promise.reject({ status: 401, error: 'update-not-permitted' });
+        return Promise.reject(new Forbidden(Errors.INSUFFICIENT_ACCESS));
       }
 
       // TODO: Ownership test and role test.
@@ -178,18 +183,18 @@ const resolverMethods = {
         });
       }, error => {
         logger.error('Error updating project', id, proj.name, error);
-        return Promise.reject({ status: 500, error: 'internal' });
+        return Promise.reject(new InternalError());
       });
     }, err => {
       logger.error('Error finding project to update', err);
-      return Promise.reject({ status: 500, error: 'internal' });
+      return Promise.reject(new InternalError());
     });
   },
 
   // TODO: Rename this to 'purge', and make delete merely set the delete flag.
   deleteProject({ id }, { user }) {
     if (!user) {
-      return Promise.reject({ status: 401, error: 'unauthorized' });
+      return Promise.reject(new Unauthorized());
     }
     const pid = new ObjectId(id);
     const projects = this.db.collection('projects');
@@ -198,10 +203,10 @@ const resolverMethods = {
       // Make sure we have permissions to do this.
       if (!proj) {
         logger.error('Error updating non-existent project', id, this.user);
-        return Promise.reject({ status: 404, error: 'project-not-found' });
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
       } else if (role < Role.ADMINISTRATOR) {
         logger.error('Access denied updating project', id, this.user);
-        return Promise.reject({ status: 401, error: 'update-not-permitted' });
+        return Promise.reject(new Forbidden(Errors.INSUFFICIENT_ACCESS));
       }
       return proj;
     })
@@ -224,7 +229,7 @@ const resolverMethods = {
       return pid;
     }, error => {
       logger.error('Error deleting project:', pid, error);
-      return Promise.reject({ status: 500, error: 'internal' });
+      return Promise.reject(new InternalError());
     });
   },
 };

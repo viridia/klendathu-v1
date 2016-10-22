@@ -15,6 +15,7 @@ import '../common/ac/chip.scss';
 
 const NewLabelMutation = gql`mutation NewLabelMutation($project: ID!, $label: LabelInput!) {
   newLabel(project: $project, label: $label) {
+    project
     id
     name
     color
@@ -32,7 +33,7 @@ class LabelDialog extends React.Component {
     this.onKeyDown = this.onKeyDown.bind(this);
     this.state = {
       name: '',
-      color: '#BA68C8',
+      color: '#e679f8',
       busy: false,
     };
   }
@@ -149,7 +150,6 @@ LabelDialog.propTypes = {
     id: React.PropTypes.string.isRequired,
   }).isRequired,
   onHide: React.PropTypes.func.isRequired,
-  // createLabel: React.PropTypes.func.isRequired,
   onInsertLabel: React.PropTypes.func.isRequired,
   client: React.PropTypes.instanceOf(ApolloClient).isRequired,
 };

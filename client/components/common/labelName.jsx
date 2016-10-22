@@ -18,14 +18,16 @@ class LabelName extends React.Component {
 }
 
 LabelName.propTypes = {
-  label: React.PropTypes.string.isRequired,
+  label: React.PropTypes.number.isRequired,
+  project: React.PropTypes.string.isRequired,
   data: PropTypes.shape({
     label: PropTypes.shape({}),
   }),
 };
 
-const LabelQuery = gql`query LabelQuery($label: ID!) {
-  label(id: $label) {
+const LabelQuery = gql`query LabelQuery($project: ID!, $label: Int!) {
+  label(project: $project, id: $label) {
+    project
     id
     name
     color
@@ -33,5 +35,5 @@ const LabelQuery = gql`query LabelQuery($label: ID!) {
 }`;
 
 export default graphql(LabelQuery, {
-  options: ({ label }) => ({ variables: { label } }),
+  options: ({ label, project }) => ({ variables: { label, project } }),
 })(LabelName);

@@ -13,6 +13,7 @@ export default class AutoCompleteChips extends React.Component {
     this.onReceiveSuggestions = this.onReceiveSuggestions.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onClickContainer = this.onClickContainer.bind(this);
+    this.onClickSuggestion = this.onClickSuggestion.bind(this);
     this.state = {
       open: false,
       valid: false,
@@ -63,6 +64,20 @@ export default class AutoCompleteChips extends React.Component {
     e.preventDefault();
     const inputEl = ReactDOM.findDOMNode(this.input); // eslint-disable-line
     inputEl.focus();
+  }
+
+  onClickSuggestion(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const { suggestions, suggestionsSuffix } = this.state;
+    const suggestionIndex = parseInt(e.target.dataset.index, 10);
+    const item = suggestions.concat(suggestionsSuffix)[suggestionIndex];
+    this.setState({
+      value: '',
+      open: false,
+    });
+    this.searchValue = '';
+    this.chooseSuggestion(item);
   }
 
   onReceiveSuggestions(suggestions, suggestionsSuffix = []) {
@@ -207,7 +222,14 @@ export default class AutoCompleteChips extends React.Component {
           className={classNames({ active })}
           key={value}
           role="presentation">
-        <a role="menuitem" tabIndex="-1" href="">{onRenderSuggestion(s)}</a>
+        <a
+            role="menuitem"
+            tabIndex="-1"
+            href=""
+            data-index={index}
+            onClick={this.onClickSuggestion}>
+          {onRenderSuggestion(s)}
+        </a>
       </li>);
     });
     if (menu.length > 0 && suggestionsSuffix.length > 0) {
@@ -220,7 +242,14 @@ export default class AutoCompleteChips extends React.Component {
           className={classNames({ active })}
           key={value}
           role="presentation">
-        <a role="menuitem" tabIndex="-1" href="">{onRenderSuggestion(s)}</a>
+        <a
+            role="menuitem"
+            tabIndex="-1"
+            href=""
+            data-index={index}
+            onClick={this.onClickSuggestion}>
+          {onRenderSuggestion(s)}
+        </a>
       </li>);
     });
     return menu.concat(suffix);
