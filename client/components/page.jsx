@@ -37,7 +37,7 @@ class Page extends React.Component {
     const child = React.Children.only(children);
     const main = React.cloneElement(child, { params, profile });
     return (<div className="kdt page">
-      <ReduxToastr />
+      <ReduxToastr position="bottom-right" />
       <Header location={location} params={params} />
       {main}
     </div>);

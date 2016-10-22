@@ -9,6 +9,7 @@ import UserName from '../common/userName.jsx';
 import ErrorDisplay from '../debug/errorDisplay.jsx';
 import FilterParams from './filterParams.jsx';
 import './issueList.scss';
+import './../common/card.scss';
 
 class ColumnRenderer {
   constructor(field) {
@@ -160,7 +161,7 @@ class IssueList extends React.Component {
 
     if (!issues || issues.length === 0) {
       return (
-        <div className="card">
+        <div className="card report">
           <div className="no-issues">No issues found</div>
         </div>
       );
@@ -168,7 +169,7 @@ class IssueList extends React.Component {
 
     // console.log(JSON.stringify(issues, null, 2));
     return (
-      <div className="card">
+      <div className="card report">
         <table className="issue">
           {this.renderHeader()}
           <tbody>

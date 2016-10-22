@@ -3,11 +3,9 @@ New React Router?
 Check out Strider? (Means we'd have to write some tests)
 * Adding label to issues doesn't invalidate query.
 * Convert user references to usernames.
-* Convert label references to numeric ids.
 * A way to delete a bug
 * UpdateQueries
   * Issue list
-  * Label list
   * User list
   * Filtering and sorting?
 * How to sort by user?
@@ -18,8 +16,6 @@ Check out Strider? (Means we'd have to write some tests)
 * I think we're going to need tests for the graphql stuff, and the tests will probably
   need a real db.
 * Flesh out issue details
-* Delete labels
-* Figure out how to do refetch on project creation / deletion
 * Edit existing issue (with permissions for various fields).
 * Should be able to comment on a bug without going to edit page.
 * Show issue change log
@@ -28,9 +24,6 @@ Check out Strider? (Means we'd have to write some tests)
   * Get rid of typeahead
 * Search users on both username and fullname.
 * Click on autocomplete menu (in addition to ENTER).
-* Label view
-* Editing of labels
-* Deletion of labels
 * return key to navigate between fields
 * escape to dismiss menus
 * make note about #hash tags and @mentions

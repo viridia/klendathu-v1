@@ -27,7 +27,7 @@ const resolverMethods = {
       id: { $in: idList },
       project,
     };
-    return this.db.collection('labels').find(query).sort({ id: 1 }).toArray();
+    return this.db.collection('labels').find(query).sort({ name: 1 }).toArray();
   },
 
   newLabel({ project, label }) {
@@ -46,35 +46,83 @@ const resolverMethods = {
       // Increment the issue id counter.
       return this.db.collection('projects').findOneAndUpdate(
           { _id: proj._id },
-          { $inc: { labelIdCounter: 1 } })
-      .then(p => {
-        if (!p) {
-          return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
+          { $inc: { labelIdCounter: 1 } });
+    }).then(p => {
+      if (!p) {
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
+      }
+
+      const labels = this.db.collection('labels');
+      const now = new Date();
+      const record = {
+        project: new ObjectId(project),
+        id: p.value.labelIdCounter,
+        name: label.name,
+        color: label.color,
+        creator: this.user._id,
+        created: now,
+        updated: now,
+      };
+      // Insert new user into the database.
+      return labels.insertOne(record).then(result => {
+        return result.ops[0];
+      }, error => {
+        logger.error('Error creating label', label, error);
+        return Promise.reject(new InternalError());
+      });
+    });
+  },
+
+  updateLabel({ id, project, label }) {
+    if (!this.user) {
+      return Promise.reject(new Unauthorized());
+    }
+    return this.getProjectAndRole({ projectId: project }).then(([proj, role]) => {
+      if (!proj) {
+        logger.error('Error updating non-existent project', id, this.user);
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
+      } else if (role < Role.UPDATER) {
+        logger.error('Access denied updating issue', id, this.user);
+        return Promise.reject(new Forbidden(Errors.INSUFFICIENT_ACCESS));
+      }
+
+      const query = {
+        id,
+        project: proj._id,
+      };
+
+      const labels = this.db.collection('labels');
+      return labels.findOne(query).then(existing => {
+        if (!existing) {
+          logger.error('Error updating non-existent label', id, this.user);
+          return Promise.reject(new NotFound(Errors.LABEL_NOT_FOUND));
         }
 
-        const labels = this.db.collection('labels');
-        const now = new Date();
         const record = {
-          project: new ObjectId(project),
-          id: p.value.labelIdCounter,
-          name: label.name,
-          color: label.color,
-          creator: this.user._id,
-          created: now,
-          updated: now,
+          updated: new Date(),
         };
-        // Insert new user into the database.
-        return labels.insertOne(record).then(result => {
-          return result.ops[0];
+
+        if (label.name) {
+          record.name = label.name;
+        }
+
+        if (label.color) {
+          record.color = label.color;
+        }
+
+        return labels.updateOne(query, {
+          $set: record,
+        }).then(() => {
+          return labels.findOne(query);
         }, error => {
-          logger.error('Error creating label', label, error);
+          logger.error('Error updating label', id, proj.name, error);
           return Promise.reject(new InternalError());
         });
       });
     });
   },
 
-  deleteLabel({ project, label }) {
+  deleteLabel({ project, id }) {
     if (!this.user) {
       return Promise.reject(new Unauthorized());
     }
@@ -88,18 +136,18 @@ const resolverMethods = {
       const pid = new ObjectId(project);
       const issues = this.db.collection('issues');
       const labels = this.db.collection('labels');
-      const labelQuery = { project: pid, id: label };
+      const labelQuery = { project: pid, id };
       return labels.findOne(labelQuery).then(l => {
         if (!l) {
           return Promise.reject(new NotFound(Errors.LABEL_NOT_FOUND));
         }
-        return issues.updateMany({ project: pid }, { $pullAll: { labels: [l._id] } });
+        return issues.updateMany({ project: pid }, { $pullAll: { labels: [l.id] } });
       }).then(() => {
         return labels.deleteOne(labelQuery).then(() => {
-          return label;
+          return id;
         });
       }, error => {
-        logger.error('Error deleting label:', label, error);
+        logger.error('Error deleting label:', id, project, error);
         return Promise.reject(new InternalError());
       });
     });

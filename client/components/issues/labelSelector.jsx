@@ -1,21 +1,11 @@
 import React, { PropTypes } from 'react';
 import { withApollo } from 'react-apollo';
 import ApolloClient from 'apollo-client';
-import gql from 'graphql-tag';
 import AutocompleteChips from '../common/ac/autocompleteChips.jsx';
-import LabelDialog from './labelDialog.jsx';
+import LabelDialog from '../labels/labelDialog.jsx';
 import Chip from '../common/ac/chip.jsx';
-import './labelSelector.scss';
+import { LabelSearchQuery } from '../../store/queries';
 import '../common/ac/chip.scss';
-
-const LabelQuery = gql`query LabelQuery($token:String!) {
-  labels(token: $token) {
-    project
-    id
-    name
-    color
-  }
-}`;
 
 class LabelSelector extends React.Component {
   constructor() {
@@ -40,7 +30,7 @@ class LabelSelector extends React.Component {
       callback([], [newLabelOption]);
     } else {
       this.props.client.query({
-        query: LabelQuery,
+        query: LabelSearchQuery,
         variables: { token, project: this.props.project.id },
       }).then(resp => {
         callback(resp.data.labels.slice(0, 5), [newLabelOption]);
@@ -57,6 +47,9 @@ class LabelSelector extends React.Component {
   }
 
   onInsertLabel(label) {
+    if (label === null || label === undefined) {
+      throw new Error('invalid label');
+    }
     this.ac.addToSelection(label);
   }
 

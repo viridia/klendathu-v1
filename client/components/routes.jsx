@@ -8,7 +8,7 @@ import IssueDetails from './issues/issueDetails.jsx';
 import IssueCreate from './issues/issueCreate.jsx';
 import IssueEdit from './issues/issueEdit.jsx';
 import IssueList from './issues/issueList.jsx';
-import LabelList from './issues/labelList.jsx';
+import LabelList from './labels/labelList.jsx';
 import ProjectSettings from './settings/projectSettings.jsx';
 import ProfilePage from './profile/profilePage.jsx';
 import LoginPage from './login/loginPage.jsx';

@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+import { LabelQuery } from '../../store/queries';
 import './labelName.scss';
 
 /** Component that displays a label as a chip. */
@@ -24,15 +24,6 @@ LabelName.propTypes = {
     label: PropTypes.shape({}),
   }),
 };
-
-const LabelQuery = gql`query LabelQuery($project: ID!, $label: Int!) {
-  label(project: $project, id: $label) {
-    project
-    id
-    name
-    color
-  }
-}`;
 
 export default graphql(LabelQuery, {
   options: ({ label, project }) => ({ variables: { label, project } }),

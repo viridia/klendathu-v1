@@ -1,13 +1,13 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 import AppsIcon from 'icons/ic_apps_black_24px.svg';
 import ListIcon from 'icons/ic_list_black_24px.svg';
 import BookmarkIcon from 'icons/ic_bookmark_border_black_24px.svg';
 import PersonIcon from 'icons/ic_person_black_24px.svg';
 import SettingsIcon from 'icons/ic_settings_black_24px.svg';
 import LocalOfferIcon from 'icons/ic_local_offer_black_24px.svg';
+import { LabelsQuery } from '../../store/queries';
 import LabelName from './labelName.jsx';
 import './leftNav.scss';
 
@@ -78,15 +78,6 @@ LeftNav.propTypes = {
   }).isRequired,
 };
 
-const LabelQuery = gql`query LabelQuery($project:ID!) {
-  labels(project: $project) {
-    project
-    id
-    name
-    color
-  }
-}`;
-
-export default graphql(LabelQuery, {
+export default graphql(LabelsQuery, {
   options: ({ project }) => ({ variables: { project: project.id } }),
 })(LeftNav);

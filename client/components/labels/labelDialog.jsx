@@ -1,6 +1,5 @@
 import React from 'react';
 import { withApollo } from 'react-apollo';
-import ApolloClient from 'apollo-client';
 import Button from 'react-bootstrap/lib/Button';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FormControl from 'react-bootstrap/lib/FormControl';
@@ -8,34 +7,33 @@ import FormGroup from 'react-bootstrap/lib/FormGroup';
 import Modal from 'react-bootstrap/lib/Modal';
 import classNames from 'classnames';
 import { toastr } from 'react-redux-toastr';
-import gql from 'graphql-tag';
+import { createLabel, updateLabel } from '../../store/label';
 import LABEL_COLORS from '../common/labelColors';
-import './labelSelector.scss';
+import './labelDialog.scss';
 import '../common/ac/chip.scss';
-
-const NewLabelMutation = gql`mutation NewLabelMutation($project: ID!, $label: LabelInput!) {
-  newLabel(project: $project, label: $label) {
-    project
-    id
-    name
-    color
-  }
-}`;
 
 // UpdateLabelMutation
 
 class LabelDialog extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.onChangeLabelText = this.onChangeLabelText.bind(this);
     this.onChangeLabelColor = this.onChangeLabelColor.bind(this);
-    this.onCreateLabel = this.onCreateLabel.bind(this);
+    this.onUpdateLabel = this.onUpdateLabel.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
-    this.state = {
-      name: '',
-      color: '#e679f8',
-      busy: false,
-    };
+    if (props.label) {
+      this.state = {
+        name: props.label.name,
+        color: props.label.color,
+        busy: false,
+      };
+    } else {
+      this.state = {
+        name: '',
+        color: '#e679f8',
+        busy: false,
+      };
+    }
   }
 
   onChangeLabelText(e) {
@@ -50,25 +48,27 @@ class LabelDialog extends React.Component {
     if (e.keyCode === 13 && this.state.name.length >= 3) { // RETURN
       e.preventDefault();
       e.stopPropagation();
-      this.onCreateLabel();
+      this.onUpdateLabel();
     }
   }
 
-  onCreateLabel() {
+  onUpdateLabel() {
+    const { label } = this.props;
     const { name, color } = this.state;
     this.setState({ busy: true });
-    this.props.client.mutate({
-      mutation: NewLabelMutation,
-      variables: {
-        project: this.props.project.id,
-        label: { name, color },
-      },
-    })
-    .then(resp => {
+    let result;
+    if (label) {
+      result = updateLabel(this.props.project.id, label.id, { name, color });
+    } else {
+      result = createLabel(this.props.project.id, { name, color });
+    }
+
+    result.then(resp => {
       this.props.onInsertLabel(resp.data.newLabel);
       this.setState({ busy: false });
       this.props.onHide();
     }, error => {
+      console.error(error);
       if (error.response && error.response.data && error.response.data.err) {
         switch (error.response.data.err) {
           case 'no-project':
@@ -88,13 +88,16 @@ class LabelDialog extends React.Component {
   }
 
   render() {
+    const { label } = this.props;
     return (
       <Modal
           show
           onHide={this.props.onHide}
           dialogClassName="create-label">
         <Modal.Header closeButton>
-          <Modal.Title>Create Label</Modal.Title>
+          {label
+              ? <Modal.Title>Edit Label</Modal.Title>
+              : <Modal.Title>Create Label</Modal.Title>}
         </Modal.Header>
         <Modal.Body>
           <FormGroup controlId="name">
@@ -137,9 +140,9 @@ class LabelDialog extends React.Component {
         <Modal.Footer>
           <Button onClick={this.props.onHide}>Cancel</Button>
           <Button
-              onClick={this.onCreateLabel}
+              onClick={this.onUpdateLabel}
               disabled={this.state.name.length < 3 && !this.state.busy}
-              bsStyle="primary">Create</Button>
+              bsStyle="primary">{label ? 'Save' : 'Create'}</Button>
         </Modal.Footer>
       </Modal>);
   }
@@ -149,9 +152,13 @@ LabelDialog.propTypes = {
   project: React.PropTypes.shape({
     id: React.PropTypes.string.isRequired,
   }).isRequired,
+  label: React.PropTypes.shape({
+    id: React.PropTypes.number.isRequired,
+    name: React.PropTypes.string.isRequired,
+    color: React.PropTypes.string.isRequired,
+  }),
   onHide: React.PropTypes.func.isRequired,
   onInsertLabel: React.PropTypes.func.isRequired,
-  client: React.PropTypes.instanceOf(ApolloClient).isRequired,
 };
 
 export default withApollo(LabelDialog);

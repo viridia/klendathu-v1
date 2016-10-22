@@ -236,21 +236,29 @@ module.exports = new GraphQLSchema({
       updateLabel: {
         type: new GraphQLNonNull(labelType),
         args: {
-          id: {
+          project: {
             type: new GraphQLNonNull(GraphQLID),
+            description: 'Id of the project containing the label to update.',
+          },
+          id: {
+            type: new GraphQLNonNull(GraphQLInt),
             description: 'Id of the label to update.',
           },
           label: {
             type: labelInputType,
-            description: 'Contents of the label to be created.',
+            description: 'Contents of the label to be updated.',
           },
         },
       },
       deleteLabel: {
-        type: new GraphQLNonNull(GraphQLID),
+        type: new GraphQLNonNull(GraphQLInt),
         args: {
-          id: {
+          project: {
             type: new GraphQLNonNull(GraphQLID),
+            description: 'Project containing the label.',
+          },
+          id: {
+            type: new GraphQLNonNull(GraphQLInt),
             description: 'Id of the label to delete.',
           },
         },
