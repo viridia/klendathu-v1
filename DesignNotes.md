@@ -1,7 +1,6 @@
-Hot loading?
 New React Router?
-Check out Strider? (Means we'd have to write some tests)
-TypeScript?
+Check out Strider?
+TypeScript on the server? (Need to read the docs.)
 
 * Convert user references to usernames.
 * Per-user project settings
@@ -15,15 +14,9 @@ TypeScript?
   * Issue list
   * User list
   * Filtering and sorting?
-* How to sort by user?
-  * Option 1: Store references to users by user name.
-    (Might as well store labels by id while we are at it).
-  * Option 2: Store denorm usernames along with user ids.
-* Use TypeScript on the backend?
-* I think we're going to need tests for the graphql stuff, and the tests will probably
-  need a real db.
+* I think we're going to need tests for the graphql stuff.
 * Flesh out issue details
-* Edit existing issue (with permissions for various fields).
+* Issue compose needs role checks on individual fields.
 * Should be able to comment on a bug without going to edit page.
 * Show issue change log
 * Custom suggest field / enter key support.
@@ -34,7 +27,6 @@ TypeScript?
 * return key to navigate between fields
 * escape to dismiss menus
 * make note about #hash tags and @mentions
-* Errors
 * Simplify rendering of suggestionsSuffix in autocomplete
 * Additional roles
   * Project membership
@@ -143,6 +135,7 @@ issues: [
 
 Things to experiment with:
   -- Nginx config and https
+  -- Hot loading 3?
 
 Filter rows:
   [field][op][value][x]

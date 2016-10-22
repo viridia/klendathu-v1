@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { browserHistory } from 'react-router';
 import { graphql } from 'react-apollo';
 import { toastr } from 'react-redux-toastr';
 import IssueCompose from './issueCompose.jsx';
@@ -15,6 +16,7 @@ class IssueEdit extends React.Component {
   onSave(issueId, issue) {
     return updateIssue(issueId, this.props.project.id, issue).then(resp => {
       toastr.success(`Issue #${resp.data.updateIssue.id} updated.`);
+      browserHistory.goBack();
     });
   }
 
