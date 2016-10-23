@@ -48,7 +48,6 @@ export default class Dashboard extends React.Component {
 
 Dashboard.contextTypes = {
   profile: React.PropTypes.shape({
-    id: React.PropTypes.string.isRequired,
     username: React.PropTypes.string.isRequired,
   }),
 };

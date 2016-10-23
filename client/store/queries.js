@@ -54,3 +54,15 @@ export const LabelSearchQuery = gql`query labelsQuery($project:ID!, $token:Strin
     color
   }
 }`;
+
+export const ProjectMembershipQuery = gql`query projectMembershipQuery($project: ID!) {
+  projectMemberships(project: $project) {
+    user
+    role
+    inheritedRole
+    labels
+    queries {
+      name
+    }
+  }
+}`;

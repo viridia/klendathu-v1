@@ -16,6 +16,7 @@ const userType = require('./schemas/userType');
 const projectType = require('./schemas/projectType');
 const projectInputType = require('./schemas/projectInputType');
 const projectMembershipType = require('./schemas/projectMembershipType');
+const projectMembershipInputType = require('./schemas/projectMembershipInputType');
 const templateType = require('./schemas/templateType');
 const workflowType = require('./schemas/workflowType');
 const predicateType = require('./schemas/predicateType');
@@ -304,6 +305,23 @@ module.exports = new GraphQLSchema({
           id: {
             type: new GraphQLNonNull(GraphQLID),
             description: 'Id of the project to delete.',
+          },
+        },
+      },
+      updateProjectMembership: {
+        type: new GraphQLNonNull(projectMembershipType),
+        args: {
+          project: {
+            type: new GraphQLNonNull(GraphQLID),
+            description: 'Reference to project.',
+          },
+          user: {
+            type: new GraphQLNonNull(GraphQLString),
+            description: 'Reference to user member of project.',
+          },
+          membership: {
+            type: new GraphQLNonNull(projectMembershipInputType),
+            description: 'Membership data to update.',
           },
         },
       },

@@ -39,6 +39,8 @@ TypeScript on the server? (Need to read the docs.)
   * Need project settings
 * Undo mode (set deleted flag) for issues, labels, projects.
 * Show linked issues hierarchically
+* Need a way to create Mongo indices programmatically.
+* Delete project memberships when deleting projects and/or users.
 
 URLS:
   https://github.com/mlabieniec/complexity

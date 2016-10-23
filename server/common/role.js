@@ -10,9 +10,11 @@ module.exports = {
   UPDATER: 40,
   // Developers can create new labels and edit the labels they own.
   DEVELOPER: 55,
-  // Managers can change the project issue template and workflow.
+  // Managers can change the project issue template and workflow. They can also grant access
+  // to users up to DEVELOPER role.
   MANAGER: 70,
-  // Administrators can update project info and delete projects.
+  // Administrators can update project info and delete projects. They can also grant access
+  // to users up to ADMINISTRATOR role.
   ADMINISTRATOR: 90,
   // Owners have the same permissions as admins.
   OWNER: 100,

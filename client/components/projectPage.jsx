@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import 'react-redux-toastr/src/less/index.less';
 import { graphql } from 'react-apollo';
+import ErrorDisplay from './debug/errorDisplay.jsx';
 import LeftNav from './common/leftNav.jsx';
 import { ProjectQuery } from '../store/queries';
 import { ProjectContent } from '../store/fragments';
@@ -8,12 +9,13 @@ import './page.scss';
 
 class ProjectPage extends React.Component {
   render() {
-    const { children, params, data: { project, errors } } = this.props;
-    if (errors) {
-      return <p>{JSON.stringify(errors)}</p>;
-    }
-    if (!this.context.profile || !project) {
-      return <div className="content" />;
+    const { children, params, data: { project, error } } = this.props;
+    if (error) {
+      return <ErrorDisplay error={error} />;
+    } else if (!this.context.profile) {
+      return <div className="content">Profile not loaded</div>;
+    } else if (!project) {
+      return <div className="content">Project not found</div>;
     }
     const child = React.Children.only(children);
     const main = React.cloneElement(child, { project, params });

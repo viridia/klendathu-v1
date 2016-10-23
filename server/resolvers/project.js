@@ -46,7 +46,7 @@ const resolverMethods = {
       if (!project) {
         return [null, Role.NONE];
       }
-      if (this.user.username === project.owningUser) {
+      if (this.user && this.user.username === project.owningUser) {
         return [project, Role.OWNER];
       }
       // TODO: Lookup user role.
