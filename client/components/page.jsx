@@ -64,7 +64,7 @@ Page.childContextTypes = {
 };
 
 const ProjectsProfileQuery = gql`query ProjectsProfileQuery {
-  profile { id username fullname photo }
+  profile { username fullname photo }
 }`;
 
 export default graphql(ProjectsProfileQuery)(Page);

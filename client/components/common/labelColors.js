@@ -44,6 +44,11 @@ const LABEL_COLORS = [
     '#A5D6A7',
     '#81C784',
     '#4CAF50',
+  ], [ // Emerald Green
+    '#b4febc',
+    '#86f291',
+    '#66ea73',
+    '#44ca51',
   ], [ // Light Green
     '#CCFF90',
     '#B2FF59',

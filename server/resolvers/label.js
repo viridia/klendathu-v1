@@ -59,7 +59,7 @@ const resolverMethods = {
         id: p.value.labelIdCounter,
         name: label.name,
         color: label.color,
-        creator: this.user._id,
+        creator: this.user.username,
         created: now,
         updated: now,
       };

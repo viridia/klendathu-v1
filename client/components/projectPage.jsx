@@ -35,7 +35,6 @@ ProjectPage.propTypes = {
 
 ProjectPage.contextTypes = {
   profile: React.PropTypes.shape({
-    id: React.PropTypes.string.isRequired,
     username: React.PropTypes.string.isRequired,
   }),
 };

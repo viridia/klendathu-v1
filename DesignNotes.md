@@ -2,7 +2,6 @@ New React Router?
 Check out Strider?
 TypeScript on the server? (Need to read the docs.)
 
-* Convert user references to usernames.
 * Per-user project settings
   * Label hot list
   * Stored queries
@@ -10,6 +9,11 @@ TypeScript on the server? (Need to read the docs.)
   * More generally, invalidating issue queries doesn't work.
 * Get rid of typeahead
 * A way to delete an issue
+  * Individual delete
+  * Mass edit
+* Convert user references to usernames. Advantages:
+  * sorting issues alphabetically by user
+  * nice-looking query strings.
 * UpdateQueries
   * Issue list
   * User list

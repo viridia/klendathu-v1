@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import Button from 'react-bootstrap/lib/Button';
 import Modal from 'react-bootstrap/lib/Modal';
-import UserName from '../common/userName.jsx';
 import roleName from '../../lib/role';
 import { deleteProject } from '../../store/projects';
 import './projectCard.scss';
@@ -60,7 +59,7 @@ export default class ProjectCard extends React.Component {
           <div className="project-owner">
             <div className="owned-by">
               <span className="title">Owned by: </span>
-              <UserName user={project.owningUser} />
+              {project.owningUser}
             </div>
             <div className="role">
               <span className="title">Role: </span>

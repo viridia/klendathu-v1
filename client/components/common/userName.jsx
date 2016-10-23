@@ -25,9 +25,8 @@ UserName.propTypes = {
   full: PropTypes.bool,
 };
 
-const UserQuery = gql`query UserQuery($user: ID!) {
-  user(id: $user) {
-    id
+const UserQuery = gql`query UserQuery($user: String!) {
+  user(username: $user) {
     username
     fullname
     photo

@@ -3,7 +3,6 @@ import Button from 'react-bootstrap/lib/Button';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import { saveProject } from '../../store/projects';
-import UserName from '../common/userName.jsx';
 import pick from '../../lib/pick';
 
 export default class ProjectInfoEdit extends React.Component {
@@ -82,7 +81,7 @@ export default class ProjectInfoEdit extends React.Component {
             <tr>
               <th className="header"><ControlLabel>Owner:</ControlLabel></th>
               <td className="owner single-static">
-                <UserName user={project.owningUser} />
+                {project.owningUser}
               </td>
             </tr>
           </tbody>

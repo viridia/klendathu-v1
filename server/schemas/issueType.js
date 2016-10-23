@@ -95,7 +95,7 @@ module.exports = new GraphQLObjectType({
       type: userType,
       description: 'Current owner of this issue, as a User object.',
       resolve(issue, args, context, options) {
-        return options.rootValue.singleUser({ id: issue.owner });
+        return options.rootValue.singleUser({ username: issue.owner });
       },
     },
     cc: {
@@ -106,7 +106,7 @@ module.exports = new GraphQLObjectType({
       type: new GraphQLList(new GraphQLNonNull(userType)),
       description: 'Users who wish to be informed when this issue is updated (as User objects).',
       resolve(issue, args, context, options) {
-        return issue.cc.map(cc => options.rootValue.singleUser({ id: cc }));
+        return issue.cc.map(cc => options.rootValue.singleUser({ username: cc }));
       },
     },
     created: {

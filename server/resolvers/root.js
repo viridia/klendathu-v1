@@ -6,8 +6,7 @@ class RootResolver {
   }
 
   profile() {
-    if (!this.user) { return null; }
-    return Object.assign({}, this.user, { id: this.user._id });
+    return this.user;
   }
 }
 

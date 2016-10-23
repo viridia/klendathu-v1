@@ -15,6 +15,7 @@ const labelInputType = require('./schemas/labelInputType');
 const userType = require('./schemas/userType');
 const projectType = require('./schemas/projectType');
 const projectInputType = require('./schemas/projectInputType');
+const projectMembershipType = require('./schemas/projectMembershipType');
 const templateType = require('./schemas/templateType');
 const workflowType = require('./schemas/workflowType');
 const predicateType = require('./schemas/predicateType');
@@ -124,6 +125,19 @@ module.exports = new GraphQLSchema({
           name: { type: GraphQLString },
         },
       },
+      projectMembership: {
+        type: projectMembershipType,
+        args: {
+          project: { type: GraphQLID },
+          user: { type: GraphQLString },
+        },
+      },
+      projectMemberships: {
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(projectMembershipType))),
+        args: {
+          project: { type: GraphQLID },
+        },
+      },
       label: {
         type: labelType,
         args: {
@@ -158,17 +172,16 @@ module.exports = new GraphQLSchema({
       user: {
         type: userType,
         args: {
-          id: { type: new GraphQLNonNull(GraphQLID) },
+          username: { type: GraphQLString },
         },
         // This needs to be here because we already have a 'user' field on the root object.
-        resolve(root, { id }) {
-          return root.singleUser({ id });
+        resolve(root, { username }) {
+          return root.singleUser({ username });
         },
       },
       users: {
         type: new GraphQLNonNull(new GraphQLList(userType)),
         args: {
-          id: { type: GraphQLID },
           token: { type: GraphQLString },
         },
       },

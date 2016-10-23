@@ -64,11 +64,11 @@ module.exports = new GraphQLInputObjectType({
       description: 'Detailed description of the issue.',
     },
     owner: {
-      type: GraphQLID,
+      type: GraphQLString,
       description: 'Current owner of this issue.',
     },
     cc: {
-      type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
+      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
       description: 'Users who wish to be informed when this issue is updated.',
     },
     labels: {

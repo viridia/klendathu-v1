@@ -8,7 +8,6 @@ import dateFormat from 'dateformat';
 import ErrorDisplay from '../debug/errorDisplay.jsx';
 import LabelDialog from './labelDialog.jsx';
 import LabelName from '../common/labelName.jsx';
-import UserName from '../common/userName.jsx';
 import { LabelsQuery } from '../../store/queries';
 import { deleteLabel } from '../../store/label';
 import './labelList.scss';
@@ -35,7 +34,7 @@ class LabelList extends React.Component {
 
   onShowCreate(e) {
     e.preventDefault();
-    this.setState({ showCreate: true });
+    this.setState({ showCreate: true, labelToUpdate: null });
   }
 
   onHideCreate() {
@@ -82,7 +81,7 @@ class LabelList extends React.Component {
         <td className="label-id center">{label.id}</td>
         <td className="visible center"><Checkbox bsClass="cbox" /></td>
         <td className="name center"><LabelName project={label.project} label={label.id} /></td>
-        <td className="creator center"><UserName user={label.creator} /></td>
+        <td className="creator center">label.creator</td>
         <td className="created center">{dateFormat(label.created, 'mmm dS, yyyy h:MM TT')}</td>
         <td className="actions center">
           <Button data-label={label.id} onClick={e => this.onShowUpdate(e, label)}>Edit</Button>

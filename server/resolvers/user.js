@@ -1,4 +1,3 @@
-const { ObjectId } = require('mongodb');
 const escapeRegExp = require('../lib/escapeRegExp');
 
 function serialize(user) {
@@ -7,8 +6,8 @@ function serialize(user) {
 }
 
 const resolverMethods = {
-  singleUser({ id }) {
-    return this.db.collection('users').findOne({ _id: new ObjectId(id) }).then(user => {
+  singleUser({ username }) {
+    return this.db.collection('users').findOne({ username }).then(user => {
       if (!user) {
         return null;
       }
@@ -16,11 +15,8 @@ const resolverMethods = {
     });
   },
 
-  users({ id, token }) {
+  users({ token }) {
     const query = {};
-    if (id) {
-      query._id = new ObjectId(id);
-    }
     if (token) {
       const pattern = `\\b${escapeRegExp(token)}`;
       query.fullname = { $regex: pattern, $options: 'i' };

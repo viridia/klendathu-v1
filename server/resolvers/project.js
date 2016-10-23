@@ -15,7 +15,7 @@ function serialize(project, props = {}) {
 function getRole(db, project, user) {
   if (!user) {
     return Role.NONE;
-  } else if (project.owningUser && project.owningUser.equals(user._id)) {
+  } else if (project.owningUser && project.owningUser === user.username) {
     return Role.OWNER;
   } else {
     return Role.NONE;
@@ -46,7 +46,7 @@ const resolverMethods = {
       if (!project) {
         return [null, Role.NONE];
       }
-      if (this.user._id.equals(project.owningUser)) {
+      if (this.user.username === project.owningUser) {
         return [project, Role.OWNER];
       }
       // TODO: Lookup user role.
@@ -118,7 +118,7 @@ const resolverMethods = {
           deleted: false,
         };
         if (!project.owningUser) {
-          newProject.owningUser = this.user._id;
+          newProject.owningUser = this.user.username;
           newProject.owningOrg = null;
         } else {
           // TODO: Make the user an administrator

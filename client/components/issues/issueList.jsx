@@ -5,7 +5,6 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import classNames from 'classnames';
 import LabelName from '../common/labelName.jsx';
-import UserName from '../common/userName.jsx';
 import ErrorDisplay from '../debug/errorDisplay.jsx';
 import FilterParams from './filterParams.jsx';
 import './issueList.scss';
@@ -122,9 +121,7 @@ class IssueList extends React.Component {
         </td>
         <td className="owner">
           <div className="pad">
-            {issue.owner
-              ? <UserName user={issue.owner} />
-            : <div className="unassigned">unassigned</div>}
+            {issue.owner || <div className="unassigned">unassigned</div>}
           </div>
         </td>
         <td className="state">

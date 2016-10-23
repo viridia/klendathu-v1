@@ -29,10 +29,10 @@ const resolverMethods = {
       // const userOrgs = req.user.organizations || [];
       // const query = {
       //   $or: [
-      //     { owningUser: req.user._id, },
+      //     { owningUser: req.user.username, },
       //   ]
       // }
-      return this.db.collection('workflows').find({ owningUser: this.user._id, name })
+      return this.db.collection('workflows').find({ owningUser: this.user.username, name })
       .toArray().then(rows => {
         return rows;
         // return res.json({

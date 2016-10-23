@@ -7,7 +7,6 @@ import Chip from './ac/chip.jsx';
 
 const UserQuery = gql`query UsersQuery($token:String!) {
   users(token: $token) {
-    id
     username
     fullname
     photo

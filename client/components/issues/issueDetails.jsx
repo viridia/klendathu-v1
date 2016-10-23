@@ -120,7 +120,7 @@ class IssueDetails extends React.Component {
             {issue.cc.length > 0 && (
               <tr>
                 <th className="header">CC:</th>
-                <td>{issue.cc.map(user => <UserName user={user} key={user} full />)}
+                <td>{issue.cc.map(cc => <UserName user={cc} key={cc} full />)}
                 </td>
               </tr>
             )}

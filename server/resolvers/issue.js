@@ -164,7 +164,7 @@ const resolverMethods = {
           state: issue.state,
           summary: issue.summary,
           description: issue.description,
-          reporter: this.user._id,
+          reporter: this.user.username,
           owner: issue.owner,
           created: now,
           updated: now,
@@ -235,7 +235,7 @@ const resolverMethods = {
         }
 
         if (issue.cc) {
-          record.cc = issue.cc.map(cc => new ObjectId(cc));
+          record.cc = issue.cc;
         }
 
         if (issue.labels) {
