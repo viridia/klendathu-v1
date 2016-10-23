@@ -1,17 +1,9 @@
 import React, { PropTypes } from 'react';
 import { withApollo } from 'react-apollo';
 import ApolloClient from 'apollo-client';
-import gql from 'graphql-tag';
 import AutoCompleteChips from './ac/autocompleteChips.jsx';
+import UsersQuery from '../../graphql/queries/users.graphql';
 import Chip from './ac/chip.jsx';
-
-const UserQuery = gql`query UsersQuery($token:String!) {
-  users(token: $token) {
-    username
-    fullname
-    photo
-  }
-}`;
 
 class UserAutoComplete extends React.Component {
   constructor(props) {
@@ -28,7 +20,7 @@ class UserAutoComplete extends React.Component {
       callback([]);
     } else {
       this.props.client.query({
-        query: UserQuery,
+        query: UsersQuery,
         variables: { token, project: this.props.project.id },
       }).then(resp => {
         callback(resp.data.users);

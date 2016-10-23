@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { graphql } from 'react-apollo';
 import ProjectCard from './projectCard.jsx';
-import { ProjectListQuery } from '../../store/queries';
+import ProjectListQuery from '../../graphql/queries/projectList.graphql';
 
 class ProjectList extends React.Component {
   render() {

@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+import UserQuery from '../../graphql/queries/user.graphql';
 
 class UserName extends React.Component {
   render() {
@@ -24,14 +24,6 @@ UserName.propTypes = {
   }),
   full: PropTypes.bool,
 };
-
-const UserQuery = gql`query UserQuery($user: String!) {
-  user(username: $user) {
-    username
-    fullname
-    photo
-  }
-}`;
 
 export default graphql(UserQuery, {
   options: ({ user }) => ({ variables: { user } }),

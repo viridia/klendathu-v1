@@ -90,6 +90,11 @@ module.exports = {
         test: /\.svg$/i,
         loader: 'react-svg-inline-loader',
       },
+      {
+        test: /\.(graphql|gql)$/,
+        include: path.resolve(__dirname, 'client'),
+        loader: 'graphql-tag/loader'
+      }
     ],
   },
 };

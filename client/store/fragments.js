@@ -42,13 +42,11 @@ export const IssueContent = createFragment(gql`
       value
     }
     ownerData {
-      id
       username
       fullname
       photo
     }
     ccData {
-      id
       username
       fullname
       photo

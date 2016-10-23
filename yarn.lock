@@ -2351,13 +2351,13 @@ graphql-date@^1.0.2:
   dependencies:
     assert-err "^1.0.0"
 
+graphql-tag:
+  version "0.1.15"
+  resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-0.1.15.tgz#a6b25cb5c6a57b56fcbda252083a39a4c9a34234"
+
 graphql-tag@^0.1.13:
   version "0.1.14"
   resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-0.1.14.tgz#9a304a6c054ab5c6fe3d0aa28e3407b3d200ee6d"
-
-graphql-tag@latest:
-  version "0.1.15"
-  resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-0.1.15.tgz#a6b25cb5c6a57b56fcbda252083a39a4c9a34234"
 
 graphql@^0.7.1:
   version "0.7.2"

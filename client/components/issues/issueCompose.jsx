@@ -216,7 +216,7 @@ export default class IssueCompose extends React.Component {
   onAddComment(e) {
     e.preventDefault();
     const newComment = {
-      author: this.context.profile.id,
+      author: this.context.profile.username,
       body: this.state.commentText,
     };
     this.setState({
@@ -572,7 +572,6 @@ IssueCompose.propTypes = {
 
 IssueCompose.contextTypes = {
   profile: PropTypes.shape({
-    id: PropTypes.string.isRequired,
     username: PropTypes.string.isRequired,
   }),
 };

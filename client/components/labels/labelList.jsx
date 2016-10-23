@@ -8,7 +8,7 @@ import dateFormat from 'dateformat';
 import ErrorDisplay from '../debug/errorDisplay.jsx';
 import LabelDialog from './labelDialog.jsx';
 import LabelName from '../common/labelName.jsx';
-import { LabelsQuery } from '../../store/queries';
+import LabelsQuery from '../../graphql/queries/labels.graphql';
 import { deleteLabel } from '../../store/label';
 import './labelList.scss';
 import './../common/card.scss';

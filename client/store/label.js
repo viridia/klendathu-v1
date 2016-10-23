@@ -1,16 +1,7 @@
-import gql from 'graphql-tag';
 import client from './apollo';
-
-export const NewLabelMutation = gql`mutation NewLabelMutation($project: ID!, $label: LabelInput!) {
-  newLabel(project: $project, label: $label) {
-    project
-    id
-    name
-    color
-    creator
-    created
-  }
-}`;
+import NewLabelMutation from '../graphql/mutations/newLabel.graphql';
+import UpdateLabelMutation from '../graphql/mutations/updateLabel.graphql';
+import DeleteLabelMutation from '../graphql/mutations/deleteLabel.graphql';
 
 export function createLabel(project, label) {
   return client.mutate({
@@ -29,32 +20,16 @@ export function createLabel(project, label) {
   });
 }
 
-const UpdateLabel = gql`mutation updateLabelMutation(
-    $project: ID!, $id: Int!, $label: LabelInput!) {
-  updateLabel(project: $project, id: $id, label: $label) {
-    project
-    id
-    name
-    color
-    creator
-    created
-  }
-}`;
-
 export function updateLabel(project, id, label) {
   return client.mutate({
-    mutation: UpdateLabel,
+    mutation: UpdateLabelMutation,
     variables: { project, id, label },
   });
 }
 
-const DeleteLabel = gql`mutation DeleteLabelMutation($project: ID!, $label: Int!) {
-  deleteLabel(project: $project, id: $label)
-}`;
-
 export function deleteLabel(project, id) { // eslint-disable-line
   return client.mutate({
-    mutation: DeleteLabel,
+    mutation: DeleteLabelMutation,
     variables: { project, label: id },
     updateQueries: {
       labelsQuery: (previousQueryResult, { mutationResult }) => {

@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react';
 import { browserHistory } from 'react-router';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 import ReduxToastr from 'react-redux-toastr';
 import 'react-redux-toastr/src/less/index.less';
 import Header from './common/header.jsx';
 import ErrorDisplay from './debug/errorDisplay.jsx';
+import ProfileQuery from '../graphql/queries/profile.graphql';
 import './page.scss';
 
 class Page extends React.Component {
@@ -63,8 +63,4 @@ Page.childContextTypes = {
   }),
 };
 
-const ProjectsProfileQuery = gql`query ProjectsProfileQuery {
-  profile { username fullname photo }
-}`;
-
-export default graphql(ProjectsProfileQuery)(Page);
+export default graphql(ProfileQuery)(Page);

@@ -11,7 +11,7 @@ import ErrorDisplay from '../debug/errorDisplay.jsx';
 import UserName from '../common/userName.jsx';
 import LabelName from '../common/labelName.jsx';
 import { Role } from '../../lib/role';
-import { IssueQuery } from '../../store/queries';
+import IssueQuery from '../../graphql/queries/issue.graphql';
 import { IssueContent } from '../../store/fragments';
 import './issueDetails.scss';
 

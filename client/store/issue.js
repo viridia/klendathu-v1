@@ -1,12 +1,8 @@
-import gql from 'graphql-tag';
 import client from './apollo';
 import { IssueContent } from './fragments';
-
-const NewIssueMutation = gql`mutation NewIssueMutation($project: ID!, $issue: IssueInput!) {
-  newIssue(project: $project, issue: $issue) {
-    ...issueContent
-  }
-}`;
+import NewIssueMutation from '../graphql/mutations/newIssue.graphql';
+import UpdateIssueMutation from '../graphql/mutations/updateIssue.graphql';
+import DeleteIssueMutation from '../graphql/mutations/deleteIssue.graphql';
 
 export function createIssue(project, issue) {
   return client.mutate({
@@ -23,13 +19,6 @@ export function createIssue(project, issue) {
   });
 }
 
-const UpdateIssueMutation = gql`mutation UpdateIssueMutation(
-    $project: ID!, $id: Int!, $issue: IssueInput!) {
-  updateIssue(id: $id, project: $project, issue: $issue) {
-    ...issueContent
-  }
-}`;
-
 export function updateIssue(id, project, issue) {
   return client.mutate({
     mutation: UpdateIssueMutation,
@@ -38,13 +27,9 @@ export function updateIssue(id, project, issue) {
   });
 }
 
-const DeleteIssue = gql`mutation DeleteIssueMutation($id: ID!) {
-  deleteIssue(id: $id)
-}`;
-
 export function deleteIssue(id) {
   return client.mutate({
-    mutation: DeleteIssue,
+    mutation: DeleteIssueMutation,
     variables: { id },
     // updateQueries: {
     //   projectListQuery: (previousQueryResult, { mutationResult }) => {

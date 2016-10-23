@@ -7,7 +7,7 @@ import BookmarkIcon from 'icons/ic_bookmark_border_black_24px.svg';
 import PersonIcon from 'icons/ic_person_black_24px.svg';
 import SettingsIcon from 'icons/ic_settings_black_24px.svg';
 import LocalOfferIcon from 'icons/ic_local_offer_black_24px.svg';
-import { LabelsQuery } from '../../store/queries';
+import LabelsQuery from '../../graphql/queries/labels.graphql';
 import LabelName from './labelName.jsx';
 import './leftNav.scss';
 

@@ -3,7 +3,7 @@ import { browserHistory } from 'react-router';
 import { graphql } from 'react-apollo';
 import { toastr } from 'react-redux-toastr';
 import IssueCompose from './issueCompose.jsx';
-import { IssueQuery } from '../../store/queries';
+import IssueQuery from '../../graphql/queries/issue.graphql';
 import { IssueContent } from '../../store/fragments';
 import { updateIssue } from '../../store/issue';
 

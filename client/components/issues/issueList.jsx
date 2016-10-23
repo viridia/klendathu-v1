@@ -2,11 +2,11 @@ import React, { PropTypes } from 'react';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
 import { Link } from 'react-router';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 import classNames from 'classnames';
 import LabelName from '../common/labelName.jsx';
 import ErrorDisplay from '../debug/errorDisplay.jsx';
 import FilterParams from './filterParams.jsx';
+import IssueListQuery from '../../graphql/queries/issueList.graphql';
 import './issueList.scss';
 import './../common/card.scss';
 
@@ -187,55 +187,6 @@ class IssueList extends React.Component {
 
 // linked: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
 // custom: new GraphQLList(new GraphQLNonNull(customSearch)),
-const IssueListQuery = gql`query IssueListQuery(
-    $project: ID!,
-    $search: String,
-    $type: [String!],
-    $state: [String!],
-    $summary: String,
-    $summaryPred: PREDICATE,
-    $description: String,
-    $descriptionPred: PREDICATE,
-    $owner: [ID!],
-    $reporter: [ID!],
-    $cc: [ID!],
-    $labels: [Int!],
-    $comment: String,
-    $commentPred: PREDICATE,
-    $sort: [String!]) {
-  issues(
-      project: $project,
-      search: $search,
-      type: $type,
-      state: $state,
-      summary: $summary,
-      summaryPred: $summaryPred,
-      description: $description,
-      descriptionPred: $descriptionPred,
-      owner: $owner,
-      reporter: $reporter,
-      cc: $cc,
-      labels: $labels,
-      comment: $comment,
-      commentPred: $commentPred,
-      sort: $sort) {
-    id
-    project
-    type
-    state
-    summary
-    description
-    owner
-    cc
-    created
-    updated
-    labels
-    custom {
-      name
-      value
-    }
-  }
-}`;
 
 IssueList.propTypes = {
   data: PropTypes.shape({

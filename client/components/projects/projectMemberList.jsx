@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { graphql } from 'react-apollo';
 import Button from 'react-bootstrap/lib/Button';
-import { ProjectMembershipQuery } from '../../store/queries';
+import ProjectMembershipsQuery from '../../graphql/queries/projectMemberships.graphql';
 import AddMemberDialog from './addMemberDialog.jsx';
 import { roleName } from '../../lib/role';
 
@@ -87,6 +87,6 @@ ProjectMemberList.propTypes = {
   }).isRequired,
 };
 
-export default graphql(ProjectMembershipQuery, {
+export default graphql(ProjectMembershipsQuery, {
   options: ({ project }) => ({ variables: { project: project.id } }),
 })(ProjectMemberList);

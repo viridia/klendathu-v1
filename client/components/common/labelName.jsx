@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { graphql } from 'react-apollo';
-import { LabelQuery } from '../../store/queries';
+import LabelQuery from '../../graphql/queries/label.graphql';
 import './labelName.scss';
 
 /** Component that displays a label as a chip. */

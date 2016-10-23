@@ -3,7 +3,7 @@ import 'react-redux-toastr/src/less/index.less';
 import { graphql } from 'react-apollo';
 import ErrorDisplay from './debug/errorDisplay.jsx';
 import LeftNav from './common/leftNav.jsx';
-import { ProjectQuery } from '../store/queries';
+import ProjectQuery from '../graphql/queries/project.graphql';
 import { ProjectContent } from '../store/fragments';
 import './page.scss';
 

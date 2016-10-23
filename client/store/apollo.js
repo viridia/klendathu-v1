@@ -1,4 +1,4 @@
-import ApolloClient, { createNetworkInterface } from 'apollo-client';
+import ApolloClient, { createNetworkInterface, addTypename } from 'apollo-client';
 
 const networkInterface = createNetworkInterface({
   uri: '/api/gql',
@@ -9,6 +9,16 @@ const networkInterface = createNetworkInterface({
 
 export default new ApolloClient({
   networkInterface,
-  dataIdFromObject: o => o.id && `${o.__typename}:${o.id},`,
+  queryTransformer: addTypename,
+  dataIdFromObject: o => {
+    if (o.id) {
+      if (o.__typename === 'Label' || o.__typename === 'Issue') {
+        return `${o.__typename}:${o.project}:${o.id},`;
+      } else {
+        return `${o.__typename}:${o.id},`;
+      }
+    }
+    return null;
+  },
   // shouldBatch: true,
 });

@@ -4,7 +4,7 @@ import ApolloClient from 'apollo-client';
 import AutocompleteChips from '../common/ac/autocompleteChips.jsx';
 import LabelDialog from '../labels/labelDialog.jsx';
 import Chip from '../common/ac/chip.jsx';
-import { LabelSearchQuery } from '../../store/queries';
+import LabelSearchQuery from '../../graphql/queries/labelSearch.graphql';
 import '../common/ac/chip.scss';
 
 class LabelSelector extends React.Component {
