@@ -60,3 +60,25 @@ export const IssueContent = createFragment(gql`
     }
   }
 `);
+
+export const LabelContent = createFragment(gql`
+  fragment labelContent on Label {
+    project
+    id
+    name
+    color
+    creator
+    created
+  }
+`);
+
+export const ProjectMembershipContent = createFragment(gql`
+  fragment projectMembershipContent on ProjectMembership {
+    user
+    role
+    labels
+    queries {
+      name
+    }
+  }
+`);

@@ -10,7 +10,7 @@ export const Role = {
 };
 
 /** Given a role level, return a role name. */
-export default function roleName(level) {
+export function roleName(level) {
   switch (true) {
     case (level < Role.VIEWER): return 'NONE';
     case (level < Role.REPORTER): return 'VIEWER';
@@ -21,4 +21,11 @@ export default function roleName(level) {
     case (level < Role.OWNER): return 'ADMINISTRATOR';
     default: return 'OWNER';
   }
+}
+
+/** Return the list of [level, name] pairs in sorted order. */
+export function roles() {
+  const result = Object.keys(Role).map(name => [Role[name], name]);
+  result.sort();
+  return result;
 }

@@ -41,6 +41,7 @@ TypeScript on the server? (Need to read the docs.)
 * Show linked issues hierarchically
 * Need a way to create Mongo indices programmatically.
 * Delete project memberships when deleting projects and/or users.
+* Don't allow people to be added to project if they are already members.
 
 URLS:
   https://github.com/mlabieniec/complexity

@@ -141,7 +141,7 @@ class LabelDialog extends React.Component {
           <Button onClick={this.props.onHide}>Cancel</Button>
           <Button
               onClick={this.onUpdateLabel}
-              disabled={this.state.name.length < 3 && !this.state.busy}
+              disabled={this.state.name.length < 3 || this.state.busy}
               bsStyle="primary">{label ? 'Save' : 'Create'}</Button>
         </Modal.Footer>
       </Modal>);

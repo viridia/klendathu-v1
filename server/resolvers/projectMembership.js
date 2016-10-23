@@ -62,7 +62,7 @@ const resolverMethods = {
             logger.error('Access denied changing user role', project, this.user);
             return Promise.reject(new Forbidden(Errors.INSUFFICIENT_ACCESS));
           }
-          membership.role = membership.role;
+          record.role = membership.role;
         }
 
         // List of displayed labels (hot list)

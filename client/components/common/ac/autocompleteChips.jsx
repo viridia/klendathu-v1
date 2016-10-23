@@ -273,7 +273,7 @@ export default class AutoCompleteChips extends React.Component {
   }
 
   render() {
-    const { className, maxLength, placeholder } = this.props;
+    const { className, maxLength, placeholder, autoFocus } = this.props;
     const { value, valid, open, focused } = this.state;
     const selection = this.selection();
     const editing = value.length > 0;
@@ -288,6 +288,7 @@ export default class AutoCompleteChips extends React.Component {
             bsClass="ac-input"
             placeholder={selection.length > 0 ? null : placeholder}
             ref={el => { this.input = el; }}
+            autoFocus={autoFocus}
             value={value}
             maxLength={maxLength}
             onChange={this.onValueChange}
@@ -312,6 +313,7 @@ AutoCompleteChips.propTypes = {
   ]),
   className: PropTypes.string,
   placeholder: PropTypes.string,
+  autoFocus: PropTypes.bool,
   maxLength: PropTypes.number,
   multiple: PropTypes.bool,
   onSearch: PropTypes.func.isRequired,

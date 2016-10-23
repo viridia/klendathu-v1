@@ -140,7 +140,7 @@ export default class CreateProjectDialog extends React.Component {
           <Button onClick={this.props.onHide}>Cancel</Button>
           <Button
               onClick={this.onCreate}
-              disabled={this.state.projectName.length === 0 && !this.state.busy}
+              disabled={this.state.projectName.length === 0 || this.state.busy}
               bsStyle="primary">
             <AddBoxIcon />
             Create Project
