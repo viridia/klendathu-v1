@@ -78,6 +78,7 @@
     "react-bootstrap-typeahead": "^0.9.4",
     "react-dom": "^15.3.2",
     "react-immutable-proptypes": "^2.1.0",
+    "react-hot-loader": "^3.0.0-beta.5",
     "react-redux": "^4.4.5",
     "react-redux-toastr": "^3.8.5",
     "react-router": "^2.8.1",
@@ -97,8 +98,7 @@
   },
   "devDependencies": {
     "certainty": "^1.2.1",
-    "mocha": "^3.1.2",
-    "react-hot-loader": "^3.0.0-beta.5"
+    "mocha": "^3.1.2"
   },
   "repository": {
     "type": "git",

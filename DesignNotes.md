@@ -11,9 +11,7 @@ TypeScript on the server? (Need to read the docs.)
 * A way to delete an issue
   * Individual delete
   * Mass edit
-* Convert user references to usernames. Advantages:
-  * sorting issues alphabetically by user
-  * nice-looking query strings.
+* Custom sorting by column
 * UpdateQueries
   * Issue list
   * User list

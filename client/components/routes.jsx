@@ -1,6 +1,7 @@
 import React from 'react';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import { ApolloProvider } from 'react-apollo';
+import { AppContainer } from 'react-hot-loader';
 import Page from './page.jsx';
 import ProjectPage from './projectPage.jsx';
 import Dashboard from './dashboard/dashboard.jsx';
@@ -20,24 +21,26 @@ import store from '../store/store';
 
 const Routes = (
   <ApolloProvider store={store} client={client}>
-    <Router history={browserHistory}>
-      <Route component={LoginPage} path="/login" />
-      <Route component={SignUpPage} path="/signup" />
-      <Route component={Page} path="/">
-        <Route component={GraphQLPage} path="/gql" />
-        <Route component={ProjectPage} path="/project/:project">
-          <Route component={IssueCreate} path="/project/:project/new" />
-          <Route component={IssueEdit} path="/project/:project/edit/:id" />
-          <Route component={IssueDetails} path="/project/:project/issues/:id" />
-          <Route component={IssueList} path="/project/:project/issues" />
-          <Route component={LabelList} path="/project/:project/labels" />
-          <Route component={ProjectSettings} path="/project/:project/settings" />
+    <AppContainer>
+      <Router history={browserHistory}>
+        <Route component={LoginPage} path="/login" />
+        <Route component={SignUpPage} path="/signup" />
+        <Route component={Page} path="/">
+          <Route component={GraphQLPage} path="/gql" />
+          <Route component={ProjectPage} path="/project/:project">
+            <Route component={IssueCreate} path="/project/:project/new" />
+            <Route component={IssueEdit} path="/project/:project/edit/:id" />
+            <Route component={IssueDetails} path="/project/:project/issues/:id" />
+            <Route component={IssueList} path="/project/:project/issues" />
+            <Route component={LabelList} path="/project/:project/labels" />
+            <Route component={ProjectSettings} path="/project/:project/settings" />
+          </Route>
+          <IndexRoute component={Dashboard} />
+          <Route component={ProfilePage} path="/profile" />
+          <Route component={NotFound} path="*" />
         </Route>
-        <IndexRoute component={Dashboard} />
-        <Route component={ProfilePage} path="/profile" />
-        <Route component={NotFound} path="*" />
-      </Route>
-    </Router>
+      </Router>
+    </AppContainer>
   </ApolloProvider>
 );
 

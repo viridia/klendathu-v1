@@ -8,4 +8,9 @@ import './components/defines/font-faces.scss';
 document.addEventListener('DOMContentLoaded', () => {
   axios.defaults.baseURL = env.apiUrl;
   ReactDOM.render(Routes, document.getElementById('react-root'));
+  if (module.hot) {
+    module.hot.accept('./components/routes.jsx', () => {
+      ReactDOM.render(Routes, document.getElementById('react-root'));
+    });
+  }
 });
