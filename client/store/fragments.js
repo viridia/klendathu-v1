@@ -1,82 +1,10 @@
-import gql from 'graphql-tag';
 import { createFragment } from 'apollo-client';
+import projectContentFragment from '../graphql/fragments/projectContent.graphql';
+import issueContentFragment from '../graphql/fragments/issueContent.graphql';
+import labelContentFragment from '../graphql/fragments/labelContent.graphql';
+import projectMembershipContentFragment from '../graphql/fragments/projectMembershipContent.graphql';
 
-export const ProjectContent = createFragment(gql`
-  fragment projectContent on Project {
-    id name title
-    description
-    owningUser
-    owningOrg
-    role
-    created updated
-    template {
-      name project
-      types {
-        id caption abstract extends
-        fields { id type caption align default values }
-      }
-    }
-    workflow {
-      name project extends start
-      states { id caption closed transitions }
-    }
-  }
-`);
-
-export const IssueContent = createFragment(gql`
-  fragment issueContent on Issue {
-    id
-    project
-    type
-    state
-    summary
-    description
-    reporter
-    owner
-    cc
-    created
-    updated
-    labels
-    custom {
-      name
-      value
-    }
-    ownerData {
-      username
-      fullname
-      photo
-    }
-    ccData {
-      username
-      fullname
-      photo
-    }
-    labelsData {
-      id
-      name
-      color
-    }
-  }
-`);
-
-export const LabelContent = createFragment(gql`
-  fragment labelContent on Label {
-    project
-    id
-    name
-    color
-    creator
-    created
-  }
-`);
-
-export const ProjectMembershipContent = createFragment(gql`
-  fragment projectMembershipContent on ProjectMembership {
-    user
-    role
-    labels
-    queries {
-      name
-    }
-  }
-`);
+export const ProjectContent = createFragment(projectContentFragment);
+export const IssueContent = createFragment(issueContentFragment);
+export const LabelContent = createFragment(labelContentFragment);
+export const ProjectMembershipContent = createFragment(projectMembershipContentFragment);
