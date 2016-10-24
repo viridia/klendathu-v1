@@ -18,6 +18,7 @@
     {
       "id": "custom",
       "enabled": true,
+      "showStatus": true,
       "config": {
         "shell": "bash",
         "prepare": "yarn install",
