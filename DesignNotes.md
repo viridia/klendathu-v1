@@ -1,11 +1,10 @@
 New React Router?
-TypeScript on the server? (Need to re-read the typescript language docs.)
 
 * What do we need to do to finalize the db format enough that we can start collecting
   real issues (and not worry about having to wipe the db during development?)
   -- linked issues
-  -- comments
-  -- changelog
+  -- changelog (interleaved with comments?)
+  -- liking comments
 * Per-user project settings
   * Label hot list
   * Stored queries
@@ -13,6 +12,8 @@ TypeScript on the server? (Need to re-read the typescript language docs.)
 * Adding label to issues doesn't invalidate query.
   * More generally, invalidating issue queries doesn't work.
 * Get rid of typeahead
+* Editing comments
+* Deleting comments
 * A way to delete an issue
   * Individual delete
   * Mass edit
@@ -111,8 +112,6 @@ collections:
 client-side state:
   list of projects - for top-level menu
   list of organizations?
-  whether we are logged in or not.
-  user profile?
 
 do we want orgs to contain users or users to contain orgs?
   -- what operations?
@@ -146,6 +145,8 @@ issues: [
 Things to experiment with:
   -- Nginx config and https
   -- Hot loading 3?
+  -- TypeScript on the server? (Need to re-read the typescript language docs.)
+    (Typescript isn't that useful for this particular server.)
 
 Filter rows:
   [field][op][value][x]
