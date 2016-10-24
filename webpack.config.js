@@ -47,7 +47,8 @@ module.exports = {
     extensions: ['.js', '.jsx'],
   },
   plugins,
-  devtool: debug ? 'cheap-eval-source-map' : 'hidden-source-map',
+  // devtool: debug ? 'cheap-eval-source-map' : 'hidden-source-map',
+  devtool: debug ? 'inline-source-map' : 'hidden-source-map',
   module: {
     loaders: [
       {
@@ -59,13 +60,13 @@ module.exports = {
             loader: 'babel',
             query: {
               plugins: babel_plugins,
-              // plugins: [
-              //   'transform-runtime',
-              //   'transform-object-rest-spread',
-              //   'react-hot-loader/babel',
-              // ],
+              plugins: [
+                'transform-runtime',
+                'transform-object-rest-spread',
+                'react-hot-loader/babel',
+              ],
               presets: [
-                // ['es2015', { modules: false }],
+                ['es2015', { modules: false }],
                 'react',
               ],
             },

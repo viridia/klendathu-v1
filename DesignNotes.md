@@ -5,6 +5,7 @@ TypeScript on the server? (Need to re-read the typescript language docs.)
 * Per-user project settings
   * Label hot list
   * Stored queries
+    * Should stored queries include which labels to show?
 * Adding label to issues doesn't invalidate query.
   * More generally, invalidating issue queries doesn't work.
 * Get rid of typeahead
@@ -14,19 +15,19 @@ TypeScript on the server? (Need to re-read the typescript language docs.)
 * Custom sorting by column
 * UpdateQueries
   * Issue list
-  * User list
+  * User list (in autocomplete).
   * Filtering and sorting?
 * I think we're going to need tests for the graphql stuff.
 * Flesh out issue details
 * Issue compose needs role checks on individual fields.
 * Should be able to comment on a bug without going to edit page.
 * Show issue change log
+* Commenting.
 * Custom suggest field / enter key support.
   * Will be easier once we have some data
   * Get rid of typeahead
-* Search users on both username and fullname.
-* Click on autocomplete menu (in addition to ENTER).
-* return key to navigate between fields
+* return key to navigate between fields (all dialogs)
+* Make sure all dialogs have proper autoFocus.
 * escape to dismiss menus
 * make note about #hash tags and @mentions
 * Simplify rendering of suggestionsSuffix in autocomplete
@@ -36,12 +37,12 @@ TypeScript on the server? (Need to re-read the typescript language docs.)
   * Org membership
 * Check roles client-side when editing / deleting labels
 * option to add label to hot list when creating it
-  * Need project settings
 * Undo mode (set deleted flag) for issues, labels, projects.
 * Show linked issues hierarchically
 * Need a way to create Mongo indices programmatically.
 * Delete project memberships when deleting projects and/or users.
 * Don't allow people to be added to project if they are already members.
+* User autocomplete has a bug where it gets stuck sometimes.
 
 URLS:
   https://github.com/mlabieniec/complexity
