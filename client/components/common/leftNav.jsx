@@ -32,7 +32,6 @@ class LeftNav extends React.Component {
     const { project } = this.props;
     const { labels } = this.props.data;
     return (<nav className="kdt left-nav">
-      <NavItem icon={<AppsIcon />} title="Dashboard" onlyActiveOnIndex path="/" />
       <NavItem
           icon={<ListIcon />}
           title="All Issues"
@@ -60,6 +59,7 @@ class LeftNav extends React.Component {
           icon={<BookmarkIcon />}
           title="Saved Queries"
           path={`/project/${project.name}/queries`} />
+      <NavItem icon={<AppsIcon />} title="Dashboard" onlyActiveOnIndex path="/" />
       <NavItem
           icon={<SettingsIcon />}
           title="Project Settings"

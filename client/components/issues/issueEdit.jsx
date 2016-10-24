@@ -14,7 +14,7 @@ class IssueEdit extends React.Component {
   }
 
   onSave(issueId, issue) {
-    return updateIssue(issueId, this.props.project.id, issue).then(resp => {
+    return updateIssue(this.props.project.id, issueId, issue).then(resp => {
       toastr.success(`Issue #${resp.data.updateIssue.id} updated.`);
       browserHistory.goBack();
     });

@@ -45,7 +45,13 @@
       }
     }
 
+    > .content {
+      padding-right: 8px;
+      overflow-y: auto;
+    }
+
     .create-issue-table {
+      width: 100%;
       td {
         line-height: 1.9em;
       }

@@ -207,13 +207,13 @@ module.exports = new GraphQLSchema({
       updateIssue: {
         type: new GraphQLNonNull(issueType),
         args: {
-          id: {
-            type: new GraphQLNonNull(GraphQLInt),
-            description: 'Id of the issue to update.',
-          },
           project: {
             type: new GraphQLNonNull(GraphQLID),
             description: 'Project containing the issue.',
+          },
+          id: {
+            type: new GraphQLNonNull(GraphQLInt),
+            description: 'Id of the issue to update.',
           },
           issue: {
             type: issueInputType,
@@ -224,13 +224,30 @@ module.exports = new GraphQLSchema({
       deleteIssue: {
         type: new GraphQLNonNull(GraphQLInt),
         args: {
+          project: {
+            type: new GraphQLNonNull(GraphQLID),
+            description: 'Project containing the issue.',
+          },
           id: {
             type: new GraphQLNonNull(GraphQLInt),
             description: 'Id of the issue to delete.',
           },
+        },
+      },
+      addComment: {
+        type: new GraphQLNonNull(issueType),
+        args: {
           project: {
             type: new GraphQLNonNull(GraphQLID),
             description: 'Project containing the issue.',
+          },
+          id: {
+            type: new GraphQLNonNull(GraphQLInt),
+            description: 'Id of the issue to update.',
+          },
+          comment: {
+            type: new GraphQLNonNull(GraphQLString),
+            description: 'Text of the comment to add.',
           },
         },
       },

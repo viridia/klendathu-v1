@@ -1,7 +1,11 @@
 New React Router?
-Check out Strider?
 TypeScript on the server? (Need to re-read the typescript language docs.)
 
+* What do we need to do to finalize the db format enough that we can start collecting
+  real issues (and not worry about having to wipe the db during development?)
+  -- linked issues
+  -- comments
+  -- changelog
 * Per-user project settings
   * Label hot list
   * Stored queries

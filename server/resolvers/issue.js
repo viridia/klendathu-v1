@@ -258,7 +258,55 @@ const resolverMethods = {
         }).then(() => {
           return issues.findOne(query);
         }, error => {
-          logger.error('Error updating project', id, proj.name, error);
+          logger.error('Error updating issue', id, proj.name, error);
+          return Promise.reject(new InternalError());
+        });
+      });
+    });
+  },
+
+  addComment({ id, project, comment }) {
+    if (!this.user) {
+      return Promise.reject(new Unauthorized());
+    }
+    return this.getProjectAndRole({ projectId: project }).then(([proj, role]) => {
+      if (!proj) {
+        logger.error('Error updating non-existent project', id, this.user);
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
+      } else if (role < Role.REPORTER) {
+        logger.error('Access denied commenting on issue', id, this.user);
+        return Promise.reject(new Forbidden(Errors.INSUFFICIENT_ACCESS));
+      }
+
+      const query = {
+        id,
+        project: proj._id,
+      };
+
+      const issues = this.db.collection('issues');
+      return issues.findOne(query).then(existing => {
+        if (!existing) {
+          logger.error('Error commenting on non-existent issue', id, this.user);
+          return Promise.reject(new NotFound(Errors.ISSUE_NOT_FOUND));
+        }
+
+        const now = new Date();
+        const update = {
+          updated: now,
+          comments: existing.comments ? existing.comments.slice() : [],
+        };
+
+        update.comments.push({
+          author: this.user.username,
+          created: now,
+          updated: now,
+          body: comment,
+        });
+
+        return issues.updateOne(query, { $set: update }).then(() => {
+          return issues.findOne(query);
+        }, error => {
+          logger.error('Error updating issue', id, proj.name, error);
           return Promise.reject(new InternalError());
         });
       });

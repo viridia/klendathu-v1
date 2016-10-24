@@ -30,4 +30,9 @@ fragment issueContent on Issue {
     name
     color
   }
+  comments {
+    author
+    body
+    created
+  }
 }

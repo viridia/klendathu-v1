@@ -10,6 +10,7 @@ import ArrowUpIcon from 'icons/ic_arrow_upward_black_24px.svg';
 import ErrorDisplay from '../debug/errorDisplay.jsx';
 import UserName from '../common/userName.jsx';
 import LabelName from '../common/labelName.jsx';
+import IssueComments from './issueComments.jsx';
 import { Role } from '../../lib/role';
 import IssueQuery from '../../graphql/queries/issue.graphql';
 import { IssueContent } from '../../store/fragments';
@@ -18,11 +19,16 @@ import './issueDetails.scss';
 class IssueDetails extends React.Component {
   constructor(props) {
     super(props);
+    this.onIssueChanged = this.onIssueChanged.bind(this);
     this.state = this.navState(props);
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState(this.navState(nextProps));
+  }
+
+  onIssueChanged() {
+    this.props.data.refetch();
   }
 
   navState(props) {
@@ -93,74 +99,81 @@ class IssueDetails extends React.Component {
             </LinkContainer>
           </ButtonGroup>
         </header>
-        <table className="create-issue-table form-table">
-          <tbody>
-            {issue.description.length > 0 && (
+        <section className="content">
+          <table className="create-issue-table form-table">
+            <tbody>
+              {issue.description.length > 0 && (
+                <tr>
+                  <th className="header">Description:</th>
+                  <td>{issue.description}</td>
+                </tr>
+              )}
               <tr>
-                <th className="header">Description:</th>
-                <td>{issue.description}</td>
-              </tr>
-            )}
-            <tr>
-              <th className="header">Reporter:</th>
-              <td className="reporter">
-                {issue.reporter
-                  ? <UserName user={issue.reporter} full />
-                  : <span className="unassigned">unassigned</span>}
-              </td>
-            </tr>
-            <tr>
-              <th className="header">Owner:</th>
-              <td>
-                {issue.owner
-                  ? <UserName user={issue.owner} full />
-                  : <span className="unassigned">unassigned</span>}
-              </td>
-            </tr>
-            {issue.cc.length > 0 && (
-              <tr>
-                <th className="header">CC:</th>
-                <td>{issue.cc.map(cc => <UserName user={cc} key={cc} full />)}
+                <th className="header">Reporter:</th>
+                <td className="reporter">
+                  {issue.reporter
+                    ? <UserName user={issue.reporter} full />
+                    : <span className="unassigned">unassigned</span>}
                 </td>
               </tr>
-            )}
-            {this.renderTemplateFields()}
-            {issue.labels.length > 0 && (
               <tr>
-                <th className="header">Labels:</th>
+                <th className="header">Owner:</th>
                 <td>
-                  {issue.labels.map(label =>
-                    <LabelName label={label} project={project.id} key={label} />)}
+                  {issue.owner
+                    ? <UserName user={issue.owner} full />
+                    : <span className="unassigned">unassigned</span>}
                 </td>
               </tr>
-            )}
-            <tr>
-              <th className="header">Attachments:</th>
-              <td>
-                <div className="upload">
-                  Drop files here to upload (or click)
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th className="header">Linked Issues:</th>
-              <td>
-                <div className="linked-group">
-                  Links
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th className="header">Comments:</th>
-              <td>Comments
-              </td>
-            </tr>
-            <tr>
-              <th className="header">Changes:</th>
-              <td>Created: {dateFormat(issue.created, 'mmm dS, yyyy h:MM TT')}</td>
-            </tr>
-          </tbody>
-        </table>
+              {issue.cc.length > 0 && (
+                <tr>
+                  <th className="header">CC:</th>
+                  <td>{issue.cc.map(cc => <UserName user={cc} key={cc} full />)}
+                  </td>
+                </tr>
+              )}
+              {this.renderTemplateFields()}
+              {issue.labels.length > 0 && (
+                <tr>
+                  <th className="header">Labels:</th>
+                  <td>
+                    {issue.labels.map(label =>
+                      <LabelName label={label} project={project.id} key={label} />)}
+                  </td>
+                </tr>
+              )}
+              <tr>
+                <th className="header">Attachments:</th>
+                <td>
+                  <div className="upload">
+                    Drop files here to upload (or click)
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th className="header">Linked Issues:</th>
+                <td>
+                  <div className="linked-group">
+                    Links
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th className="header">Comments:</th>
+                <td>
+                  <IssueComments issue={issue} project={project} onChange={this.onIssueChanged} />
+                </td>
+              </tr>
+              <tr>
+                <th className="header">Changes:</th>
+                <td className="changes">
+                  <div className="issue-change">
+                    Created {dateFormat(issue.created, 'mmm dS, yyyy h:MM TT')}
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
       </section>
     </section>);
   }
@@ -173,6 +186,7 @@ IssueDetails.propTypes = {
       id: PropTypes.number.isRequired,
     }),
     loading: PropTypes.bool,
+    refetch: PropTypes.func.isRequired,
   }),
   params: PropTypes.shape({
     id: PropTypes.string.isRequired,

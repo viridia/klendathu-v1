@@ -1,0 +1,46 @@
+@import '../defines/base';
+
+.comment-list {
+  max-width: 40em;
+  > section.comment {
+    border: 1px solid lighten($cardBorder, 15%);
+    border-radius: 4px;
+    margin-bottom: 8px;
+
+    > header.comment-header {
+      font-size: 90%;
+      padding: 4px 8px;
+      line-height: 1.4em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid lighten($cardBorder, 15%);
+      background-color: lighten($cardBorder, 23%);
+
+      > .comment-date {
+        font-size: 90%;
+        color: lighten($textDark, 25%);
+      }
+    }
+
+    > .comment-body {
+      margin: 0;
+      padding: 4px 8px;
+      font-size: 90%;
+      color: $textDark;
+      white-space: normal;
+      line-height: 1.3em;
+    }
+  }
+}
+
+.comment-compose {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  > .comment-entry {
+    height: 8em;
+    margin-bottom: 8px;
+  }
+}
