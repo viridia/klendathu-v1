@@ -15,6 +15,19 @@ const plugins = [
   new webpack.LoaderOptionsPlugin({ minimize: !debug, debug }),
 ];
 
+// Minimal babel transforms for modern browsers.
+var babel_plugins = [
+  'transform-runtime',
+  'transform-object-rest-spread',
+  // Transforms needed for modern browsers only
+  'babel-plugin-check-es2015-constants',
+  'babel-plugin-transform-es2015-block-scoping',
+  'babel-plugin-transform-es2015-function-name',
+  'babel-plugin-transform-es2015-parameters',
+  'babel-plugin-transform-es2015-destructuring',
+  'react-hot-loader/babel',
+];
+
 module.exports = {
   context: path.resolve(__dirname, 'client'),
   entry: {
@@ -45,13 +58,14 @@ module.exports = {
           {
             loader: 'babel',
             query: {
-              plugins: [
-                'transform-runtime',
-                'transform-object-rest-spread',
-                'react-hot-loader/babel',
-              ],
+              plugins: babel_plugins,
+              // plugins: [
+              //   'transform-runtime',
+              //   'transform-object-rest-spread',
+              //   'react-hot-loader/babel',
+              // ],
               presets: [
-                ['es2015', { modules: false }],
+                // ['es2015', { modules: false }],
                 'react',
               ],
             },

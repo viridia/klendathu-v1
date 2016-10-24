@@ -1,6 +1,6 @@
 New React Router?
 Check out Strider?
-TypeScript on the server? (Need to read the docs.)
+TypeScript on the server? (Need to re-read the typescript language docs.)
 
 * Per-user project settings
   * Label hot list
