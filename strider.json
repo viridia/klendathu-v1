@@ -6,7 +6,7 @@
   "plugins": [
     {
       "id": "node",
-      "enabled": true,
+      "enabled": false,
       "showStatus": true,
       "config": {
         "test": "npm run test-server",
@@ -15,5 +15,14 @@
         "fork": ""
       }
     },
+    {
+      "id": "custom",
+      "enabled": true,
+      "config": {
+        "shell": "bash",
+        "prepare": "yarn install",
+        "test": "mocha server/**/*tests.js"
+      }
+    }
   ]
 }
