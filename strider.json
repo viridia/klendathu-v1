@@ -1,0 +1,19 @@
+{
+  "runner": {
+    "id": "simple-runner",
+  },
+  "merge_plugins": true,
+  "plugins": [
+    {
+      "id": "node",
+      "enabled": true,
+      "showStatus": true,
+      "config": {
+        "test": "npm run test-server",
+        "caching": "none",
+        "runtime": "whatever",
+        "fork": ""
+      }
+    },
+  ]
+}
