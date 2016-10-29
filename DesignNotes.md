@@ -1,10 +1,8 @@
-New React Router?
-
 * What do we need to do to finalize the db format enough that we can start collecting
   real issues (and not worry about having to wipe the db during development?)
   -- linked issues
-  -- changelog (interleaved with comments?)
   -- liking comments
+  -- liking issues
 * Per-user project settings
   * Label hot list
   * Stored queries
@@ -14,6 +12,7 @@ New React Router?
 * Get rid of typeahead
 * Editing comments
 * Deleting comments
+* Adding comments in the edit page.
 * A way to delete an issue
   * Individual delete
   * Mass edit
@@ -22,12 +21,8 @@ New React Router?
   * Issue list
   * User list (in autocomplete).
   * Filtering and sorting?
-* I think we're going to need tests for the graphql stuff.
 * Flesh out issue details
 * Issue compose needs role checks on individual fields.
-* Should be able to comment on a bug without going to edit page.
-* Show issue change log
-* Commenting.
 * Custom suggest field / enter key support.
   * Will be easier once we have some data
   * Get rid of typeahead
@@ -142,11 +137,25 @@ issues: [
   }
 ]
 
+Changelog entries:
+  -- separate table or part of issue?
+  -- changes: [
+      {
+        by: user, at: time, fields: [
+          {
+            name: description,
+            before: '',
+            after: '',
+          }
+        ]
+    ]
+
 Things to experiment with:
   -- Nginx config and https
   -- Hot loading 3?
   -- TypeScript on the server? (Need to re-read the typescript language docs.)
     (Typescript isn't that useful for this particular server.)
+  -- New React Router? (Can't because we depend on LinkContainer)
 
 Filter rows:
   [field][op][value][x]

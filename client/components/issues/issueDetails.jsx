@@ -3,23 +3,25 @@ import { graphql } from 'react-apollo';
 import Button from 'react-bootstrap/lib/Button';
 import ButtonGroup from 'react-bootstrap/lib/ButtonGroup';
 import { LinkContainer } from 'react-router-bootstrap';
-import dateFormat from 'dateformat';
 import ArrowBackIcon from 'icons/ic_arrow_back_black_24px.svg';
 import ArrowForwardIcon from 'icons/ic_arrow_forward_black_24px.svg';
 import ArrowUpIcon from 'icons/ic_arrow_upward_black_24px.svg';
 import ErrorDisplay from '../debug/errorDisplay.jsx';
 import UserName from '../common/userName.jsx';
 import LabelName from '../common/labelName.jsx';
-import IssueComments from './issueComments.jsx';
+import RelativeDate from '../common/relativeDate.jsx';
+import IssueChanges from './issueChanges.jsx';
+import CommentEdit from './commentEdit.jsx';
 import { Role } from '../../lib/role';
-import IssueQuery from '../../graphql/queries/issue.graphql';
+import IssueDetailsQuery from '../../graphql/queries/issueDetails.graphql';
 import { IssueContent } from '../../store/fragments';
+import { addComment } from '../../store/issue';
 import './issueDetails.scss';
 
 class IssueDetails extends React.Component {
   constructor(props) {
     super(props);
-    this.onIssueChanged = this.onIssueChanged.bind(this);
+    this.onAddComment = this.onAddComment.bind(this);
     this.state = this.navState(props);
   }
 
@@ -27,8 +29,11 @@ class IssueDetails extends React.Component {
     this.setState(this.navState(nextProps));
   }
 
-  onIssueChanged() {
-    this.props.data.refetch();
+  onAddComment(newComment) {
+    const { project, data: { issue } } = this.props;
+    return addComment(project.id, issue.id, newComment).then(() => {
+      this.props.data.refetch();
+    });
   }
 
   navState(props) {
@@ -51,6 +56,48 @@ class IssueDetails extends React.Component {
     return null;
   }
 
+  renderChange(change, index) {
+    const { project } = this.props;
+    return (<section className="change-entry" key={index}>
+      <ul className="field-change-list">
+        {change.type && (<li className="field-change">
+            type: {change.type.before} to {change.type.after}
+          </li>)}
+        {change.state &&
+          <li className="field-change">state: {change.state.before} to {change.state.after}</li>}
+        {change.summary && (<li className="field-change">
+          summary: {change.summary.before} to {change.summary.after}
+        </li>)}
+        {change.owner &&
+          <li className="field-change">owner: {change.owner.before} to {change.owner.after}</li>}
+        {change.cc && change.cc.added && change.cc.added.map(cc =>
+          (<li className="field-change" key={cc}>added <UserName user={cc} full /> to cc</li>))}
+        {change.cc && change.cc.removed && change.cc.removed.map(cc =>
+          (<li className="field-change" key={cc}>removed <UserName user={cc} full /> from cc</li>))}
+        {change.labels && change.labels.added && change.labels.added.map(l =>
+          (<li className="field-change" key={l}>
+            added label <LabelName label={l} project={project.id} key={l} />
+          </li>))}
+        {change.labels && change.labels.removed && change.labels.removed.map(l =>
+          (<li className="field-change" key={l}>
+            removed label <LabelName label={l} project={project.id} key={l} />
+          </li>))}
+      </ul>
+    </section>);
+  }
+
+  renderChangeLog() {
+    const { issue } = this.props.data;
+    if (!issue.changes) {
+      return null;
+    }
+    return (
+      <div>
+        {issue.changes.map((ch, index) => this.renderChange(ch, index))}
+      </div>
+    );
+  }
+
   render() {
     const { location, project } = this.props;
     const { issue, error } = this.props.data;
@@ -68,8 +115,10 @@ class IssueDetails extends React.Component {
           <LinkContainer to={backLink}>
             <Button title="Back to issue list" className="issue-up"><ArrowUpIcon /></Button>
           </LinkContainer>
-          <div className="issue-id">Issue #{issue.id}: </div>
-          <div className="issue-summary">{issue.summary}</div>
+          <section className="title">
+            <div className="issue-id">Issue #{issue.id}: </div>
+            <div className="issue-summary">{issue.summary}</div>
+          </section>
           <div className="issue-type">{issue.type}</div>
           <div className="divider" />
           <ButtonGroup className="issue-actions">
@@ -80,7 +129,9 @@ class IssueDetails extends React.Component {
                 }}>
               <Button title="Edit issue" disabled={project.role < Role.UPDATER}>Edit</Button>
             </LinkContainer>
-            <Button title="Delete issue" disabled={project.role < Role.MANAGER}>Delete</Button>
+            <Button
+                title="Delete issue" bsStyle="default"
+                disabled={project.role < Role.MANAGER}>Delete</Button>
           </ButtonGroup>
           <ButtonGroup className="issue-nav">
             <LinkContainer
@@ -108,6 +159,12 @@ class IssueDetails extends React.Component {
                   <td>{issue.description}</td>
                 </tr>
               )}
+              <tr>
+                <th className="header">Created:</th>
+                <td className="changes">
+                  <RelativeDate date={new Date(issue.created)} />
+                </td>
+              </tr>
               <tr>
                 <th className="header">Reporter:</th>
                 <td className="reporter">
@@ -158,17 +215,19 @@ class IssueDetails extends React.Component {
                 </td>
               </tr>
               <tr>
-                <th className="header">Comments:</th>
+                <th className="header">Issue History:</th>
                 <td>
-                  <IssueComments issue={issue} project={project} onChange={this.onIssueChanged} />
+                  <IssueChanges
+                      issue={issue} comments={issue.comments} changes={issue.changes}
+                      project={project} onAddComment={this.onAddComment} />
                 </td>
               </tr>
               <tr>
-                <th className="header">Changes:</th>
-                <td className="changes">
-                  <div className="issue-change">
-                    Created {dateFormat(issue.created, 'mmm dS, yyyy h:MM TT')}
-                  </div>
+                <th className="header" />
+                <td>
+                  <CommentEdit
+                      issue={issue} comments={issue.comments}
+                      project={project} onAddComment={this.onAddComment} />
                 </td>
               </tr>
             </tbody>
@@ -203,7 +262,7 @@ IssueDetails.propTypes = {
   }).isRequired,
 };
 
-export default graphql(IssueQuery, {
+export default graphql(IssueDetailsQuery, {
   options: ({ project, params }) => ({
     variables: { project: project.id, id: parseInt(params.id, 10) },
     fragments: [IssueContent],

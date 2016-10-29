@@ -13,7 +13,7 @@ import LabelSelector from './labelSelector.jsx';
 import StateSelector from './stateSelector.jsx';
 import TypeSelector from './typeSelector.jsx';
 import CustomEnumField from './customEnumField.jsx';
-import UserName from '../common/userName.jsx';
+import CommentEdit from './commentEdit.jsx';
 import './issueCompose.scss';
 import '../common/card.scss';
 import '../common/table.scss';
@@ -213,16 +213,16 @@ export default class IssueCompose extends React.Component {
     this.setState({ commentText: e.target.value });
   }
 
-  onAddComment(e) {
-    e.preventDefault();
+  onAddComment(commentText) {
     const newComment = {
       author: this.context.profile.username,
-      body: this.state.commentText,
+      body: commentText,
     };
     this.setState({
-      comments: this.state.comments.concate([newComment]),
+      comments: this.state.comments.concat([newComment]),
       commentText: '',
     });
+    return Promise.resolve(newComment);
   }
 
   onCreate(e) {
@@ -497,23 +497,9 @@ export default class IssueCompose extends React.Component {
                   <tr>
                     <th className="header"><ControlLabel>Comments:</ControlLabel></th>
                     <td>
-                      {this.state.comments && this.state.comments.map((comment, index) =>
-                        (<div className="comment card internal" key={index}>
-                          <div className="author"><UserName user={comment.author} /></div>
-                          {comment.body}
-                        </div>))}
-                      <div className="add-comment-group">
-                        <FormControl
-                            className="add-comment"
-                            componentClass="textarea"
-                            placeholder="add a comment..."
-                            value={this.state.commentText}
-                            onChange={this.onChangeCommentText} />
-                        <Button
-                            bsSize="small"
-                            disabled={this.state.commentText.length === 0}
-                            onClick={this.onAddComment}>Add</Button>
-                      </div>
+                      <CommentEdit
+                          issue={issue} project={project} comments={this.state.comments}
+                          onAddComment={this.onAddComment} />
                     </td>
                   </tr>
                 </tbody>

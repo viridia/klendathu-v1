@@ -1,0 +1,64 @@
+@import '../defines/base';
+
+.changes-list {
+  max-width: 40em;
+  > section.comment {
+    border: 1px solid lighten($cardBorder, 15%);
+    border-radius: 4px;
+    margin-bottom: 8px;
+
+    > header.comment-header {
+      font-size: 90%;
+      padding: 4px 8px;
+      line-height: 1.4em;
+      display: flex;
+      justify-content:flex-start;
+      align-items: center;
+      border-bottom: 1px solid lighten($cardBorder, 15%);
+      background-color: lighten($cardBorder, 23%);
+      color: lighten($textDark, 25%);
+
+      > .user-name {
+        color: $textDark;
+      }
+    }
+
+    > .comment-body {
+      margin: 0;
+      padding: 4px 8px;
+      font-size: 90%;
+      color: $textDark;
+      white-space: normal;
+      line-height: 1.3em;
+    }
+  }
+
+  > section.change {
+    // border: 1px solid lighten($cardBorder, 15%);
+    margin-bottom: 8px;
+
+    > header.change-header {
+      font-size: 90%;
+      padding: 4px 8px;
+      line-height: 1.4em;
+      display: flex;
+      justify-content:flex-start;
+      align-items: center;
+      border-bottom: 1px solid lighten($cardBorder, 15%);
+      color: lighten($textDark, 25%);
+
+      > .user-name {
+        color: $textDark;
+      }
+    }
+
+    > ul {
+      margin: 6px 0 0 0;
+      font-size: 90%;
+      color: $textDark;
+      > li {
+        padding: 2px 0;
+      }
+    }
+  }
+}

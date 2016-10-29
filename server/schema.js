@@ -199,7 +199,7 @@ module.exports = new GraphQLSchema({
             description: 'Id of the project the new issue is being added to.',
           },
           issue: {
-            type: issueInputType,
+            type: new GraphQLNonNull(issueInputType),
             description: 'Contents of the issue to be created.',
           },
         },
@@ -216,7 +216,7 @@ module.exports = new GraphQLSchema({
             description: 'Id of the issue to update.',
           },
           issue: {
-            type: issueInputType,
+            type: new GraphQLNonNull(issueInputType),
             description: 'Contents of the issue to be created.',
           },
         },

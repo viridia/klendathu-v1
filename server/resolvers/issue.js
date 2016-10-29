@@ -157,6 +157,7 @@ const resolverMethods = {
           return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
         }
         const now = new Date();
+        let commentIndex = 0;
         const record = {
           id: p.value.issueIdCounter,
           project: new ObjectId(project),
@@ -168,11 +169,18 @@ const resolverMethods = {
           owner: issue.owner,
           created: now,
           updated: now,
-          cc: (issue.cc || []).map(cc => new ObjectId(cc)),
+          cc: (issue.cc || []),
           labels: issue.labels || [],
           linked: (issue.linked || []).map(
               ln => ({ to: new ObjectId(ln.to), relation: ln.relation })),
           custom: issue.custom || [],
+          comments: (issue.comments || []).map(comment => ({
+            id: () => { commentIndex += 1; return commentIndex; },
+            body: comment.body,
+            author: this.user.username,
+            created: now,
+            updated: now,
+          })),
         };
         // Insert new user into the database.
         return this.db.collection('issues').insertOne(record).then(result => {
@@ -214,41 +222,147 @@ const resolverMethods = {
           updated: new Date(),
         };
 
-        if (issue.type) {
+        const change = {
+          by: this.user.username,
+        };
+
+        if (issue.type !== undefined && issue.type !== existing.type) {
           record.type = issue.type;
+          change.type = { before: existing.type, after: issue.type };
+          change.at = record.updated;
         }
 
-        if (issue.state) {
+        if (issue.state !== undefined && issue.state !== existing.state) {
           record.state = issue.state;
+          change.state = { before: existing.state, after: issue.state };
+          change.at = record.updated;
         }
 
-        if (issue.summary) {
+        if (issue.summary !== undefined && issue.summary !== existing.summary) {
           record.summary = issue.summary;
+          change.summary = { before: existing.summary, after: issue.summary };
+          change.at = record.updated;
         }
 
-        if (issue.description) {
+        if (issue.description !== undefined && issue.description !== existing.description) {
           record.description = issue.description;
+          change.description = { before: existing.description, after: issue.description };
+          change.at = record.updated;
         }
 
-        if (issue.owner) {
+        if (issue.owner !== undefined && issue.owner !== existing.owner) {
           record.owner = issue.owner;
+          change.owner = { before: existing.owner, after: issue.owner };
+          change.at = record.updated;
         }
 
         if (issue.cc) {
           record.cc = issue.cc;
+          const ccPrev = new Set(existing.cc);
+          const ccNext = new Set(issue.cc);
+          issue.cc.forEach(cc => ccPrev.delete(cc));
+          existing.cc.forEach(cc => ccNext.delete(cc));
+          if (ccNext.size > 0 || ccPrev.size > 0) {
+            change.cc = { added: Array.from(ccNext), removed: Array.from(ccPrev) };
+            change.at = record.updated;
+          }
         }
 
         if (issue.labels) {
           record.labels = issue.labels;
+          const labelsPrev = new Set(existing.labels);
+          const labelsNext = new Set(issue.labels);
+          issue.labels.forEach(labels => labelsPrev.delete(labels));
+          existing.labels.forEach(labels => labelsNext.delete(labels));
+          if (labelsNext.size > 0 || labelsPrev.size > 0) {
+            change.labels = { added: Array.from(labelsNext), removed: Array.from(labelsPrev) };
+            change.at = record.updated;
+          }
         }
 
         if (issue.linked) {
+          // TODO: Change log
           record.linked = issue.linked.map(
               ln => ({ to: new ObjectId(ln.to), relation: ln.relation }));
         }
 
         if (issue.custom !== undefined) {
           record.custom = issue.custom;
+          const customPrev = new Map(existing.custom.map(custom => [custom.name, custom.value]));
+          const customNext = new Map(issue.custom.map(custom => [custom.name, custom.value]));
+          const customChange = [];
+          customNext.forEach((value, name) => {
+            if (customPrev.has(name)) {
+              const before = customPrev.get(name);
+              if (value !== before) {
+                // A changed value
+                customChange.push({ name, before, after: value });
+              }
+            } else {
+              // A newly-added value
+              customChange.push({ name, after: value });
+            }
+          });
+          customPrev.forEach((value, name) => {
+            if (!customNext.has(name)) {
+              // A deleted value
+              customChange.push({ name, before: value });
+            }
+          });
+          if (customChange.length > 0) {
+            change.custom = customChange;
+            change.at = record.updated;
+          }
+        }
+
+        // Patch comments list.
+        // Note that we don't include comments in the change log since the comments themselves can
+        // serve that purpose.
+        if (issue.comments !== undefined) {
+          const commentMap = new Map();
+          const commentList = [];
+          let nextCommentIndex = 0;
+          // Build a map of existing comments.
+          if (existing.comments) {
+            for (const c of existing.comments) {
+              commentMap.set(c.id, c);
+              commentList.push(c);
+              nextCommentIndex = Math.max(nextCommentIndex, c.id);
+            }
+          }
+          for (const c of issue.comments) {
+            if (c.id) {
+              const oldComment = commentMap.get(c.id);
+              // You can only modify your own comments.
+              if (oldComment !== null && oldComment.author === this.user.username) {
+                oldComment.body = c.body;
+                oldComment.updated = record.updated;
+              }
+            } else {
+              // Insert a new comment from this author.
+              nextCommentIndex += 1;
+              commentList.push({
+                id: nextCommentIndex,
+                author: this.user.username,
+                body: c.body,
+                created: record.updated,
+                updated: record.updated,
+              });
+            }
+          }
+
+          // updateIssue() can only append comments, not edit existing comments.
+          // That requires a different method.
+          record.comments = existing.comments.concat(issue.comments.map(comment => ({
+            body: comment.body,
+            author: this.user.username,
+            created: record.updated,
+            updated: record.updated,
+          })));
+        }
+
+        if (change.at) {
+          record.changes = (existing.changes || []).concat([change]);
         }
 
         // TODO: owning user, owning org, template name, workflow name

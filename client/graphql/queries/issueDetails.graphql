@@ -1,0 +1,16 @@
+query issueDetailsQuery($project: ID!, $id: Int!) {
+  issue(project: $project, id: $id) {
+    ...issueContent
+    changes {
+      at
+      by
+      type { before after }
+      state { before after }
+      summary { before after }
+      owner { before after }
+      cc { added removed }
+      labels { added removed }
+      custom { name before after }
+    }
+  }
+}

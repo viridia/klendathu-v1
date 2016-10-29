@@ -13,7 +13,7 @@
     "build-container": "docker build -t viridia/klendathu .",
     "start-container": "docker run --rm -it -u app -p 49160:8080 --name klendathu -v $(pwd):/usr/src/app viridia/klendathu",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test-server": "mocha server/**/*.tests.js"
+    "test-server": "mocha -w server/**/*.tests.js"
   },
   "keywords": [
     "bug",

@@ -19,8 +19,12 @@ const linkedIssueInputType = new GraphQLInputObjectType({
 const commentInputType = new GraphQLInputObjectType({
   name: 'CommentInput',
   fields: {
+    id: {
+      type: GraphQLInt,
+      description: 'Numeric id of this comment.',
+    },
     author: {
-      type: GraphQLID,
+      type: GraphQLString,
       description: 'Current owner of this issue.',
     },
     body: {

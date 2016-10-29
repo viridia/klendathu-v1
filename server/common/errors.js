@@ -3,6 +3,10 @@ class BaseError {
     this.status = status;
     this.error = error;
   }
+
+  toString() {
+    return `${this.constructor.name}: ${this.error}`;
+  }
 }
 
 class BadRequest extends BaseError {

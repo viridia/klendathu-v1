@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 // const graphql = require('graphql');
-const certainty = require('certainty');
+const { ensure } = require('certainty');
 const { createRoot, createUser, reset } = require('../testing/fixtures');
 // const schema = require('../schema');
 
@@ -31,15 +31,15 @@ describe('resolvers/label', function () {
   describe('query.label', function () {
     it('should return null if there are no labels.', function () {
       return this.root.label({ project: this.project._id, id: 1 }).then(result => {
-        certainty.ensure(result).isNull();
+        ensure(result).isNull();
       });
     });
     it('should return a label if it exists.', function () {
       return this.root.label({ project: this.project._id, id: this.label.id }).then(result => {
-        certainty.ensure(result).named('label').isNotNull();
-        certainty.ensure(result).named('label').hasField('name').withValue('test-label');
-        certainty.ensure(result).named('label').hasField('color').withValue('test-color');
-        certainty.ensure(result).named('label').hasField('creator');
+        ensure(result).named('label').isNotNull();
+        ensure(result).named('label').hasField('name').withValue('test-label');
+        ensure(result).named('label').hasField('color').withValue('test-color');
+        ensure(result).named('label').hasField('creator');
       });
     });
   });

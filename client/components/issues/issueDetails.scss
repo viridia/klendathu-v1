@@ -14,15 +14,19 @@
     header {
       display: flex;
       align-items: center;
-      font-size: 110%;
       padding: 6px;
+      min-height: 36px;
+
+      > .title {
+        display: flex;
+        font-size: 120%;
+        > .issue-id, > .issue-summary {
+          margin-left: 8px;
+        }
+      }
 
       > .issue-up {
         align-self: stretch;
-      }
-
-      > .issue-id, > .issue-summary {
-        margin-left: 8px;
       }
 
       > .divider {
@@ -73,6 +77,16 @@
     .unassigned {
       font-style: italic;
       color: $textDarkDisabled;
+    }
+
+    .field-change-list {
+      li {
+        margin: 0;
+        line-height: 1.1em;
+      }
+      .user-name {
+        display: inline-block;
+      }
     }
   }
 }

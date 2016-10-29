@@ -20,7 +20,6 @@ export default class ErrorDisplay extends React.Component {
   }
 
   renderGQLError(error, index) {
-    console.log('GQL:', error);
     return (
       <div key={index}>
         <pre>{error.details.error}</pre>
@@ -43,7 +42,6 @@ export default class ErrorDisplay extends React.Component {
         </section>
       );
     }
-    console.error(error);
     return (
       <section className="error-display">
         {error.message}
