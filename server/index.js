@@ -8,12 +8,14 @@ const MongoStore = require('connect-mongo')(session);
 const bodyParser = require('body-parser');
 const compression = require('compression');
 const graphql = require('express-graphql');
+const fallback = require('express-history-api-fallback');
 const authActions = require('./actions/auth');
 const schema = require('./schema');
 const RootResolver = require('./resolvers/root');
 const logger = require('./common/logger');
 
 // Constants
+const debug = process.env.NODE_ENV !== 'production';
 const PORT = 8080;
 const DB_URL = 'mongodb://localhost:27017/klendathu';
 
@@ -64,6 +66,7 @@ mongo.then(db => {
   // Static files
   app.use('/fonts', express.static(path.join(__dirname, '../client/media/fonts')));
   app.use('/favicon', express.static(path.join(__dirname, '../client/media/favicon')));
+  app.use('/builds', express.static(path.join(__dirname, '../builds')));
 
   // Set up AJAX routes.
   const apiRouter = express.Router(); // eslint-disable-line new-cap
@@ -98,13 +101,14 @@ mongo.then(db => {
 
   app.use('/api', apiRouter);
 
-  // Proxy for webpack dev server.
-  app.use('/', proxy('http://localhost:8081'));
-
-  // TODO: Replace this with a webpack-generated template file.
-  // app.get('/', (req, res) => {
-  //   res.sendFile(path.resolve(__dirname, '../client/index.html'));
-  // });
+  if (debug) {
+    // Proxy for webpack dev server.
+    app.use('/', proxy('http://localhost:8081'));
+  } else {
+    // Serve frontend as static files with fallback.
+    app.use('index.html', express.static(path.join(__dirname, '../client/index.html')));
+    app.use(fallback('index.html', { root: path.join(__dirname, '../client') }));
+  }
 
   app.listen(PORT);
   logger.info(`Running on http://localhost: ${PORT}`);
