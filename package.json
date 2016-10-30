@@ -83,7 +83,7 @@
     "react-bootstrap": "^0.30.3",
     "react-bootstrap-typeahead": "^0.9.4",
     "react-dom": "^15.3.2",
-    "react-hot-loader": "^3.0.0-beta.5",
+    "react-hot-loader": "^3.0.0-beta.6",
     "react-immutable-proptypes": "^2.1.0",
     "react-redux": "^4.4.5",
     "react-redux-toastr": "^3.8.5",
@@ -113,8 +113,8 @@
   "bugs": {
     "url": "https://github.com/viridia/klendathu/issues"
   },
-  "engines" : {
-    "node" : ">=6.7.0 <v7.0.0"
+  "engines": {
+    "node": ">=6.7.0 <v7.0.0"
   },
   "homepage": "https://github.com/viridia/klendathu#readme"
 }

@@ -3,7 +3,7 @@ const path = require('path');
 
 const debug = process.env.NODE_ENV !== 'production';
 const envVars = {
-  apiUrl: '//localhost:8080/api',
+  apiUrl: '/api',
 };
 const plugins = [
   new webpack.DefinePlugin({
@@ -71,9 +71,7 @@ module.exports = {
               ],
             },
           },
-          {
-            loader: 'eslint',
-          }
+          'eslint',
         ],
       },
       {

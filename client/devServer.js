@@ -21,3 +21,5 @@ const server = new WebpackDevServer(compiler, {
   publicPath: '/builds/',
 });
 server.listen(8081, 'localhost', () => {});
+
+console.log('Dev server starting.');
