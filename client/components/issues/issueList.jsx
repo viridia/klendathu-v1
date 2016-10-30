@@ -212,8 +212,14 @@ IssueList.propTypes = {
   }).isRequired,
   params: PropTypes.shape({
     project: PropTypes.string,
+    states: PropTypes.string,
   }).isRequired,
 };
+
+function defaultStates(project) {
+  // Default behavior is to show 'open' states.
+  return project.workflow.states.filter(st => !st.closed).map(st => st.id);
+}
 
 export default graphql(IssueListQuery, {
   options: ({ project, location: { query } }) => {
@@ -223,7 +229,7 @@ export default graphql(IssueListQuery, {
         project: project.id,
         search: undefined,
         type: type && type.split(','),
-        state: state && state.split(','),
+        state: state ? state.split(',') : defaultStates(project),
         summary,
         summaryPred: undefined,
         description,

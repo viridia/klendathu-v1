@@ -10,13 +10,7 @@ export function createIssue(project, issue) {
     mutation: NewIssueMutation,
     variables: { project, issue },
     fragments: IssueContent,
-    // updateQueries: {
-    //   projectListQuery: (previousQueryResult, { mutationResult }) => {
-    //     return {
-    //       projects: [mutationResult.data.newProject, ...previousQueryResult.projects],
-    //     };
-    //   },
-    // },
+    refetchQueries: ['issueListQuery'],
   });
 }
 
@@ -25,6 +19,7 @@ export function updateIssue(project, id, issue) {
     mutation: UpdateIssueMutation,
     variables: { id, project, issue },
     fragments: IssueContent,
+    refetchQueries: ['issueListQuery'],
   });
 }
 

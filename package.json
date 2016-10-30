@@ -5,7 +5,7 @@
   "main": "server/index.js",
   "scripts": {
     "client": "node client/devServer.js",
-    "client-build": "cd client && webpack",
+    "install": "webpack",
     "start": "supervisor -w server server",
     "start-pm2": "pm2 --node-args=\"--harmony\" start process.json",
     "stop": "pm2 kill",

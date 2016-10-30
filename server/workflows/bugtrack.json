@@ -24,6 +24,7 @@
         "needs_more_info",
         "review",
         "qa",
+        "verified",
         "duplicate",
         "working_as_intended",
         "deferred"
@@ -40,6 +41,7 @@
         "needs_more_info",
         "review",
         "qa",
+        "verified",
         "duplicate",
         "working_as_intended",
         "deferred",
@@ -90,7 +92,10 @@
       "id": "verified",
       "caption": "Verified",
       "closed": true,
-      "transitions": [],
+      "transitions": [
+        "assigned",
+        "in_progress"
+      ],
       "actions": {
         "owner": null
       }
@@ -99,7 +104,10 @@
       "id": "duplicate",
       "caption": "Duplicate",
       "closed": true,
-      "transitions": [],
+      "transitions": [
+        "assigned",
+        "in_progress"
+      ],
       "actions": []
     },
     {

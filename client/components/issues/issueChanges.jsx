@@ -56,6 +56,21 @@ function Change({ change, project }) {
     }
   }
 
+  function customValue(value) {
+    return value !== null
+      ? <span className="custom-value">{value || '""'}</span>
+      : <span className="custom-value-none">(none)</span>;
+  }
+
+  function customChange({ name, before, after }) { // eslint-disable-line
+    return (
+      <li className="field-change custom-field" key={name}>
+        changed <span className="custom-name">
+          {name}
+        </span> from {customValue(before)} to {customValue(after)}
+      </li>);
+  }
+
   return (<section className="change">
     <header className="change-header">
       <UserName user={change.by} fullOnly />
@@ -64,11 +79,22 @@ function Change({ change, project }) {
       :
     </header>
     <ul className="field-change-list">
-      {change.type && (<li className="field-change">
-          type: {change.type.before} to {change.type.after}
+      {change.type && (
+        <li className="field-change">
+          type: <span className="type">
+            {change.type.before}
+          </span> to <span className="type">
+            {change.type.after}
+          </span>
         </li>)}
-      {change.state &&
-        <li className="field-change">state: {change.state.before} to {change.state.after}</li>}
+      {change.state && (
+        <li className="field-change">
+          state: <span className="state">
+            {change.state.before}
+          </span> to <span className="state">
+            {change.state.after}
+          </span>
+        </li>)}
       {change.summary && (<li className="field-change">
         summary: {change.summary.before} to {change.summary.after}
       </li>)}
@@ -87,6 +113,7 @@ function Change({ change, project }) {
           removed label <LabelName label={l} project={project.id} key={l} />
         </li>))}
       {change.linked && change.linked.map(linkChange)}
+      {change.custom && change.custom.map(customChange)}
     </ul>
   </section>);
 }

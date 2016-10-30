@@ -59,6 +59,15 @@
       color: $textDark;
       > li {
         padding: 2px 0;
+
+        .state, .type, .custom-name, .custom-value {
+          font-weight: bold;
+          color: $textDarkAccent;
+        }
+        .custom-value-none {
+          font-style: italic;
+          color: lighten($textDark, 20%);
+        }
       }
     }
   }

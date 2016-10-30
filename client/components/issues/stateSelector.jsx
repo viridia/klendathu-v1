@@ -29,19 +29,20 @@ export default class StateSelector extends React.Component {
       }
     }
 
-    const state = this.stateMap.get(this.props.state);
-    const selectedState = this.props.startingState || state.id;
+    const prevState = this.props.prevState || this.props.state;
+    const nextState = this.props.state;
+    const prevStateInfo = this.stateMap.get(prevState);
     return (<FormGroup controlId="state">
       <ControlLabel>State</ControlLabel>
       <Radio
-          checked={state.id === selectedState}
-          data-state={state.id}
-          onChange={this.onChange}>{caption(state)}</Radio>
-      {state.transitions.map(s => {
+          checked={prevState === nextState}
+          data-state={prevState}
+          onChange={this.onChange}>{caption(prevStateInfo)}</Radio>
+      {prevStateInfo.transitions.map(s => {
         const toState = this.stateMap.get(s);
         return (<Radio
             key={toState.id}
-            checked={toState.id === selectedState}
+            checked={toState.id === nextState}
             data-state={toState.id}
             onChange={this.onChange}>{caption(toState)}</Radio>);
       })}
@@ -51,7 +52,7 @@ export default class StateSelector extends React.Component {
 
 StateSelector.propTypes = {
   state: PropTypes.string.isRequired,
-  startingState: PropTypes.string,
+  prevState: PropTypes.string,
   project: PropTypes.shape({}),
   workflow: PropTypes.shape({
     states: PropTypes.arrayOf(PropTypes.shape({}).isRequired).isRequired,

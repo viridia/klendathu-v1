@@ -122,7 +122,7 @@ export default class IssueCompose extends React.Component {
     this.me = { id: context.profile.username, label: context.profile.username };
     this.templateTypes = new Map();
     this.state = {
-      startringState: 'new',
+      prevState: 'new',
       issueState: 'new',
       type: '',
       summary: '',
@@ -304,7 +304,7 @@ export default class IssueCompose extends React.Component {
     if (issue) {
       const linked = issue.linked || [];
       this.setState({
-        startingState: issue.state,
+        prevState: issue.state,
         issueState: issue.state,
         type: issue.type,
         summary: issue.summary,
@@ -325,9 +325,10 @@ export default class IssueCompose extends React.Component {
     } else {
       const initialState = project.workflow.start || 'new';
       this.setState({
-        startingState: initialState,
+        prevState: initialState,
         issueState: initialState,
-        type: concreteTypes[0].id,
+        // If current type is valid then keep it, otherwise default to the first type.
+        type: this.templateTypes.has(this.state.type) ? this.state.type : concreteTypes[0].id,
         summary: '',
         description: '',
         reporter: this.me,
@@ -440,7 +441,7 @@ export default class IssueCompose extends React.Component {
         <header>{issue ? 'Edit Issue' : 'New Issue'}: {project.name}</header>
         <section className="content create-issue">
           <div className="left">
-            <form ref={el => { this.form = el; }}>
+            <form ref={el => { this.form = el; }} name="lastpass-disable-search">
               <table className="create-issue-table form-table">
                 <tbody>
                   <tr>
@@ -582,7 +583,7 @@ export default class IssueCompose extends React.Component {
                 project={project}
                 workflow={project.workflow}
                 state={this.state.issueState}
-                startingState={this.state.startingState}
+                prevState={this.state.prevState}
                 onStateChanged={this.onChangeState} />
             <ControlLabel>Visbility</ControlLabel>
             <Checkbox checked={this.state.public} onChange={this.onChangePublic}>
