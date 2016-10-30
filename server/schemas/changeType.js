@@ -1,6 +1,7 @@
 const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLID, GraphQLList, GraphQLNonNull }
     = require('graphql');
 const GraphQLDate = require('graphql-date');
+const relationType = require('./relationType');
 
 const scalarChangeType = new GraphQLObjectType({
   name: 'ScalarChange',
@@ -40,24 +41,6 @@ const intListChangeType = new GraphQLObjectType({
     removed: {
       type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
       description: 'List of entries that were removed from the field.',
-    },
-  },
-});
-
-const mapChangeType = new GraphQLObjectType({
-  name: 'MapChange',
-  fields: {
-    name: {
-      type: new GraphQLNonNull(GraphQLString),
-      description: 'List of entries that were added to the field.',
-    },
-    before: {
-      type: GraphQLString,
-      description: 'Value of the field before the change.',
-    },
-    after: {
-      type: GraphQLString,
-      description: 'Value of the field after the change.',
     },
   },
 });
@@ -102,8 +85,44 @@ module.exports = new GraphQLObjectType({
       description: 'Change to the list of issue labels.',
     },
     custom: {
-      type: new GraphQLList(new GraphQLNonNull(mapChangeType)),
-      description: 'Change to the list of issue labels.',
+      type: new GraphQLList(new GraphQLNonNull(new GraphQLObjectType({
+        name: 'CustomChange',
+        fields: {
+          name: {
+            type: new GraphQLNonNull(GraphQLString),
+            description: 'Name of the custom field.',
+          },
+          before: {
+            type: GraphQLString,
+            description: 'Value of the field before the change.',
+          },
+          after: {
+            type: GraphQLString,
+            description: 'Value of the field after the change.',
+          },
+        },
+      }))),
+      description: 'Change to the list of custom fields.',
+    },
+    linked: {
+      type: new GraphQLList(new GraphQLNonNull(new GraphQLObjectType({
+        name: 'LinkChange',
+        fields: {
+          to: {
+            type: new GraphQLNonNull(GraphQLInt),
+            description: 'ID of the issue being linked to.',
+          },
+          before: {
+            type: relationType,
+            description: 'Relationship before the change.',
+          },
+          after: {
+            type: relationType,
+            description: 'Relationship after the change.',
+          },
+        },
+      }))),
+      description: 'Change to the list of linked issues.',
     },
   },
 });

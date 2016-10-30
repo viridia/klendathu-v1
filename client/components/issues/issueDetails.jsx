@@ -14,6 +14,7 @@ import IssueChanges from './issueChanges.jsx';
 import CommentEdit from './commentEdit.jsx';
 import { Role } from '../../lib/role';
 import IssueDetailsQuery from '../../graphql/queries/issueDetails.graphql';
+import LinkedIssues from './linkedIssues.jsx';
 import { IssueContent } from '../../store/fragments';
 import { addComment } from '../../store/issue';
 import './issueDetails.scss';
@@ -109,6 +110,7 @@ class IssueDetails extends React.Component {
       return <section className="kdt issue-details" />;
     }
     const backLink = (location.state && location.state.back) || { pathname: '..' };
+    const linkedIssues = issue.linked || [];
     return (<section className="kdt issue-details">
       <section className="card">
         <header>
@@ -191,7 +193,7 @@ class IssueDetails extends React.Component {
               {this.renderTemplateFields()}
               {issue.labels.length > 0 && (
                 <tr>
-                  <th className="header">Labels:</th>
+                  <th className="header labels">Labels:</th>
                   <td>
                     {issue.labels.map(label =>
                       <LabelName label={label} project={project.id} key={label} />)}
@@ -206,14 +208,15 @@ class IssueDetails extends React.Component {
                   </div>
                 </td>
               </tr>
-              <tr>
-                <th className="header">Linked Issues:</th>
+              {linkedIssues.length > 0 && <tr>
+                <th className="header linked">Linked Issues:</th>
                 <td>
-                  <div className="linked-group">
-                    Links
-                  </div>
+                  <LinkedIssues
+                      project={project}
+                      links={linkedIssues}
+                      onRemoveLink={this.onRemoveLinkedIssue} />
                 </td>
-              </tr>
+              </tr>}
               <tr>
                 <th className="header">Issue History:</th>
                 <td>

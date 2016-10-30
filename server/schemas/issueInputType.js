@@ -1,4 +1,4 @@
-const { GraphQLInputObjectType, GraphQLInt, GraphQLString, GraphQLID, GraphQLList,
+const { GraphQLInputObjectType, GraphQLInt, GraphQLString, GraphQLList,
     GraphQLNonNull } = require('graphql');
 const relationType = require('./relationType');
 
@@ -6,7 +6,7 @@ const linkedIssueInputType = new GraphQLInputObjectType({
   name: 'LinkedIssueInput',
   fields: {
     to: {
-      type: new GraphQLNonNull(GraphQLID),
+      type: new GraphQLNonNull(GraphQLInt),
       description: 'ID of issue to which this is linked.',
     },
     relation: {

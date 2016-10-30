@@ -10,7 +10,7 @@ const linkedIssueType = new GraphQLObjectType({
   name: 'LinkedIssue',
   fields: {
     to: {
-      type: new GraphQLNonNull(GraphQLID),
+      type: new GraphQLNonNull(GraphQLInt),
       description: 'ID of issue to which this is linked.',
     },
     relation: {
@@ -146,6 +146,10 @@ module.exports = new GraphQLObjectType({
     changes: {
       type: new GraphQLList(new GraphQLNonNull(changeType)),
       description: 'List of comments on this issue.',
+    },
+    score: {
+      type: GraphQLInt,
+      description: 'Relevance score for text searches.',
     },
   },
 });

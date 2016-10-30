@@ -3,12 +3,11 @@ const { GraphQLEnumType } = require('graphql');
 module.exports = new GraphQLEnumType({
   name: 'RELATION',
   values: {
-    BLOCKED_BY: { value: 'blocked_by' },
+    BLOCKED_BY: { value: 'blocked-by' },
     BLOCKS: { value: 'blocks' },
-    INCLUDED_BY: { value: 'included_by' },
+    INCLUDED_BY: { value: 'included-by' },
     INCLUDES: { value: 'includes' },
-    DUPLICATE_OF: { value: 'duplicate_of' },
-    HAS_DUPLICATE: { value: 'has_duplicate' },
+    DUPLICATE: { value: 'duplicate' },
     RELATED: { value: 'related' },
   },
 });

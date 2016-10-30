@@ -64,6 +64,53 @@
     flex: 1;
   }
 
+  .linked-group {
+    align-items: stretch;
+  }
+
+  // Allows ac-issue to be absolute so that content doesn't stretch the table.
+  .ac-shim {
+    position: relative;
+    flex: 1;
+  }
+
+  .ac-issue {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    margin: 0 4px;
+    flex: 1 1 0;
+    > .ac-chip-wrapper {
+      display: inline-block;
+      flex: 0 1 auto; // Only shrinks never grows
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+      // border: 1px dotted green;
+    }
+    > input {
+      flex: 1 1 4px; // Grows if there's room, but otherwise shrinks very small.
+      // border: 1px dotted blue;
+    }
+    .ac-menu {
+      > li {
+        overflow-x: hidden;
+      }
+    }
+    .issue-ref {
+      display: inline-block;
+      white-space: nowrap;
+      > .id {
+        font-weight: bold;
+      }
+      > .summary {
+      }
+    }
+  }
+
   .upload {
     display: flex;
     flex-direction: column;

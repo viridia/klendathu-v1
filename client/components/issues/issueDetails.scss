@@ -57,7 +57,16 @@
     .create-issue-table {
       width: 100%;
       td {
-        line-height: 1.9em;
+        line-height: 1.4em;
+      }
+      th {
+        line-height: 1.5em;
+      }
+      th.labels {
+        line-height: 1.5em;
+      }
+      th.linked {
+        line-height: 2.4em;
       }
     }
 

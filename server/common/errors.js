@@ -56,6 +56,7 @@ const Errors = {
   NAME_TOO_SHORT: 'name-too-short',
   INVALID_NAME: 'invalid-name',
   NAME_EXISTS: 'name-exists',
+  INVALID_LINK: 'invalid-link',
 };
 
 module.exports = {

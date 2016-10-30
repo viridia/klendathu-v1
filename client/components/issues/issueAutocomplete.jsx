@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react';
 import { withApollo } from 'react-apollo';
 import ApolloClient from 'apollo-client';
-import AutoCompleteChips from './ac/autocompleteChips.jsx';
-import UsersQuery from '../../graphql/queries/users.graphql';
-import Chip from './ac/chip.jsx';
+import AutocompleteChips from '../common/ac/autocompleteChips.jsx';
+import IssueSearchQuery from '../../graphql/queries/issueSearch.graphql';
+import '../common/ac/chip.scss';
 
-class UserAutoComplete extends React.Component {
+class IssueAutoComplete extends React.Component {
   constructor(props) {
     super(props);
     this.onSearch = this.onSearch.bind(this);
@@ -15,44 +15,41 @@ class UserAutoComplete extends React.Component {
     this.onGetSortKey = this.onGetSortKey.bind(this);
   }
 
-  onSearch(token, callback) {
-    if (token.length < 1) {
+  onSearch(search, callback) {
+    if (search.length < 1) {
       callback([]);
     } else {
       this.props.client.query({
-        query: UsersQuery,
-        variables: { token, project: this.props.project.id },
+        query: IssueSearchQuery,
+        variables: { search, project: this.props.project.id },
       }).then(resp => {
-        callback(resp.data.users);
+        callback(resp.data.issueSearch.filter(issue => issue.id !== this.props.exclude));
       });
     }
   }
 
-  onRenderSuggestion(user) {
-    return (<span>
-      <span className="name">{user.fullname}</span>
-      &nbsp;- <span className="username">{user.username}</span>
+  onRenderSuggestion(issue) {
+    return (<span className="issue-ref">
+      <span className="id">#{issue.id}: </span>
+      <span className="summary">{issue.summary}</span>
     </span>);
   }
 
-  onRenderSelection(user) {
-    return (<Chip>
-      <span className="name">{user.fullname}</span>
-      &nbsp;- <span className="username">{user.username}</span>
-    </Chip>);
+  onRenderSelection(issue) {
+    return this.onRenderSuggestion(issue);
   }
 
-  onGetValue(user) {
-    return user.username;
+  onGetValue(issue) {
+    return issue.id;
   }
 
-  onGetSortKey(user) {
-    return user.fullname;
+  onGetSortKey(issue) {
+    return -issue.score;
   }
 
   render() {
     return (
-      <AutoCompleteChips
+      <AutocompleteChips
           {...this.props}
           onSearch={this.onSearch}
           onGetValue={this.onGetValue}
@@ -63,7 +60,7 @@ class UserAutoComplete extends React.Component {
   }
 }
 
-UserAutoComplete.propTypes = {
+IssueAutoComplete.propTypes = {
   value: PropTypes.string,
   project: PropTypes.shape({
     id: PropTypes.string,
@@ -74,6 +71,7 @@ UserAutoComplete.propTypes = {
     PropTypes.arrayOf(PropTypes.any.isRequired),
     PropTypes.any,
   ]),
+  exclude: PropTypes.number,
 };
 
-export default withApollo(UserAutoComplete);
+export default withApollo(IssueAutoComplete);

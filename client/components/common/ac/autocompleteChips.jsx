@@ -92,7 +92,7 @@ export default class AutoCompleteChips extends React.Component {
       suggestionIndex: uniqueSuggestions.length > 0 ? 0 : -1,
     });
     if (this.state.value !== this.searchValue) {
-      this.searchValue = this.this.value;
+      this.searchValue = this.value;
       this.props.onSearch(this.state.value, this.onReceiveSuggestions);
     }
   }
@@ -131,8 +131,8 @@ export default class AutoCompleteChips extends React.Component {
         e.stopPropagation();
         if (suggestionCount > 0 && suggestionIndex !== -1) {
           if (!this.state.open) {
-            if (this.props.onFocusNext) {
-              this.props.onFocusNext();
+            if (this.props.onEnter) {
+              this.props.onEnter();
             }
           } else {
             const item = suggestions.concat(suggestionsSuffix)[suggestionIndex];
@@ -162,10 +162,15 @@ export default class AutoCompleteChips extends React.Component {
   }
 
   deleteLastSelectedItem() {
-    this.updateSelection(this.selection().slice(0, -1));
+    if (this.selection().length > 0) {
+      this.updateSelection(this.selection().slice(0, -1));
+    }
   }
 
   chooseSuggestion(suggestion) {
+    if (!suggestion) {
+      throw new Error('Invalid suggestion.');
+    }
     const callback = s => { this.addToSelection(s); };
     const done = this.props.onChooseSuggestion(suggestion, callback);
     if (!done) {
@@ -322,7 +327,7 @@ AutoCompleteChips.propTypes = {
   onRenderSelection: PropTypes.func,
   onGetValue: PropTypes.func,
   onGetSortKey: PropTypes.func,
-  onFocusNext: PropTypes.func,
+  onEnter: PropTypes.func,
   onSelectionChange: PropTypes.func.isRequired,
 };
 

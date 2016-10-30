@@ -1,0 +1,18 @@
+@import '../defines/base';
+
+.linked-issues {
+  margin: 0 0 0 24px;
+  padding: 8px;
+}
+
+.linked-issue {
+  white-space: normal;
+  > .relation {
+    font-weight: bold;
+    color: lighten($textDarkAccent, 25%);
+    margin-right: 5px;
+  }
+  > .issue > .id {
+    font-weight: bold;
+  }
+}

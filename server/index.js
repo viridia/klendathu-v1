@@ -24,6 +24,12 @@ const mongo = MongoClient.connect(DB_URL).catch(err => {
 });
 
 mongo.then(db => {
+  db.collection('issues').createIndex({
+    summary: 'text',
+    description: 'text',
+  });
+  return db;
+}).then(db => {
   // App
   const app = express();
 

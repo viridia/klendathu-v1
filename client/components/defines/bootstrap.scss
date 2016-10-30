@@ -55,6 +55,24 @@
   fieldset[disabled] & {
     @include opacity(.35);
   }
+
+  &.bare {
+    border: none;
+    background: none;
+    outline: none;
+    padding: 1px;
+  }
+
+  &.light {
+    > .svg-icon > svg {
+      fill: lighten($textDark, 40%);
+    }
+    &:hover {
+      > .svg-icon > svg {
+        fill: $textDark;
+      }
+    }
+  }
 }
 
 .btn-primary .svg-icon > svg {

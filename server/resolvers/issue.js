@@ -25,6 +25,17 @@ function stringPredicate(pred, value) {
   }
 }
 
+function inverseRelation(relation) {
+  switch (relation) {
+    case 'blocked-by': return 'blocks';
+    case 'blocks': return 'blocked-by';
+    case 'included-by': return 'includes';
+    case 'includes': return 'included-by';
+    default:
+      return relation;
+  }
+}
+
 const VALID_SORT_KEYS = new Set([
   'id',
   'type',
@@ -65,7 +76,7 @@ const resolverMethods = {
       };
 
       if (req.search) {
-        logger.error('unimplemented: issues(search)');
+        query.$text = { $search: req.search };
       }
 
       if (req.type) {
@@ -98,14 +109,13 @@ const resolverMethods = {
         query.owner = { $in: req.owner.map(id => new ObjectId(id)) };
       }
 
-      // cc
-
       // Must match *all* labels
       if (req.labels) {
         query.labels = { $all: req.labels };
       }
 
       // Other things we might want to search by:
+      // cc
       // keywords
       // custom fields
       // comments / commenter
@@ -134,6 +144,22 @@ const resolverMethods = {
       }
 
       return this.db.collection('issues').find(query).sort(sort).toArray();
+    });
+  },
+
+  issueSearch({ project, search }) {
+    return this.getProjectAndRole({ projectId: project }).then(([proj, role]) => {
+      if (proj === null || (!proj.public && role < Role.VIEWER)) {
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
+      }
+
+      const query = {
+        project: new ObjectId(project),
+        $text: { $search: search },
+      };
+      const sort = { score: { $meta: 'textScore' } };
+      return this.db.collection('issues')
+        .find(query, { score: { $meta: 'textScore' } }).sort(sort).toArray();
     });
   },
 
@@ -171,8 +197,7 @@ const resolverMethods = {
           updated: now,
           cc: (issue.cc || []),
           labels: issue.labels || [],
-          linked: (issue.linked || []).map(
-              ln => ({ to: new ObjectId(ln.to), relation: ln.relation })),
+          linked: issue.linked || [],
           custom: issue.custom || [],
           comments: (issue.comments || []).map(comment => ({
             id: () => { commentIndex += 1; return commentIndex; },
@@ -182,12 +207,17 @@ const resolverMethods = {
             updated: now,
           })),
         };
-        // Insert new user into the database.
-        return this.db.collection('issues').insertOne(record).then(result => {
-          return result.ops[0];
-        }, error => {
-          logger.error('Error creating issue', issue, error);
-          return Promise.reject(new InternalError());
+
+        return this.findLinked(record.project, record.linked).then(issueRefs => {
+          return this.db.collection('issues').insertOne(record).then(result => {
+            if (issue.linked) {
+              return this.reconcileLinks(result.ops[0], issueRefs);
+            }
+            return result.ops[0];
+          }, error => {
+            logger.error('Error creating issue', issue, error);
+            return Promise.reject(new InternalError());
+          });
         });
       });
     });
@@ -221,6 +251,18 @@ const resolverMethods = {
         const record = {
           updated: new Date(),
         };
+
+        const update = {
+          $set: record,
+        };
+
+        function append(field, value) {
+          if (update.$push) {
+            update.$push[field] = value;
+          } else {
+            update.$push = { [field]: value };
+          }
+        }
 
         const change = {
           by: this.user.username,
@@ -281,9 +323,32 @@ const resolverMethods = {
         }
 
         if (issue.linked) {
-          // TODO: Change log
-          record.linked = issue.linked.map(
-              ln => ({ to: new ObjectId(ln.to), relation: ln.relation }));
+          record.linked = issue.linked.map(ln => ({ to: ln.to, relation: ln.relation }));
+          const linkedPrev = new Map(existing.linked.map(ln => [ln.to, ln.relation]));
+          const linkedNext = new Map(issue.linked.map(ln => [ln.to, ln.relation]));
+          const linkedChange = [];
+          linkedNext.forEach((relation, to) => {
+            if (linkedPrev.has(to)) {
+              const before = linkedPrev.get(to);
+              if (relation !== before) {
+                // A changed value
+                linkedChange.push({ to, before, after: relation });
+              }
+            } else {
+              // A newly-added value
+              linkedChange.push({ to, after: relation });
+            }
+          });
+          linkedPrev.forEach((relation, to) => {
+            if (!linkedNext.has(to)) {
+              // A deleted value
+              linkedChange.push({ to, before: relation });
+            }
+          });
+          if (linkedChange.length > 0) {
+            change.linked = linkedChange;
+            change.at = record.updated;
+          }
         }
 
         if (issue.custom !== undefined) {
@@ -351,32 +416,110 @@ const resolverMethods = {
             }
           }
 
-          // updateIssue() can only append comments, not edit existing comments.
-          // That requires a different method.
-          record.comments = existing.comments.concat(issue.comments.map(comment => ({
-            body: comment.body,
-            author: this.user.username,
-            created: record.updated,
-            updated: record.updated,
-          })));
+          record.comments = commentList;
         }
 
+        // Append the change log entry to the list of changes.
         if (change.at) {
-          record.changes = (existing.changes || []).concat([change]);
+          append('changes', change);
         }
 
         // TODO: owning user, owning org, template name, workflow name
         // All of which need validation
-        return issues.updateOne(query, {
-          $set: record,
-        }).then(() => {
-          return issues.findOne(query);
-        }, error => {
-          logger.error('Error updating issue', id, proj.name, error);
-          return Promise.reject(new InternalError());
+        return this.findLinked(query.project, record.linked, existing.linked).then(issueRefs => {
+          return issues.updateOne(query, update).then(() => {
+            const result = issues.findOne(query);
+            if (issue.linked) {
+              result.then(ni => this.reconcileLinks(ni, issueRefs));
+            }
+            return result;
+          }, error => {
+            logger.error('Error updating issue', id, proj.name, error);
+            return Promise.reject(new InternalError());
+          });
         });
       });
     });
+  },
+
+  /** Retrieve all of the issues that are in the linked issue list. */
+  findLinked(project, linked = [], existing = []) {
+    const combined = linked.concat(existing);
+    if (combined === undefined) {
+      return Promise.resolve([]);
+    }
+    const toIds = Array.from(new Set(combined.map(ln => ln.to)));
+    if (toIds.length === 0) {
+      return Promise.resolve([]);
+    }
+    const issues = this.db.collection('issues');
+    return issues.find({ project, id: { $in: toIds } }).toArray().then(found => {
+      if (found.length < toIds.length) {
+        return Promise.reject(new BadRequest(Errors.INVALID_LINK));
+      }
+      return new Map(found.map(issue => [issue.id, issue]));
+    });
+  },
+
+  /** Make sure that all linked issues are reciprocal.
+      @param {issue} issue The issue we are updating.
+      @param {Map} issueRefs A map containing all of the issues that this issue references. This
+        includes all references from both before and after the update.
+  */
+  reconcileLinks(issue, issueRefs) {
+    const linksById = new Map(issue.linked.map(ln => [ln.to, ln.relation]));
+    const toChange = new Map();
+    linksById.forEach((relation, to) => {
+      const inv = inverseRelation(relation);
+      const toIssue = issueRefs.get(to);
+      const existingLink = toIssue.linked.find(ln => ln.to === issue.id);
+      if (existingLink) {
+        // Change the type of the other issue's relation
+        if (existingLink.relation !== inv) {
+          existingLink.relation = inv;
+          toIssue.change = {
+            by: this.user.username,
+            at: issue.updated,
+            linked: [{ to: issue.id, before: relation, after: inv }],
+          };
+          toChange.set(toIssue.id, toIssue);
+        }
+      } else {
+        // Add a new relation to the other issue
+        toIssue.linked.push({ to: issue.id, relation: inv });
+        toIssue.change = {
+          by: this.user.username,
+          at: issue.updated,
+          linked: [{ to: issue.id, after: inv }],
+        };
+        toChange.set(toIssue.id, toIssue);
+      }
+    });
+    issueRefs.forEach(toIssue => {
+      if (!linksById.has(toIssue.id)) {
+        const existingLink = toIssue.linked.find(ln => ln.to === issue.id);
+        if (existingLink) {
+          toIssue.linked = toIssue.linked.filter(ln => ln.to !== issue.id);
+          toIssue.change = {
+            by: this.user.username,
+            at: issue.updated,
+            linked: [{ to: issue.id, before: existingLink.relation }],
+          };
+          toChange.set(toIssue.id, toIssue);
+        }
+      }
+    });
+
+    // Now update all of the issues that needed changing.
+    const updates = [];
+    const issues = this.db.collection('issues');
+    toChange.forEach(iss => {
+      updates.push(
+        issues.updateOne(
+          { project: iss.project, id: iss.id },
+          { $set: { linked: iss.linked }, $push: { changes: iss.change } }));
+    });
+    return Promise.all(updates).then(() => issue);
   },
 
   addComment({ id, project, comment }) {
@@ -418,6 +561,7 @@ const resolverMethods = {
         });
 
         return issues.updateOne(query, { $set: update }).then(() => {
+          // Reconcile linkages
           return issues.findOne(query);
         }, error => {
           logger.error('Error updating issue', id, proj.name, error);

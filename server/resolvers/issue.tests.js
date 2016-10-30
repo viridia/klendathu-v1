@@ -17,22 +17,27 @@ describe('resolvers/issue', function () {
   });
 
   beforeEach(function () {
+    // Create a new test project.
     return this.root.newProject({ project: { name: 'test-project' } }).then(project => {
       this.project = project;
+      // Helper function to create an issue via graphql
       this.createIssue = (issue) => {
         return graphql(schema, `mutation newIssue($project: ID!, $issue: IssueInput!) {
           newIssue(project: $project, issue: $issue) {
             id type state summary description owner cc labels custom { name value }
-            created updated
+            linked { to relation } created updated
           }
         }`,
         this.root, null, { project: this.project._id, issue });
       };
+      // Helper function to update an issue via graphql
       this.updateIssue = (id, issue) => {
-        return graphql(schema, `mutation updateIssue($project: ID!, $id: Int! $issue: IssueInput!) {
+        return graphql(schema, `mutation updateIssue(
+            $project: ID!, $id: Int!, $issue: IssueInput!) {
           updateIssue(project: $project, id: $id, issue: $issue) {
             id type state summary description owner cc labels custom { name value }
-            created updated changes {
+            linked { to relation } created updated
+            changes {
               type { before after }
               state { before after }
               summary { before after }
@@ -40,11 +45,61 @@ describe('resolvers/issue', function () {
               cc { added removed }
               labels { added removed }
               custom { name before after }
+              linked { to before after }
             }
           }
         }`,
         this.root, null, { project: this.project._id, id, issue });
       };
+      // Helper function to retrieve an issue via graphql
+      this.queryIssue = (id) => {
+        return graphql(schema, `query issue($project: ID!, $id: Int!) {
+          issue(project: $project, id: $id) {
+            id type state summary description owner cc labels custom { name value }
+            linked { to relation } created updated
+            changes {
+              type { before after }
+              state { before after }
+              summary { before after }
+              owner { before after }
+              cc { added removed }
+              labels { added removed }
+              custom { name before after }
+              linked { to before after }
+            }
+          }
+        }`,
+        this.root, null, { project: this.project._id, id });
+      };
+      // Check that the database operation succeeded.
+      this.checkResult = (result) => {
+        if (result.errors) {
+          // console.error(result.errors[0]); // eslint-disable-line
+          throw result.errors[0];
+        }
+      };
+    });
+  });
+
+  beforeEach(function () {
+    return Promise.all([
+      this.createIssue({
+        type: 'bug',
+        state: 'new',
+        summary: 'issue-2',
+        owner: 'test-user',
+      }),
+      this.createIssue({
+        type: 'bug',
+        state: 'new',
+        summary: 'issue-3',
+        owner: 'test-user',
+      }),
+    ]).then(([result2, result3]) => {
+      this.checkResult(result2);
+      this.checkResult(result3);
+      this.issue2 = result2.data.newIssue;
+      this.issue3 = result3.data.newIssue;
     });
   });
 
@@ -85,7 +140,9 @@ describe('resolvers/issue', function () {
         cc: ['another-user'],
         labels: [1, 2, 3],
         custom: [{ name: 'cname', value: 'cvalue' }],
+        linked: [{ to: this.issue2.id, relation: 'DUPLICATE' }],
       }).then(result => {
+        this.checkResult(result);
         const { newIssue } = result.data;
         ensure(newIssue.type).equals('bug');
         ensure(newIssue.state).equals('new');
@@ -97,6 +154,19 @@ describe('resolvers/issue', function () {
         ensure(newIssue.custom).hasLength(1);
         ensure(newIssue.custom[0]).hasField('name').withValue('cname');
         ensure(newIssue.custom[0]).hasField('value').withValue('cvalue');
+        ensure(newIssue.linked).named('linked').hasLength(1);
+        ensure(newIssue.linked[0]).hasField('to').withValue(this.issue2.id);
+        ensure(newIssue.linked[0]).hasField('relation').withValue('DUPLICATE');
+        return newIssue;
+      }).then(newIssue => {
+        // Make sure that issue2 got updated.
+        return this.queryIssue(this.issue2.id).then(result => {
+          this.checkResult(result);
+          const { issue } = result.data;
+          ensure(issue.linked).named('linked').hasLength(1);
+          ensure(issue.linked[0]).hasField('to').withValue(newIssue.id);
+          ensure(issue.linked[0]).hasField('relation').withValue('DUPLICATE');
+        });
       });
     });
 
@@ -138,7 +208,9 @@ describe('resolvers/issue', function () {
         cc: ['another-user', 'user3'],
         labels: [1, 2, 3],
         custom: [{ name: 'cname', value: 'cvalue' }],
+        linked: [{ to: this.issue2.id, relation: 'DUPLICATE' }],
       }).then(result => {
+        this.checkResult(result);
         this.issue = result.data.newIssue;
       });
     });
@@ -147,6 +219,7 @@ describe('resolvers/issue', function () {
       return this.updateIssue(this.issue.id, {
         type: 'feature',
       }).then(result => {
+        this.checkResult(result);
         const { updateIssue } = result.data;
         ensure(updateIssue.type).equals('feature');
         ensure(updateIssue.changes[0].type.before).equals('bug');
@@ -201,7 +274,7 @@ describe('resolvers/issue', function () {
 
     it('update issue custom field', function () {
       return this.updateIssue(this.issue.id, {
-        custom: { name: 'a', value: 'b' },
+        custom: [{ name: 'a', value: 'b' }],
       }).then(result => {
         const { updateIssue } = result.data;
         ensure(updateIssue.custom[0]).hasField('name').withValue('a');
@@ -216,6 +289,52 @@ describe('resolvers/issue', function () {
       });
     });
 
-    // TODO: linked
+    it('update linked issues', function () {
+      return this.updateIssue(this.issue.id, {
+        linked: [{ to: this.issue3.id, relation: 'BLOCKED_BY' }],
+      }).then(result => {
+        this.checkResult(result);
+        const { updateIssue } = result.data;
+        ensure(updateIssue.linked).hasLength(1);
+        ensure(updateIssue.linked[0]).hasField('to').withValue(this.issue3.id);
+        ensure(updateIssue.linked[0]).hasField('relation').withValue('BLOCKED_BY');
+        ensure(updateIssue.changes[0]).hasField('linked');
+        ensure(updateIssue.changes[0].linked).hasLength(2);
+        ensure(updateIssue.changes[0].linked[0]).hasField('to').withValue(this.issue3.id);
+        ensure(updateIssue.changes[0].linked[0]).hasField('before').withValue(null);
+        ensure(updateIssue.changes[0].linked[0]).hasField('after').withValue('BLOCKED_BY');
+        ensure(updateIssue.changes[0].linked[1]).hasField('to').withValue(this.issue2.id);
+        ensure(updateIssue.changes[0].linked[1]).hasField('before').withValue('DUPLICATE');
+        ensure(updateIssue.changes[0].linked[1]).hasField('after').withValue(null);
+        return updateIssue;
+      }).then(updateIssue => {
+        // Make sure that issue2 got updated by the reconciler.
+        return this.queryIssue(this.issue2.id).then(result => {
+          this.checkResult(result);
+          const { issue } = result.data;
+          ensure(issue.linked).named('linked').hasLength(0);
+          ensure(issue.changes).hasLength(2); // Includes previous change in beforeEach()
+          ensure(issue.changes[1].linked).hasLength(1);
+          ensure(issue.changes[1].linked[0]).hasField('to').withValue(updateIssue.id);
+          ensure(issue.changes[1].linked[0]).hasField('before').withValue('DUPLICATE');
+          ensure(issue.changes[1].linked[0]).hasField('after').withValue(null);
+          return updateIssue;
+        });
+      }).then(updateIssue => {
+        // Make sure that issue3 got updated by the reconciler.
+        return this.queryIssue(this.issue3.id).then(result => {
+          this.checkResult(result);
+          const { issue } = result.data;
+          ensure(issue.linked).named('linked').hasLength(1);
+          ensure(issue.linked[0]).hasField('to').withValue(updateIssue.id);
+          ensure(issue.linked[0]).hasField('relation').withValue('BLOCKS');
+          ensure(issue.changes).hasLength(1);
+          ensure(issue.changes[0].linked).hasLength(1);
+          ensure(issue.changes[0].linked[0]).hasField('to').withValue(updateIssue.id);
+          ensure(issue.changes[0].linked[0]).hasField('before').withValue(null);
+          ensure(issue.changes[0].linked[0]).hasField('after').withValue('BLOCKS');
+        });
+      });
+    });
   });
 });

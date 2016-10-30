@@ -35,4 +35,8 @@ fragment issueContent on Issue {
     body
     created
   }
+  linked {
+    relation
+    to
+  }
 }

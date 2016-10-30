@@ -1,7 +1,9 @@
 import React, { PropTypes } from 'react';
 import RelativeDate from '../common/relativeDate.jsx';
+import IssueSummary from '../common/issueSummary.jsx';
 import LabelName from '../common/labelName.jsx';
 import UserName from '../common/userName.jsx';
+import Relation from '../../lib/relation';
 import './issueChanges.scss';
 
 function compareEntries(a, b) {
@@ -33,6 +35,27 @@ Comment.propTypes = {
 };
 
 function Change({ change, project }) {
+  function linkChange({ to, before, after }) { // eslint-disable-line
+    if (before && after) {
+      return (<li className="field-change linked-issue" key={to}>
+        changed <span className="relation">{Relation.caption[before]}</span>
+      &nbsp;%raquo;&nbsp;
+        <span className="relation">{Relation.caption[after]}</span>
+        <IssueSummary id={to} project={project.id} key={to} />
+      </li>);
+    } else if (before) {
+      return (<li className="field-change linked-issue" key={to}>
+        removed <span className="relation">{Relation.caption[before]}</span>
+        <IssueSummary id={to} project={project.id} key={to} />
+      </li>);
+    } else {
+      return (<li className="field-change linked-issue" key={to}>
+        added <span className="relation">{Relation.caption[after]}</span>
+        <IssueSummary id={to} project={project.id} key={to} />
+      </li>);
+    }
+  }
+
   return (<section className="change">
     <header className="change-header">
       <UserName user={change.by} fullOnly />
@@ -63,6 +86,7 @@ function Change({ change, project }) {
         (<li className="field-change" key={l}>
           removed label <LabelName label={l} project={project.id} key={l} />
         </li>))}
+      {change.linked && change.linked.map(linkChange)}
     </ul>
   </section>);
 }

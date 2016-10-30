@@ -11,6 +11,7 @@ query issueDetailsQuery($project: ID!, $id: Int!) {
       cc { added removed }
       labels { added removed }
       custom { name before after }
+      linked { to before after }
     }
   }
 }

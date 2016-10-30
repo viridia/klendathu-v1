@@ -8,12 +8,15 @@ import DropdownButton from 'react-bootstrap/lib/DropdownButton';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
 import Typeahead from 'react-bootstrap-typeahead';
+import IssueAutoComplete from './issueAutocomplete.jsx';
 import UserAutoComplete from '../common/userAutoComplete.jsx';
 import LabelSelector from './labelSelector.jsx';
 import StateSelector from './stateSelector.jsx';
 import TypeSelector from './typeSelector.jsx';
 import CustomEnumField from './customEnumField.jsx';
 import CommentEdit from './commentEdit.jsx';
+import LinkedIssues from './linkedIssues.jsx';
+import Relation from '../../lib/relation';
 import './issueCompose.scss';
 import '../common/card.scss';
 import '../common/table.scss';
@@ -103,11 +106,15 @@ export default class IssueCompose extends React.Component {
     this.onChangeOwner = this.onChangeOwner.bind(this);
     this.onChangeCC = this.onChangeCC.bind(this);
     this.onChangeLabels = this.onChangeLabels.bind(this);
+    this.onChangeLinkedIssue = this.onChangeLinkedIssue.bind(this);
+    this.onChangeRelation = this.onChangeRelation.bind(this);
     this.onChangeCustomField = this.onChangeCustomField.bind(this);
     this.onChangePublic = this.onChangePublic.bind(this);
     this.onChangeAnother = this.onChangeAnother.bind(this);
     this.onChangeCommentText = this.onChangeCommentText.bind(this);
     this.onAddComment = this.onAddComment.bind(this);
+    this.onAddLinkedIssue = this.onAddLinkedIssue.bind(this);
+    this.onRemoveLinkedIssue = this.onRemoveLinkedIssue.bind(this);
     this.onInputKeyDown = this.onInputKeyDown.bind(this);
     this.onFocusNext = this.onFocusNext.bind(this);
     this.onFocusPrev = this.onFocusPrev.bind(this);
@@ -127,11 +134,15 @@ export default class IssueCompose extends React.Component {
       owner: null,
       cc: [],
       labels: [],
+      linkedIssue: null,
+      linkedIssueMap: Immutable.OrderedMap.of(),
+      relation: Relation.BLOCKED_BY,
       custom: Immutable.Map.of(),
       commentText: '',
       comments: [],
       another: false,
     };
+    this.buildLinkedIssueList(this.state.linkedIssueMap);
   }
 
   componentDidMount() {
@@ -139,13 +150,14 @@ export default class IssueCompose extends React.Component {
     this.reset();
   }
 
-  componentWillUpdate(nextProps) {
+  componentWillUpdate(nextProps, nextState) {
     const thisId = this.props.issue && this.props.issue.id;
     const nextId = nextProps.issue && nextProps.issue.id;
     if (thisId !== nextId) {
       this.reset();
     }
     this.buildTypeMap(nextProps.project);
+    this.buildLinkedIssueList(nextState.linkedIssueMap);
   }
 
   onInputKeyDown(e) {
@@ -197,6 +209,14 @@ export default class IssueCompose extends React.Component {
     this.setState({ labels: selection });
   }
 
+  onChangeLinkedIssue(selection) {
+    this.setState({ linkedIssue: selection });
+  }
+
+  onChangeRelation(selection) {
+    this.setState({ relation: selection });
+  }
+
   onChangeCustomField(id, value) {
     this.setState({ custom: this.state.custom.set(id, value) });
   }
@@ -225,8 +245,30 @@ export default class IssueCompose extends React.Component {
     return Promise.resolve(newComment);
   }
 
+  onAddLinkedIssue(e) {
+    if (e) {
+      e.preventDefault();
+    }
+    const { relation, linkedIssue } = this.state;
+    if (relation && linkedIssue) {
+      // Can't link an issue to itself.
+      if (this.props.issue && linkedIssue.id === this.props.issue.id) {
+        return;
+      }
+      this.setState({
+        linkedIssueMap: this.state.linkedIssueMap.set(linkedIssue.id, relation),
+        linkedIssue: null,
+      });
+    }
+  }
+
+  onRemoveLinkedIssue(id) {
+    this.setState({ linkedIssueMap: this.state.linkedIssueMap.remove(id) });
+  }
+
   onCreate(e) {
     e.preventDefault();
+    this.buildLinkedIssueList(this.state.linkedIssueMap);
     const issue = {
       state: this.state.issueState,
       type: this.state.type,
@@ -235,6 +277,7 @@ export default class IssueCompose extends React.Component {
       owner: this.state.owner ? this.state.owner.username : undefined,
       cc: this.state.cc.map(cc => cc.username),
       labels: this.state.labels.map(label => label.id),
+      linked: this.linkedIssueList,
       custom: [],
       // public: false,
       // comments
@@ -259,6 +302,7 @@ export default class IssueCompose extends React.Component {
     const { project, issue } = this.props;
     const concreteTypes = project.template.types.filter(t => !t.abstract);
     if (issue) {
+      const linked = issue.linked || [];
       this.setState({
         startingState: issue.state,
         issueState: issue.state,
@@ -272,6 +316,9 @@ export default class IssueCompose extends React.Component {
             ? new Immutable.Map(issue.custom.map(custom => [custom.name, custom.value]))
             : Immutable.Map.of(),
         labels: issue.labelsData,
+        linkedIssue: null,
+        linkedIssueMap: new Immutable.OrderedMap(linked.map(({ relation, to }) => [to, relation])),
+        relation: Relation.BLOCKED_BY,
         comments: issue.comments,
         public: !!issue.public,
       });
@@ -289,6 +336,9 @@ export default class IssueCompose extends React.Component {
         custom: Immutable.Map.of(),
         labels: [],
         comments: [],
+        linkedIssue: null,
+        linkedIssueMap: Immutable.OrderedMap.of(),
+        relation: Relation.BLOCKED_BY,
         public: false,
       });
     }
@@ -299,6 +349,11 @@ export default class IssueCompose extends React.Component {
     for (const type of project.template.types) {
       this.templateTypes.set(type.id, type);
     }
+  }
+
+  buildLinkedIssueList(linkedIssueMap) {
+    this.linkedIssueList = linkedIssueMap.map((relation, to) =>
+        ({ relation, to })).toArray();
   }
 
   navigate(dir) {
@@ -382,7 +437,7 @@ export default class IssueCompose extends React.Component {
     const backLink = (location.state && location.state.back) || { pathname: '..' };
     return (<section className="kdt issue-compose">
       <div className="card">
-        <header>New Issue: {project.name}</header>
+        <header>{issue ? 'Edit Issue' : 'New Issue'}: {project.name}</header>
         <section className="content create-issue">
           <div className="left">
             <form ref={el => { this.form = el; }}>
@@ -435,7 +490,7 @@ export default class IssueCompose extends React.Component {
                           placeholder="(unassigned)"
                           selection={this.state.owner}
                           onSelectionChange={this.onChangeOwner}
-                          onFocusNext={this.onFocusNext} />
+                          onEnter={this.onFocusNext} />
                     </td>
                   </tr>
                   <tr>
@@ -448,7 +503,7 @@ export default class IssueCompose extends React.Component {
                             multiple
                             selection={this.state.cc}
                             onSelectionChange={this.onChangeCC}
-                            onFocusNext={this.onFocusNext} />
+                            onEnter={this.onFocusNext} />
                       </div>
                     </td>
                   </tr>
@@ -463,7 +518,7 @@ export default class IssueCompose extends React.Component {
                             project={project}
                             selection={this.state.labels}
                             onSelectionChange={this.onChangeLabels}
-                            onFocusNext={this.onFocusNext} />
+                            onEnter={this.onFocusNext} />
                       </div>
                     </td>
                   </tr>
@@ -478,19 +533,35 @@ export default class IssueCompose extends React.Component {
                   <tr>
                     <th className="header"><ControlLabel>Linked Issues:</ControlLabel></th>
                     <td>
+                      <LinkedIssues
+                          project={project}
+                          links={this.linkedIssueList}
+                          onRemoveLink={this.onRemoveLinkedIssue} />
                       <div className="linked-group">
-                        <DropdownButton bsSize="small" title="Blocked By" id="issue-link-type">
-                          <MenuItem eventKey="1" active>Blocked By</MenuItem>
-                          <MenuItem eventKey="2">Blocks</MenuItem>
-                          <MenuItem eventKey="3">Duplicates</MenuItem>
-                          <MenuItem eventKey="4">Related to</MenuItem>
-                          <MenuItem eventKey="5">Child of</MenuItem>
-                          <MenuItem eventKey="6">Parent of</MenuItem>
+                        <DropdownButton
+                            bsSize="small"
+                            title={Relation.caption[this.state.relation]}
+                            id="issue-link-type"
+                            onSelect={this.onChangeRelation}>
+                          {Relation.values.map(r => (<MenuItem
+                              eventKey={r}
+                              key={r}
+                              active={r === this.state.relation}>{Relation.caption[r]}</MenuItem>))}
                         </DropdownButton>
-                        <Typeahead
-                            className="linked-issue"
-                            options={['new...']} />
-                        <Button bsSize="small">Add</Button>
+                        <div className="ac-shim">
+                          <IssueAutoComplete
+                              className="ac-issue"
+                              project={project}
+                              placeholder="select an issue..."
+                              exclude={issue && issue.id}
+                              selection={this.state.linkedIssue}
+                              onSelectionChange={this.onChangeLinkedIssue}
+                              onEnter={this.onAddLinkedIssue} />
+                        </div>
+                        <Button
+                            bsSize="small"
+                            onClick={this.onAddLinkedIssue}
+                            disabled={!this.state.linkedIssue}>Add</Button>
                       </div>
                     </td>
                   </tr>

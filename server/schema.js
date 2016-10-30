@@ -46,7 +46,10 @@ module.exports = new GraphQLSchema({
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(issueType))),
         args: {
           project: { type: GraphQLID },
-          search: { type: GraphQLString },
+          search: {
+            type: GraphQLString,
+            description: 'Text search string.',
+          },
           type: {
             type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
             description: 'Query term that restricts the issue search to a set of types.',
@@ -110,6 +113,13 @@ module.exports = new GraphQLSchema({
             type: new GraphQLList(GraphQLString),
             description: 'Query term that specifies the field sort order.',
           },
+        },
+      },
+      issueSearch: {
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(issueType))),
+        args: {
+          project: { type: GraphQLID },
+          search: { type: GraphQLString },
         },
       },
       project: {
