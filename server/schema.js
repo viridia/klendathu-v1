@@ -36,16 +36,27 @@ module.exports = new GraphQLSchema({
     name: 'Query',
     fields: {
       issue: {
+        description: 'Retrieve a single issue by id.',
         type: issueType,
         args: {
-          project: { type: new GraphQLNonNull(GraphQLID) },
-          id: { type: new GraphQLNonNull(GraphQLInt) },
+          project: {
+            type: new GraphQLNonNull(GraphQLID),
+            description: 'Project containing the issue being queried.',
+          },
+          id: {
+            type: new GraphQLNonNull(GraphQLInt),
+            description: 'Id of the issue to retrieve.',
+          },
         },
       },
       issues: {
+        description: 'Retrieve issues which meet a set of filter criteria.',
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(issueType))),
         args: {
-          project: { type: GraphQLID },
+          project: {
+            type: GraphQLID,
+            description: 'Project containing the issues being queried.',
+          },
           search: {
             type: GraphQLString,
             description: 'Text search string.',
@@ -116,6 +127,7 @@ module.exports = new GraphQLSchema({
         },
       },
       issueSearch: {
+        description: 'Search for issues by text query, sorted by relevance.',
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(issueType))),
         args: {
           project: { type: GraphQLID },
@@ -123,43 +135,69 @@ module.exports = new GraphQLSchema({
         },
       },
       project: {
+        description: 'Retrieve a project record by id or by name.',
         type: projectType,
         args: {
-          id: { type: GraphQLID },
-          name: { type: GraphQLString },
+          id: {
+            description: 'Id of the project to retrieve.',
+            type: GraphQLID,
+          },
+          name: {
+            description: 'Name of the project to retreive.',
+            type: GraphQLString,
+          },
         },
       },
       projects: {
+        description: 'Retrieve a list of projects.',
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(projectType))),
         args: {
-          id: { type: GraphQLID },
-          name: { type: GraphQLString },
+          name: {
+            type: GraphQLString,
+          },
         },
       },
       projectMembership: {
+        description: 'Information about a project member, including role and settings.',
         type: projectMembershipType,
         args: {
-          project: { type: GraphQLID },
-          user: { type: GraphQLString },
+          project: {
+            type: new GraphQLNonNull(GraphQLID),
+            description: 'Identifier for the project.',
+          },
+          user: {
+            type: GraphQLString,
+            description: 'User name of the user.',
+          },
         },
       },
       projectMemberships: {
+        description: 'Information about a project members, including roles and settings.',
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(projectMembershipType))),
         args: {
-          project: { type: GraphQLID },
+          project: {
+            description: 'Identifier for the project.',
+            type: new GraphQLNonNull(GraphQLID),
+          },
         },
       },
       label: {
         type: labelType,
         args: {
           id: { type: GraphQLInt },
-          project: { type: GraphQLID },
+          project: {
+            description: 'Identifier for the project containing the label.',
+            type: new GraphQLNonNull(GraphQLID),
+          },
         },
       },
       labels: {
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(labelType))),
         args: {
-          project: { type: GraphQLID },
+          project: {
+            description: 'Identifier for the project containing the labels.',
+            type: GraphQLID,
+          },
           token: { type: GraphQLString },
         },
       },
@@ -178,9 +216,11 @@ module.exports = new GraphQLSchema({
         },
       },
       profile: {
+        description: 'Profile of the current logged-in user.',
         type: userType,
       },
       user: {
+        description: 'Query information about a user.',
         type: userType,
         args: {
           username: { type: GraphQLString },
@@ -191,9 +231,13 @@ module.exports = new GraphQLSchema({
         },
       },
       users: {
+        description: 'Look up users matching a search token.',
         type: new GraphQLNonNull(new GraphQLList(userType)),
         args: {
-          token: { type: GraphQLString },
+          token: {
+            type: GraphQLString,
+            description: 'Search token.',
+          },
         },
       },
     },
@@ -202,6 +246,7 @@ module.exports = new GraphQLSchema({
     name: 'Mutation',
     fields: {
       newIssue: {
+        description: 'Create a new issue record.',
         type: new GraphQLNonNull(issueType),
         args: {
           project: {
@@ -215,6 +260,7 @@ module.exports = new GraphQLSchema({
         },
       },
       updateIssue: {
+        description: 'Update an existing issue record.',
         type: new GraphQLNonNull(issueType),
         args: {
           project: {
@@ -232,6 +278,7 @@ module.exports = new GraphQLSchema({
         },
       },
       deleteIssue: {
+        description: 'Delete an issue record.',
         type: new GraphQLNonNull(GraphQLInt),
         args: {
           project: {
@@ -245,6 +292,7 @@ module.exports = new GraphQLSchema({
         },
       },
       addComment: {
+        description: 'Add a comment to an issue.',
         type: new GraphQLNonNull(issueType),
         args: {
           project: {
@@ -262,6 +310,7 @@ module.exports = new GraphQLSchema({
         },
       },
       newLabel: {
+        description: 'Create a new label.',
         type: new GraphQLNonNull(labelType),
         args: {
           project: {
@@ -275,6 +324,7 @@ module.exports = new GraphQLSchema({
         },
       },
       updateLabel: {
+        description: 'Modify an existing label.',
         type: new GraphQLNonNull(labelType),
         args: {
           project: {
@@ -292,6 +342,7 @@ module.exports = new GraphQLSchema({
         },
       },
       deleteLabel: {
+        description: 'Delete a label.',
         type: new GraphQLNonNull(GraphQLInt),
         args: {
           project: {
@@ -305,6 +356,7 @@ module.exports = new GraphQLSchema({
         },
       },
       newProject: {
+        description: 'Create a new project.',
         type: new GraphQLNonNull(projectType),
         args: {
           project: {
@@ -314,6 +366,7 @@ module.exports = new GraphQLSchema({
         },
       },
       updateProject: {
+        description: 'Modify an existing project.',
         type: new GraphQLNonNull(projectType),
         args: {
           id: {
@@ -327,6 +380,7 @@ module.exports = new GraphQLSchema({
         },
       },
       deleteProject: {
+        description: 'Delete a project.',
         type: new GraphQLNonNull(GraphQLID),
         args: {
           id: {
@@ -336,6 +390,7 @@ module.exports = new GraphQLSchema({
         },
       },
       updateProjectMembership: {
+        description: 'Modify the role or settings for a project member.',
         type: new GraphQLNonNull(projectMembershipType),
         args: {
           project: {

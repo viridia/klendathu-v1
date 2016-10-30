@@ -1,6 +1,6 @@
 * What do we need to do to finalize the db format enough that we can start collecting
   real issues (and not worry about having to wipe the db during development?)
-  -- linked issues
+  -- show diffs of custom fields (enum?)
   -- liking comments
   -- liking issues
 * Per-user project settings
@@ -10,6 +10,8 @@
 * Adding label to issues doesn't invalidate query.
   * More generally, invalidating issue queries doesn't work.
 * Get rid of typeahead
+  * We'll need a slightly different autocomplete than the one we use for labels and users.
+    (One which allows new items).
 * Editing comments
 * Deleting comments
 * Adding comments in the edit page.
@@ -43,6 +45,8 @@
 * Delete project memberships when deleting projects and/or users.
 * Don't allow people to be added to project if they are already members.
 * User autocomplete has a bug where it gets stuck sometimes.
+* Limit projects query to projects the user can see.
+* Make sure deleting an issue cascades to linked issues.
 
 URLS:
   https://github.com/mlabieniec/complexity

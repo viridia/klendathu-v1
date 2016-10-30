@@ -59,11 +59,11 @@ class LeftNav extends React.Component {
           icon={<BookmarkIcon />}
           title="Saved Queries"
           path={`/project/${project.name}/queries`} />
-      <NavItem icon={<AppsIcon />} title="Dashboard" onlyActiveOnIndex path="/" />
       <NavItem
           icon={<SettingsIcon />}
           title="Project Settings"
           path={`/project/${project.name}/settings`} />
+      <NavItem icon={<AppsIcon />} title="Dashboard" onlyActiveOnIndex path="/" />
     </nav>);
   }
 }
