@@ -14,10 +14,10 @@ const schema = require('./schema');
 const RootResolver = require('./resolvers/root');
 const logger = require('./common/logger');
 
-// Constants
+// Environment
 const debug = process.env.NODE_ENV !== 'production';
-const PORT = 8080;
-const DB_URL = 'mongodb://localhost:27017/klendathu';
+const PORT = process.env.PORT || 8080;
+const DB_URL = process.env.MONGODB_URI || 'mongodb://localhost:27017/klendathu';
 
 // Promise which returns database connection.
 const mongo = MongoClient.connect(DB_URL).catch(err => {
