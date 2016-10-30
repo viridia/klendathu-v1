@@ -39,7 +39,7 @@ class CustomTextField extends React.Component {
           value={value}
           maxLength={field.max_length}
           onChange={this.onChange} />
-      );
+    );
   }
 }
 
@@ -81,7 +81,7 @@ class CustomSuggestField extends React.Component {
           allowNew
           newSelectionPrefix=""
           emptyLabel="No suggestions" />
-      );
+    );
   }
 }
 

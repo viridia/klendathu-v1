@@ -50,7 +50,7 @@ module.exports = {
   // devtool: debug ? 'cheap-eval-source-map' : 'hidden-source-map',
   devtool: debug ? 'inline-source-map' : 'hidden-source-map',
   module: {
-    loaders: [
+    rules: [
       {
         // Compile JS with Babel.
         test: /\.jsx?$/,
@@ -71,7 +71,9 @@ module.exports = {
               ],
             },
           },
-          'eslint',
+          {
+            loader: 'eslint',
+          }
         ],
       },
       {
