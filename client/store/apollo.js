@@ -20,5 +20,5 @@ export default new ApolloClient({
     }
     return null;
   },
-  // shouldBatch: true,
+  shouldBatch: true,
 });
