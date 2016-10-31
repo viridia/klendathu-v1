@@ -63,6 +63,16 @@ class LoginPage extends React.Component {
   render() {
     const canSubmit = this.state.userName.length > 1 && this.state.password.length > 1;
     const { next } = this.props.location.state || {};
+    let nextUrl = '';
+    if (next) {
+      const loc = browserHistory.createLocation(next);
+      nextUrl = loc.pathname;
+      if (loc.search) {
+        nextUrl += loc.search;
+      }
+      nextUrl = `?next=${encodeURIComponent(nextUrl)}`;
+    }
+// http://localhost:8080/project/test-project/issues?label=18
     return (<div className="kdt page">
       <Header location={this.props.location} params={this.props.params} />
       <div className="login-content">
@@ -101,9 +111,9 @@ class LoginPage extends React.Component {
           </form>
           <div className="divider" />
           <div className="providers">
-            <Button bsStyle="primary">Log in with Google</Button>
-            <Button bsStyle="primary">Log in with Twitter</Button>
-            <Button bsStyle="primary">Log in with Github</Button>
+            <Button bsStyle="primary" href={`/auth/google${nextUrl}`}>Log in with Google</Button>
+            <Button bsStyle="primary" href="/auth/github">Log in with Github</Button>
+            <Button bsStyle="primary" href="/auth/other">Something else?</Button>
           </div>
         </div>
         <div className="login-spacer-after" />

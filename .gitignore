@@ -4,3 +4,4 @@ node_modules
 log/
 builds/
 npm-debug.log
+auth.config.json

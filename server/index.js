@@ -38,14 +38,6 @@ mongo.then(db => {
   // Store db handle on the application object for convenience.
   app.db = db;
 
-  // Cross-domain config for local testing.
-  // const allowCrossDomain = (req, res, next) => {
-  //   res.header('Access-Control-Allow-Origin', 'http://localhost:8081');
-  //   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  //   res.header('Access-Control-Allow-Headers', 'Content-Type');
-  //   next();
-  // };
-
   // Make our db accessible to our router
   app.use((req, res, next) => {
     req.db = app.db;
@@ -68,12 +60,12 @@ mongo.then(db => {
   app.use('/favicon', express.static(path.join(__dirname, '../client/media/favicon')));
   app.use('/builds', express.static(path.join(__dirname, '../builds')));
 
+  // Initialize passport on /api route only.
+  app.use(passport.initialize());
+  app.use(passport.session());
+
   // Set up AJAX routes.
   const apiRouter = express.Router(); // eslint-disable-line new-cap
-
-  // Initialize passport on /api route only.
-  apiRouter.use(passport.initialize());
-  apiRouter.use(passport.session());
 
   // TODO: Break passport initialization into it's own module.
   authActions(app, apiRouter);

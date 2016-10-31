@@ -34,6 +34,7 @@ const Routes = (
             <Route component={IssueList} path="/project/:project/issues" />
             <Route component={LabelList} path="/project/:project/labels" />
             <Route component={ProjectSettings} path="/project/:project/settings" />
+            <IndexRoute component={Dashboard} />
           </Route>
           <IndexRoute component={Dashboard} />
           <Route component={ProfilePage} path="/profile" />
