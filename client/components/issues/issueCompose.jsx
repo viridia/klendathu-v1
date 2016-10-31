@@ -120,7 +120,6 @@ export default class IssueCompose extends React.Component {
     this.onFocusPrev = this.onFocusPrev.bind(this);
     this.onCreate = this.onCreate.bind(this);
     this.me = { id: context.profile.username, label: context.profile.username };
-    this.templateTypes = new Map();
     this.state = {
       prevState: 'new',
       issueState: 'new',
@@ -146,7 +145,6 @@ export default class IssueCompose extends React.Component {
   }
 
   componentDidMount() {
-    this.buildTypeMap(this.props.project);
     this.reset();
   }
 
@@ -156,7 +154,6 @@ export default class IssueCompose extends React.Component {
     if (thisId !== nextId) {
       this.reset();
     }
-    this.buildTypeMap(nextProps.project);
     this.buildLinkedIssueList(nextState.linkedIssueMap);
   }
 
@@ -282,7 +279,8 @@ export default class IssueCompose extends React.Component {
       // public: false,
       // comments
     };
-    const issueType = this.templateTypes.get(issue.type);
+    const { project } = this.props;
+    const issueType = project.template.typesById.get(issue.type);
     const fields = this.customFieldList(issueType);
     for (const field of fields) {
       const fieldValue = this.state.custom.get(field.id) || field.default;
@@ -328,7 +326,8 @@ export default class IssueCompose extends React.Component {
         prevState: initialState,
         issueState: initialState,
         // If current type is valid then keep it, otherwise default to the first type.
-        type: this.templateTypes.has(this.state.type) ? this.state.type : concreteTypes[0].id,
+        type: project.template.typesById.has(this.state.type)
+            ? this.state.type : concreteTypes[0].id,
         summary: '',
         description: '',
         reporter: this.me,
@@ -342,13 +341,6 @@ export default class IssueCompose extends React.Component {
         relation: Relation.BLOCKED_BY,
         public: false,
       });
-    }
-  }
-
-  buildTypeMap(project) {
-    this.templateTypes = new Map();
-    for (const type of project.template.types) {
-      this.templateTypes.set(type.id, type);
     }
   }
 
@@ -380,8 +372,9 @@ export default class IssueCompose extends React.Component {
 
   customFieldList(issueType) {
     let fields = [];
+    const { project } = this.props;
     if (issueType.extends && issueType.extends.startsWith('./')) {
-      const parentType = this.templateTypes.get(issueType.extends.slice(2));
+      const parentType = project.template.typesById.get(issueType.extends.slice(2));
       if (parentType) {
         fields = this.customFieldList(parentType);
       }
@@ -425,7 +418,8 @@ export default class IssueCompose extends React.Component {
   }
 
   renderTemplateFields() {
-    const issueType = this.templateTypes.get(this.state.type);
+    const { project } = this.props;
+    const issueType = project.template.typesById.get(this.state.type);
     const result = [];
     if (issueType) {
       return this.renderCustomFields(issueType, result);

@@ -37,6 +37,7 @@ class IssueDetails extends React.Component {
     });
   }
 
+  /** Compute the next and previous issue id given the list of issue ids passed in. */
   navState(props) {
     const { location: { state }, data: { issue } } = props;
     let prevIssue = null;
@@ -53,50 +54,49 @@ class IssueDetails extends React.Component {
     return { prevIssue, nextIssue };
   }
 
-  renderTemplateFields() {
-    return null;
-  }
-
-  renderChange(change, index) {
+  // TODO: combine this with the one in issueCompose?
+  customFieldList(issueType) {
+    let fields = [];
     const { project } = this.props;
-    return (<section className="change-entry" key={index}>
-      <ul className="field-change-list">
-        {change.type && (<li className="field-change">
-            type: {change.type.before} to {change.type.after}
-          </li>)}
-        {change.state &&
-          <li className="field-change">state: {change.state.before} to {change.state.after}</li>}
-        {change.summary && (<li className="field-change">
-          summary: {change.summary.before} to {change.summary.after}
-        </li>)}
-        {change.owner &&
-          <li className="field-change">owner: {change.owner.before} to {change.owner.after}</li>}
-        {change.cc && change.cc.added && change.cc.added.map(cc =>
-          (<li className="field-change" key={cc}>added <UserName user={cc} full /> to cc</li>))}
-        {change.cc && change.cc.removed && change.cc.removed.map(cc =>
-          (<li className="field-change" key={cc}>removed <UserName user={cc} full /> from cc</li>))}
-        {change.labels && change.labels.added && change.labels.added.map(l =>
-          (<li className="field-change" key={l}>
-            added label <LabelName label={l} project={project.id} key={l} />
-          </li>))}
-        {change.labels && change.labels.removed && change.labels.removed.map(l =>
-          (<li className="field-change" key={l}>
-            removed label <LabelName label={l} project={project.id} key={l} />
-          </li>))}
-      </ul>
-    </section>);
+    if (issueType.extends && issueType.extends.startsWith('./')) {
+      const parentType = project.template.typesById.get(issueType.extends.slice(2));
+      if (parentType) {
+        fields = this.customFieldList(parentType);
+      }
+    }
+    if (issueType.fields) {
+      fields = fields.concat(issueType.fields);
+    }
+    return fields;
   }
 
-  renderChangeLog() {
-    const { issue } = this.props.data;
-    if (!issue.changes) {
-      return null;
+  renderTemplateFields(issueType, custom) {
+    const result = [];
+    const fields = this.customFieldList(issueType);
+    const customMap = new Map(custom.map(field => [field.name, field.value]));
+    for (const field of fields) {
+      const value = customMap.get(field.id);
+      if (value) {
+        switch (field.type) {
+          case 'TEXT':
+            result.push(<tr key={field.id}>
+              <th>{field.caption}:</th>
+              <td>{value}</td>
+            </tr>);
+            break;
+          case 'ENUM':
+            result.push(<tr key={field.id}>
+              <th>{field.caption}:</th>
+              <td>{value}</td>
+            </tr>);
+            break;
+          default:
+            console.error('invalid field type:', field.type);
+            break;
+        }
+      }
     }
-    return (
-      <div>
-        {issue.changes.map((ch, index) => this.renderChange(ch, index))}
-      </div>
-    );
+    return result;
   }
 
   render() {
@@ -109,8 +109,9 @@ class IssueDetails extends React.Component {
     if (!issue) {
       return <section className="kdt issue-details" />;
     }
+    const { labels = [], comments = [], changes = [], linked = [], custom = [] } = issue;
+    const issueType = project.template.typesById.get(issue.type);
     const backLink = (location.state && location.state.back) || { pathname: '..' };
-    const linkedIssues = issue.linked || [];
     return (<section className="kdt issue-details">
       <section className="card">
         <header>
@@ -190,12 +191,12 @@ class IssueDetails extends React.Component {
                   </td>
                 </tr>
               )}
-              {this.renderTemplateFields()}
-              {issue.labels.length > 0 && (
+              {this.renderTemplateFields(issueType, custom)}
+              {labels.length > 0 && (
                 <tr>
                   <th className="header labels">Labels:</th>
                   <td>
-                    {issue.labels.map(label =>
+                    {labels.map(label =>
                       <LabelName label={label} project={project.id} key={label} />)}
                   </td>
                 </tr>
@@ -208,29 +209,27 @@ class IssueDetails extends React.Component {
                   </div>
                 </td>
               </tr>
-              {linkedIssues.length > 0 && <tr>
+              {linked.length > 0 && <tr>
                 <th className="header linked">Linked Issues:</th>
                 <td>
                   <LinkedIssues
                       project={project}
-                      links={linkedIssues}
+                      links={linked}
                       onRemoveLink={this.onRemoveLinkedIssue} />
                 </td>
               </tr>}
-              <tr>
-                <th className="header">Issue History:</th>
+              {(comments || changes) && <tr>
+                <th className="header history">Issue History:</th>
                 <td>
                   <IssueChanges
-                      issue={issue} comments={issue.comments} changes={issue.changes}
+                      issue={issue} comments={comments} changes={changes}
                       project={project} onAddComment={this.onAddComment} />
                 </td>
-              </tr>
+              </tr>}
               <tr>
                 <th className="header" />
                 <td>
-                  <CommentEdit
-                      issue={issue} comments={issue.comments}
-                      project={project} onAddComment={this.onAddComment} />
+                  <CommentEdit issue={issue} project={project} onAddComment={this.onAddComment} />
                 </td>
               </tr>
             </tbody>

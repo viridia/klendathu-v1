@@ -12,13 +12,10 @@
 * Get rid of typeahead
   * We'll need a slightly different autocomplete than the one we use for labels and users.
     (One which allows new items).
-* Editing comments
-* Deleting comments
 * Adding comments in the edit page.
 * A way to delete an issue
   * Individual delete
   * Mass edit
-* Custom sorting by column
 * UpdateQueries
   * Issue list
   * User list (in autocomplete).

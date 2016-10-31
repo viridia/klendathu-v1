@@ -65,7 +65,7 @@ function Change({ change, project }) {
   function customChange({ name, before, after }) { // eslint-disable-line
     return (
       <li className="field-change custom-field" key={name}>
-        changed <span className="custom-name">
+        changed <span className="field-name">
           {name}
         </span> from {customValue(before)} to {customValue(after)}
       </li>);
@@ -96,7 +96,9 @@ function Change({ change, project }) {
           </span>
         </li>)}
       {change.summary && (<li className="field-change">
-        summary: {change.summary.before} to {change.summary.after}
+        changed <span className="field-name">summary</span> from &quot;
+        {change.summary.before}&quot; to &quot;
+        {change.summary.after}&quot;
       </li>)}
       {change.owner &&
         <li className="field-change">owner: {change.owner.before} to {change.owner.after}</li>}
