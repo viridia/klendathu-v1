@@ -7,6 +7,7 @@ const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
 const fs = require('fs');
 const path = require('path');
+const url = require('url');
 
 function serializeProfile(profile) {
   return {
@@ -35,6 +36,20 @@ function loadAuthConfig() {
 module.exports = function (app, apiRouter) {
   const users = app.db.collection('users');
   const config = Object.assign(loadAuthConfig(), process.env);
+
+  function makeCallbackUrl(req, pathname) {
+    const urlParams = {
+      pathname,
+      search: req.search,
+    };
+    if (config.USE_HTTPS) {
+      urlParams.protocol = 'https:';
+    }
+    if (config.HOST) {
+      urlParams.host = config.HOST;
+    }
+    return url.format(urlParams);
+  }
 
   // Set up local username+password strategy
   passport.use(new LocalStrategy({
@@ -76,7 +91,7 @@ module.exports = function (app, apiRouter) {
           // User with matching email in our database
           // TODO: update photo if they don't have one. (Do we want to remember where the photo
           // came from and auto-update if it's from the same source?)
-          logger.info('Found google user:', user);
+          // logger.info('Found google user:', user.username);
           done(null, user);
         } else {
           // User not found, insert new user into the database.
@@ -111,8 +126,7 @@ module.exports = function (app, apiRouter) {
       // console.log('query:', req.query, req.protocol, req.hostname, req.baseUrl, req.originalUrl);
       passport.authenticate('google', {
         scope: ['openid', 'email', 'profile'],
-        // callbackURL: '/auth/google/callback',
-        callbackURL: `${req.protocol}://${req.hostname}/auth/google/callback`,
+        callbackURL: makeCallbackUrl(req, '/auth/google/callback'),
       })(req, res, next);
     });
 
@@ -172,9 +186,9 @@ module.exports = function (app, apiRouter) {
 
     app.get('/auth/github', (req, res, next) => {
       // console.log('query:', req.query, req.protocol, req.hostname);
-      passport.authenticate('google', {
+      passport.authenticate('github', {
         scope: ['openid', 'email', 'profile'],
-        callbackURL: '/auth/github/callback',
+        callbackURL: makeCallbackUrl(req, '/auth/github/callback'),
       })(req, res, next);
     });
 
