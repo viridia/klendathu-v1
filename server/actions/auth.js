@@ -68,7 +68,7 @@ module.exports = function (app, apiRouter) {
     passport.use(new GoogleStrategy({
       clientID: config.GOOGLE_CLIENT_ID,
       clientSecret: config.GOOGLE_CLIENT_SECRET,
-      callbackURL: config.GOOGLE_CALLBACK_URL,
+      callbackURL: '/auth/google/callback',
     }, (accessToken, refreshToken, profile, done) => {
       const emails = profile.emails.map(em => em.value);
       users.findOne({ email: { $in: emails } }).then(user => {
@@ -108,8 +108,11 @@ module.exports = function (app, apiRouter) {
     }));
 
     app.get('/auth/google', (req, res, next) => {
+      // console.log('query:', req.query, req.protocol, req.hostname, req.baseUrl, req.originalUrl);
       passport.authenticate('google', {
         scope: ['openid', 'email', 'profile'],
+        callbackURL: '/auth/google/callback',
+        // callbackURL: `${req.protocol}://${req.hostname}:${req.port}/auth/google/callback`,
       })(req, res, next);
     });
 
@@ -126,7 +129,7 @@ module.exports = function (app, apiRouter) {
     passport.use(new GitHubStrategy({
       clientID: config.GITHUB_CLIENT_ID,
       clientSecret: config.GITHUB_CLIENT_SECRET,
-      callbackURL: config.GITHUB_CALLBACK_URL,
+      callbackURL: '/auth/github/callback',
     }, (accessToken, refreshToken, profile, done) => {
       const emails = profile.emails.map(em => em.value);
       users.findOne({ email: { $in: emails } }).then(user => {
@@ -167,8 +170,13 @@ module.exports = function (app, apiRouter) {
       });
     }));
 
-    app.get('/auth/github',
-      passport.authenticate('github', { scope: ['openid', 'email', 'profile'] }));
+    app.get('/auth/github', (req, res, next) => {
+      // console.log('query:', req.query, req.protocol, req.hostname);
+      passport.authenticate('google', {
+        scope: ['openid', 'email', 'profile'],
+        callbackURL: '/auth/github/callback',
+      })(req, res, next);
+    });
 
     app.get('/auth/github/callback',
       passport.authenticate('github', { failureRedirect: '/login' }),
