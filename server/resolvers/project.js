@@ -52,6 +52,13 @@ const resolverMethods = {
       if (this.user && this.user.username === project.owningUser) {
         return [project, Role.OWNER];
       }
+      if (!this.user) {
+        if (project.public) {
+          return [project, Role.NONE];
+        } else {
+          return [null, Role.NONE];
+        }
+      }
       return this.db.collection('projectMemberships').findOne(
         { user: this.user.username, project: project._id })
       .then(mb => {

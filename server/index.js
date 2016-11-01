@@ -103,8 +103,9 @@ mongo.then(db => {
   }
 
   app.listen(PORT);
-  logger.info(`Running on http://localhost: ${PORT}`);
   if (!debug) {
     logger.info('Running production build.');
+  } else {
+    logger.info(`Running on http://localhost: ${PORT}`);
   }
 });

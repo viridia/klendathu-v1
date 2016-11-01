@@ -34,7 +34,7 @@ export default class CommentEdit extends React.Component {
             componentClass="textarea"
             disabled={role < Role.REPORTER}
             value={this.state.newComment}
-            placeholder="Leave a comment..."
+            placeholder="Leave a comment... (markdown format supported)"
             onChange={this.onChangeCommentBody} />
         <Button
             title="add comment"

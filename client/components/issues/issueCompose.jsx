@@ -476,7 +476,7 @@ export default class IssueCompose extends React.Component {
                           className="description"
                           componentClass="textarea"
                           value={this.state.description}
-                          placeholder="description of this issue"
+                          placeholder="description of this issue (markdown format supported)"
                           onChange={this.onChangeDescription} />
                     </td>
                   </tr>
