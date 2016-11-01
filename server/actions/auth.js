@@ -2,6 +2,7 @@ const passport = require('passport');
 const bcrypt = require('bcrypt');
 const { Strategy: LocalStrategy } = require('passport-local');
 const { OAuth2Strategy: GoogleStrategy } = require('passport-google-oauth');
+const { Strategy: GitHubStrategy } = require('passport-github2');
 const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
 const fs = require('fs');
@@ -62,7 +63,7 @@ module.exports = function (app, apiRouter) {
     });
   }));
 
-  // Enable Google auth if config vars are present.
+  // Google OAuth2 login.
   if (config.GOOGLE_CLIENT_ID && config.GOOGLE_CLIENT_SECRET) {
     passport.use(new GoogleStrategy({
       clientID: config.GOOGLE_CLIENT_ID,
@@ -87,6 +88,7 @@ module.exports = function (app, apiRouter) {
           logger.info('User not found, attempting to create a user with email:', primaryEmail);
           // Note that we don't have a username or password. We'll ask them for a username later.
           // In the mean time we'll use their email as their username.
+          // TODO: test this
           users.insertOne({
             fullname: profile.displayName,
             email: primaryEmail.value,
@@ -99,7 +101,7 @@ module.exports = function (app, apiRouter) {
             logger.info('Google user creation successful:', primaryEmail);
             done(null, u.ops[0]);
           }, reason => {
-            logger.error('User creation error:', reason);
+            logger.error('Google user creation error:', reason);
             done({ err: 'internal' });
           });
         }
@@ -114,6 +116,63 @@ module.exports = function (app, apiRouter) {
 
     app.get('/auth/google/callback',
       passport.authenticate('google', { failureRedirect: '/login' }),
+      (req, res) => {
+        // console.log('req:', req.query);
+        res.redirect('/');
+      });
+  }
+
+  // Github OAuth2 login.
+  if (config.GITHUB_CLIENT_ID && config.GITHUB_CLIENT_SECRET) {
+    passport.use(new GitHubStrategy({
+      clientID: config.GITHUB_CLIENT_ID,
+      clientSecret: config.GITHUB_CLIENT_SECRET,
+      callbackURL: '/auth/github/callback',
+    }, (accessToken, refreshToken, profile, done) => {
+      const emails = profile.emails.map(em => em.value);
+      users.findOne({ email: { $in: emails } }).then(user => {
+        if (user) {
+          // User with matching email in our database
+          // TODO: update photo if they don't have one. (Do we want to remember where the photo
+          // came from and auto-update if it's from the same source?)
+          logger.info('Found github user:', user);
+          done(null, user);
+        } else {
+          // User not found, insert new user into the database.
+          logger.info('No user found with emails:', emails);
+          logger.info('User not found, attempting to create a user with email:', emails[0]);
+          // Note that we don't have a username or password. We'll ask them for a username later.
+          // In the mean time we'll use their email as their username.
+          users.insertOne({
+            // TODO: test this
+            // profile.username
+            fullname: profile.displayName,
+            loginUsername: profile.username, // Save so that we can suggest a unique user name
+            email: emails[0],
+            photo: profile._json && profile._json.avatar_url,
+            photoSource: 'github', // Remember photo came from Github.
+            projects: [],
+            organizations: [],
+            verified: false,
+          }).then(u => {
+            logger.info('Github user creation successful:', emails[0]);
+            done(null, u.ops[0]);
+          }, reason => {
+            logger.error('Github user creation error:', reason);
+            done({ err: 'internal' });
+          });
+        }
+      }, err => {
+        logger.error('Github login error:', err);
+        done(err);
+      });
+    }));
+
+    app.get('/auth/github',
+      passport.authenticate('github', { scope: ['openid', 'email', 'profile'] }));
+
+    app.get('/auth/github/callback',
+      passport.authenticate('github', { failureRedirect: '/login' }),
       (req, res) => {
         // console.log('req:', req.query);
         res.redirect('/');
