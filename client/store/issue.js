@@ -19,7 +19,7 @@ export function updateIssue(project, id, issue) {
     mutation: UpdateIssueMutation,
     variables: { id, project, issue },
     fragments: IssueContent,
-    refetchQueries: ['issueListQuery'],
+    refetchQueries: ['issueListQuery', 'issueDetailsQuery'],
   });
 }
 

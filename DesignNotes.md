@@ -4,10 +4,8 @@
   -- liking issues
 * Per-user project settings
   * Label hot list
-  * Stored queries
-    * Should stored queries include which labels to show?
-* Adding label to issues doesn't invalidate query.
-  * More generally, invalidating issue queries doesn't work.
+* Make sure that queries are invalidated by updated.
+  * Mostly this applies to plural queries.
 * Get rid of typeahead
   * We'll need a slightly different autocomplete than the one we use for labels and users.
     (One which allows new items and editable suggestions).

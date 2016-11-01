@@ -118,12 +118,11 @@ class IssueDetails extends React.Component {
           <LinkContainer to={backLink}>
             <Button title="Back to issue list" className="issue-up"><ArrowUpIcon /></Button>
           </LinkContainer>
-          <section className="title">
-            <div className="issue-id">Issue #{issue.id}: </div>
-            <div className="issue-summary">{issue.summary}</div>
-          </section>
-          <div className="issue-type">{issue.type}</div>
-          <div className="divider" />
+          <div className="issue-id">Issue #{issue.id}: </div>
+          <div className="summary">{issue.summary}</div>
+          <div className="stretch">
+            <div className="issue-type">{issue.type}</div>
+          </div>
           <ButtonGroup className="issue-actions">
             <LinkContainer
                 to={{
@@ -156,6 +155,12 @@ class IssueDetails extends React.Component {
         <section className="content">
           <table className="create-issue-table form-table">
             <tbody>
+              {issue.summary.length > 0 && (
+                <tr>
+                  <th className="header">Summary:</th>
+                  <td>{issue.summary}</td>
+                </tr>
+              )}
               {issue.description.length > 0 && (
                 <tr>
                   <th className="header">Description:</th>

@@ -4,33 +4,46 @@
   flex: 1;
   display: flex;
   align-items: stretch;
+  overflow-x: hidden;
 
   .card {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    overflow-x: hidden;
 
     header {
       display: flex;
       align-items: center;
       padding: 6px;
-      min-height: 36px;
-
-      > .title {
-        display: flex;
-        font-size: 120%;
-        > .issue-id, > .issue-summary {
-          margin-left: 8px;
-        }
-      }
+      white-space: nowrap;
 
       > .issue-up {
         align-self: stretch;
       }
 
-      > .divider {
+      > .issue-id {
+        font-size: 120%;
+        margin-left: 8px;
+      }
+
+      > .summary {
+        font-size: 120%;
+        overflow-x: hidden;
+        margin-left: 8px;
+        text-overflow: ellipsis;
+      }
+
+      > .stretch {
         flex: 1;
+        > .issue-type {
+          display: inline-block;
+          background-color: #faf;
+          padding: 2px 8px;
+          border-radius: 3px;
+          margin-left: 8px;
+        }
       }
 
       > .issue-actions, .issue-nav {
@@ -39,19 +52,12 @@
         align-items: stretch;
         align-self: stretch;
       }
-
-      > .issue-type {
-        display: inline-block;
-        background-color: #faf;
-        padding: 2px 8px;
-        border-radius: 3px;
-        margin-left: 8px;
-      }
     }
 
     > .content {
       padding-right: 8px;
       overflow-y: auto;
+      flex: 1;
     }
 
     .create-issue-table {
@@ -92,7 +98,6 @@
     }
 
     .field-change-list {
-      white-space: normal;
       .user-name {
         display: inline-block;
       }

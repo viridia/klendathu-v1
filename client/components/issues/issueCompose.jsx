@@ -432,7 +432,11 @@ export default class IssueCompose extends React.Component {
     const backLink = (location.state && location.state.back) || { pathname: '..' };
     return (<section className="kdt issue-compose">
       <div className="card">
-        <header>{issue ? 'Edit Issue' : 'New Issue'}: {project.name}</header>
+        <header>
+          {issue
+            ? <span>Edit Issue #{issue.id}</span>
+            : <span>New Issue: {project.name}</span>}
+        </header>
         <section className="content create-issue">
           <div className="left">
             <form ref={el => { this.form = el; }} name="lastpass-disable-search">
