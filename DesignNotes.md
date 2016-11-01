@@ -1,6 +1,5 @@
 * What do we need to do to finalize the db format enough that we can start collecting
   real issues (and not worry about having to wipe the db during development?)
-  -- show diffs of custom fields (enum?)
   -- liking comments
   -- liking issues
 * Per-user project settings
@@ -11,10 +10,10 @@
   * More generally, invalidating issue queries doesn't work.
 * Get rid of typeahead
   * We'll need a slightly different autocomplete than the one we use for labels and users.
-    (One which allows new items).
+    (One which allows new items and editable suggestions).
 * Adding comments in the edit page.
 * A way to delete an issue
-  * Individual delete
+  * Individual delete - make sure to unlink related items.
   * Mass edit
 * UpdateQueries
   * Issue list
@@ -38,11 +37,12 @@
 * option to add label to hot list when creating it
 * Undo mode (set deleted flag) for issues, labels, projects.
 * Show linked issues hierarchically
-* Need a way to create Mongo indices programmatically.
+* Create Mongo indices programmatically. (Measure first).
 * Delete project memberships when deleting projects and/or users.
 * Don't allow people to be added to project if they are already members.
-* User autocomplete has a bug where it gets stuck sometimes.
+* User autocomplete has a bug where it gets stuck sometimes. (General ac problem).
 * Limit projects query to projects the user can see.
+  * Partly done.
 * Make sure deleting an issue cascades to linked issues.
 
 URLS:
@@ -152,8 +152,6 @@ Changelog entries:
     ]
 
 Things to experiment with:
-  -- Nginx config and https
-  -- Hot loading 3?
   -- TypeScript on the server? (Need to re-read the typescript language docs.)
     (Typescript isn't that useful for this particular server.)
   -- New React Router? (Can't because we depend on LinkContainer)

@@ -11,13 +11,16 @@ function serialize(project, props = {}) {
   props);
 }
 
-// TODO: Move to a roles file.
-function getRole(db, project, user) {
+function getRole(db, project, user, memberships = []) {
   if (!user) {
     return Role.NONE;
   } else if (project.owningUser && project.owningUser === user.username) {
     return Role.OWNER;
   } else {
+    const mb = memberships.find(m => m.project.equals(project._id));
+    if (mb) {
+      return mb.role;
+    }
     return Role.NONE;
   }
 }
@@ -49,9 +52,15 @@ const resolverMethods = {
       if (this.user && this.user.username === project.owningUser) {
         return [project, Role.OWNER];
       }
-      // TODO: Lookup user role.
-      // TODO: Return null for project if it's private and user is not a member.
-      return [project, Role.NONE];
+      return this.db.collection('projectMemberships').findOne(
+        { user: this.user.username, project: project._id })
+      .then(mb => {
+        if (mb) {
+          return [project, mb.role];
+        }
+        // TODO: Return null for project if it's private and user is not a member.
+        return [project, Role.NONE];
+      });
     });
   },
 
@@ -77,7 +86,7 @@ const resolverMethods = {
     return this.db.collection('projectMemberships').find({ user: this.user.username }).toArray()
     .then(memberships => {
       // Query all projects for which this user is an owner or a member.
-      const projectIdList = memberships.map(m => m._id);
+      const projectIdList = memberships.map(m => m.project);
       const query = {
         deleted: false,
         $or: [
@@ -93,7 +102,8 @@ const resolverMethods = {
         const results = [];
         for (const p of projects) {
           // TODO: Need a specialized version of lookup role
-          const role = getRole(this.db, p, this.user);
+          // Use memberships defined above.
+          const role = getRole(this.db, p, this.user, memberships);
           results.push(serialize(p, { role }));
         }
         return results;
