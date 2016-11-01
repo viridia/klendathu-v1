@@ -23,7 +23,6 @@
   * Will be easier once we have some data
   * Get rid of typeahead
 * return key to navigate between fields (all dialogs)
-* Make sure all dialogs have proper autoFocus.
 * escape to dismiss menus
 * make note about #hash tags and @mentions
 * Simplify rendering of suggestionsSuffix in autocomplete
@@ -129,25 +128,10 @@ issues: [
       {
         milestone: ? (Need a way to add to milestones other than via editing template).
           -- or is it just a label?
-        name: 'due by',
-        type: 'date',
       }
     ],
   }
 ]
-
-Changelog entries:
-  -- separate table or part of issue?
-  -- changes: [
-      {
-        by: user, at: time, fields: [
-          {
-            name: description,
-            before: '',
-            after: '',
-          }
-        ]
-    ]
 
 Things to experiment with:
   -- TypeScript on the server? (Need to re-read the typescript language docs.)

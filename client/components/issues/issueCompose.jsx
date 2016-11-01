@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { browserHistory } from 'react-router';
 import Immutable from 'immutable';
 import { LinkContainer } from 'react-router-bootstrap';
 import Button from 'react-bootstrap/lib/Button';
@@ -293,6 +294,11 @@ export default class IssueCompose extends React.Component {
     }
     return this.props.onSave(this.props.issue ? this.props.issue.id : undefined, issue).then(() => {
       this.reset();
+      if (!this.props.issue && !this.state.another) {
+        const { location } = this.props;
+        const back = (location.state && location.state.back) || { pathname: '..' };
+        browserHistory.push(back);
+      }
     });
   }
 
