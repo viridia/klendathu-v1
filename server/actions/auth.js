@@ -111,8 +111,8 @@ module.exports = function (app, apiRouter) {
       // console.log('query:', req.query, req.protocol, req.hostname, req.baseUrl, req.originalUrl);
       passport.authenticate('google', {
         scope: ['openid', 'email', 'profile'],
-        callbackURL: '/auth/google/callback',
-        // callbackURL: `${req.protocol}://${req.hostname}:${req.port}/auth/google/callback`,
+        // callbackURL: '/auth/google/callback',
+        callbackURL: `${req.protocol}:///auth/google/callback`,
       })(req, res, next);
     });
 
