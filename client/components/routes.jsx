@@ -14,6 +14,7 @@ import ProjectSettings from './settings/projectSettings.jsx';
 import ProfilePage from './profile/profilePage.jsx';
 import LoginPage from './login/loginPage.jsx';
 import SignUpPage from './login/signupPage.jsx';
+import FinishSignUpPage from './login/finishSignupPage.jsx';
 import GraphQLPage from './debug/graphiql.jsx';
 import NotFound from './common/notFound.jsx';
 import client from '../store/apollo';
@@ -25,6 +26,7 @@ const Routes = (
       <Router history={browserHistory}>
         <Route component={LoginPage} path="/login" />
         <Route component={SignUpPage} path="/signup" />
+        <Route component={FinishSignUpPage} path="/finishSignup" />
         <Route component={Page} path="/">
           <Route component={GraphQLPage} path="/gql" />
           <Route component={ProjectPage} path="/project/:project">

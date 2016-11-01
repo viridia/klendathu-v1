@@ -12,7 +12,7 @@
   display: flex;
   padding: 8px;
 
-  > .login-form {
+  > .login-form, .finish-signup-form {
     > .button-row {
       display: flex;
       justify-content: space-between;
@@ -20,6 +20,12 @@
         margin-left: 8px;
       }
     }
+  }
+
+  > .finish-signup-form > header {
+    font-weight: bold;
+    font-size: 140%;
+    margin-bottom: 8px;
   }
 
   .divider {
@@ -45,5 +51,5 @@
 }
 
 .login-spacer-after {
-  flex: 5;
+  flex: 3;
 }

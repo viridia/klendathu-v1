@@ -13,8 +13,8 @@ function serializeProfile(profile) {
     id: profile._id,
     fullname: profile.fullname,
     username: profile.username,
-    photo: profile.photo,
     verified: profile.verified,
+    photo: profile.photo,
   };
 }
 
@@ -80,12 +80,8 @@ module.exports = function (app, apiRouter) {
           done(null, user);
         } else {
           // User not found, insert new user into the database.
-          let primaryEmail = profile.emails.filter(em => em.type === 'account');
-          if (!primaryEmail) {
-            primaryEmail = profile.emails[0];
-          }
-          logger.info('No user found with emails:', emails);
-          logger.info('User not found, attempting to create a user with email:', primaryEmail);
+          const accountEmail = profile.emails.filter(em => em.type === 'account');
+          const primaryEmail = accountEmail.length > 0 ? accountEmail[0] : profile.emails[0];
           // Note that we don't have a username or password. We'll ask them for a username later.
           // In the mean time we'll use their email as their username.
           // TODO: test this
@@ -96,18 +92,18 @@ module.exports = function (app, apiRouter) {
             photoSource: 'google', // Remember photo came from Google.
             projects: [],
             organizations: [],
-            verified: false,
+            verified: true,
           }).then(u => {
             logger.info('Google user creation successful:', primaryEmail);
             done(null, u.ops[0]);
           }, reason => {
             logger.error('Google user creation error:', reason);
-            done({ err: 'internal' });
+            done(null, false, { err: 'internal' });
           });
         }
       }, err => {
         logger.error('Google login error:', err);
-        done(err);
+        done(null, false, { err: 'internal' });
       });
     }));
 
@@ -153,18 +149,18 @@ module.exports = function (app, apiRouter) {
             photoSource: 'github', // Remember photo came from Github.
             projects: [],
             organizations: [],
-            verified: false,
+            verified: true,
           }).then(u => {
             logger.info('Github user creation successful:', emails[0]);
             done(null, u.ops[0]);
           }, reason => {
             logger.error('Github user creation error:', reason);
-            done({ err: 'internal' });
+            done(null, false, { err: 'internal' });
           });
         }
       }, err => {
         logger.error('Github login error:', err);
-        done(err);
+        done(null, false, { err: 'internal' });
       });
     }));
 
@@ -268,6 +264,34 @@ module.exports = function (app, apiRouter) {
                 res.json({ err: 'internal' });
               });
             }
+          });
+        }
+      });
+    }
+  });
+
+  // Signup handler
+  apiRouter.post('/finishsignup', (req, res) => {
+    const { username } = req.body;
+    if (!req.user) {
+      res.status(401).send({ err: 'unauthorized' });
+    } else if (username.length < 5) {
+      res.send({ err: 'username-too-short' });
+    } else if (username.toLowerCase() !== username) {
+      res.send({ err: 'username-lower-case' });
+    } else {
+      users.findOne({ username }).then(user => {
+        if (user) {
+          // User name taken
+          res.json({ err: 'user-exists' });
+        } else {
+          // Update user with new user name.
+          users.updateOne({ _id: req.user._id }, { $set: { username } }).then(() => {
+            logger.info('User update successful:', username);
+            return res.end();
+          }, reason => {
+            logger.error('User creation error:', reason);
+            res.json({ err: 'internal' });
           });
         }
       });

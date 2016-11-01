@@ -24,7 +24,7 @@ export default class Dashboard extends React.Component {
   }
 
   render() {
-    if (!this.context.profile) {
+    if (!this.context.profile || !this.context.profile.username) {
       return <div className="content" />;
     }
     return (<div className="content">
@@ -48,6 +48,6 @@ export default class Dashboard extends React.Component {
 
 Dashboard.contextTypes = {
   profile: React.PropTypes.shape({
-    username: React.PropTypes.string.isRequired,
+    username: React.PropTypes.string,
   }),
 };

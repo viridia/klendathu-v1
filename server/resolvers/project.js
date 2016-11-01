@@ -69,23 +69,35 @@ const resolverMethods = {
   },
 
   projects({ name: pname }) {
-    const query = {
-      // deleted: false,
-    };
-    if (pname) {
-      query.name = pname;
+    if (!this.user || !this.user.username) {
+      return [];
     }
-    // TODO: Only return projects which this user is a member of.
-    return this.db.collection('projects').find(query).sort({ created: -1 }).toArray()
-    .then(projects => {
-      const results = [];
-      // TODO: Visibility test.
-      for (const p of projects) {
-        // TODO: Need a specialized version of lookup role
-        const role = getRole(this.db, p, this.user);
-        results.push(serialize(p, { role }));
+
+    // Get this user's list of project memberships.
+    return this.db.collection('projectMemberships').find({ user: this.user.username }).toArray()
+    .then(memberships => {
+      // Query all projects for which this user is an owner or a member.
+      const projectIdList = memberships.map(m => m._id);
+      const query = {
+        deleted: false,
+        $or: [
+          { owningUser: this.user.username },
+          { _id: { $in: projectIdList } },
+        ],
+      };
+      if (pname) {
+        query.name = pname;
       }
-      return results;
+      return this.db.collection('projects').find(query).sort({ created: -1 }).toArray()
+      .then(projects => {
+        const results = [];
+        for (const p of projects) {
+          // TODO: Need a specialized version of lookup role
+          const role = getRole(this.db, p, this.user);
+          results.push(serialize(p, { role }));
+        }
+        return results;
+      });
     });
   },
 

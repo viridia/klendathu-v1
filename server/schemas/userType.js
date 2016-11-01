@@ -4,8 +4,8 @@ module.exports = new GraphQLObjectType({
   name: 'User',
   fields: {
     username: {
-      type: new GraphQLNonNull(GraphQLString),
-      description: 'Login name of the user.',
+      type: GraphQLString,
+      description: 'Login name of the user. May be null if user hasn\'t completed sign-up.',
     },
     fullname: {
       type: new GraphQLNonNull(GraphQLString),

@@ -23,7 +23,7 @@ class UserMenuButton extends React.Component {
 
   render() {
     const { profile } = this.context;
-    if (!profile) {
+    if (!profile || !profile.username) {
       return null;
     }
     return (<DropdownButton bsStyle="primary" title={profile.username} id="user-menu" pullRight>

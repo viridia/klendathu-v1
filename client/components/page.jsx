@@ -26,6 +26,8 @@ class Page extends React.Component {
     if (!profile && !loading && !error) {
       // console.log('checkAuth:', props.data, location);
       browserHistory.replace({ pathname: '/login', state: { next: location } });
+    } else if (profile && !profile.username) {
+      browserHistory.replace({ pathname: '/finishSignup', state: { next: location } });
     }
   }
 
