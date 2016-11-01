@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { graphql } from 'react-apollo';
+import marked from 'marked';
 import Button from 'react-bootstrap/lib/Button';
 import ButtonGroup from 'react-bootstrap/lib/ButtonGroup';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -18,6 +19,18 @@ import LinkedIssues from './linkedIssues.jsx';
 import { IssueContent } from '../../store/fragments';
 import { addComment } from '../../store/issue';
 import './issueDetails.scss';
+
+// Global options for marked.
+marked.setOptions({
+  renderer: new marked.Renderer(),
+  gfm: true,
+  tables: true,
+  breaks: false,
+  pedantic: false,
+  sanitize: true,
+  smartLists: true,
+  smartypants: true,
+});
 
 class IssueDetails extends React.Component {
   constructor(props) {
@@ -99,6 +112,10 @@ class IssueDetails extends React.Component {
     return result;
   }
 
+  renderDescription(description) {
+    return <td className="descr" dangerouslySetInnerHTML={{ __html: marked(description) }} />; // eslint-disable-line
+  }
+
   render() {
     const { location, project } = this.props;
     const { issue, error } = this.props.data;
@@ -164,7 +181,7 @@ class IssueDetails extends React.Component {
               {issue.description.length > 0 && (
                 <tr>
                   <th className="header">Description:</th>
-                  <td>{issue.description}</td>
+                  {this.renderDescription(issue.description)}
                 </tr>
               )}
               <tr>

@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import marked from 'marked';
 import RelativeDate from '../common/relativeDate.jsx';
 import IssueSummary from '../common/issueSummary.jsx';
 import LabelName from '../common/labelName.jsx';
@@ -12,6 +13,10 @@ function compareEntries(a, b) {
   return 0;
 }
 
+function renderBody(body) {
+  return <div className="comment-body" dangerouslySetInnerHTML={{ __html: marked(body) }} />; // eslint-disable-line
+}
+
 function Comment({ comment }) {
   return (
     <section className="comment">
@@ -21,7 +26,7 @@ function Comment({ comment }) {
         <RelativeDate date={new Date(comment.created)} />
         :
       </header>
-      <div className="comment-body">{comment.body}</div>
+      {renderBody(comment.body)}
     </section>
   );
 }

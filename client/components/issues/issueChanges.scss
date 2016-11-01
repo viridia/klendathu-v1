@@ -30,6 +30,18 @@
       font-size: 90%;
       color: $textDark;
       line-height: 1.3em;
+
+      > p {
+        &:first-child {
+          margin-top: 0;
+        }
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+      code {
+        white-space: pre;
+      }
     }
   }
 

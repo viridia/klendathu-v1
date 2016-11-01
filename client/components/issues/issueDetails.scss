@@ -58,6 +58,12 @@
       padding-right: 8px;
       overflow-y: auto;
       flex: 1;
+
+      .descr {
+        code {
+          white-space: pre;
+        }
+      }
     }
 
     .create-issue-table {
