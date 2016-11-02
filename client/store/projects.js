@@ -10,6 +10,9 @@ export function createProject(project) {
     variables: { project },
     updateQueries: {
       projectListQuery: (previousQueryResult, { mutationResult }) => {
+        if (mutationResult.errors) {
+          return previousQueryResult;
+        }
         return {
           projects: [mutationResult.data.newProject, ...previousQueryResult.projects],
         };

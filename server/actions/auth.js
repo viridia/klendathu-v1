@@ -124,7 +124,6 @@ module.exports = function (app, apiRouter) {
     }));
 
     app.get('/auth/google', (req, res, next) => {
-      // console.log('query:', req.query, req.protocol, req.hostname, req.baseUrl, req.originalUrl);
       passport.authenticate('google', {
         scope: ['openid', 'email', 'profile'],
         callbackURL: makeCallbackUrl(req, '/auth/google/callback'),
@@ -139,7 +138,6 @@ module.exports = function (app, apiRouter) {
         })(req, res, next);
       },
       (req, res) => {
-        // console.log('req:', req.query);
         res.redirect('/');
       });
   }

@@ -46,15 +46,15 @@ class LeftNav extends React.Component {
           icon={<LocalOfferIcon />}
           title="Labels"
           path={`/project/${project.name}/labels`} />
-      <ul className="label-list">
-        {labels && labels.map(label => (
+      {labels && labels.length > 0 && <ul className="label-list">
+        {labels.map(label => (
           <li className="label-item" key={label.id}>
             <Link to={{ pathname: `/project/${project.name}/issues`, query: { label: label.id } }}>
               <LabelName label={label.id} project={project.id} />
             </Link>
           </li>
         ))}
-      </ul>
+      </ul>}
       <NavItem
           icon={<BookmarkIcon />}
           title="Saved Queries"

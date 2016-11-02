@@ -17,9 +17,13 @@
     > .search {
       flex: 1;
       background-color: lighten($b1, 5%);
-      border-color: $b3;
+      border-color: desaturate($b4, 30%);
+      color: black;
       padding: 2px 8px;
       height: 28px;
+      &::-webkit-input-placeholder {
+        color: desaturate($b3, 30%);
+      }
     }
   }
 

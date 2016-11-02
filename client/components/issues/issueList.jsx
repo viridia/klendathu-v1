@@ -223,11 +223,11 @@ function defaultStates(project) {
 
 export default graphql(IssueListQuery, {
   options: ({ project, location: { query } }) => {
-    const { type, state, summary, description, label } = query || {};
+    const { type, state, summary, description, label, search } = query || {};
     return {
       variables: {
         project: project.id,
-        search: undefined,
+        search,
         type: type && type.split(','),
         state: state ? state.split(',') : defaultStates(project),
         summary,

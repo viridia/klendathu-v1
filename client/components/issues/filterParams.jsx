@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { browserHistory } from 'react-router';
 import Immutable from 'immutable';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import DiscloseButton from '../common/discloseButton.jsx';
@@ -11,9 +12,10 @@ export default class FilterParams extends React.Component {
     this.onChangeSearch = this.onChangeSearch.bind(this);
     this.onChangeExpanded = this.onChangeExpanded.bind(this);
     this.onChangeTerm = this.onChangeTerm.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
     this.onRemoveTerm = this.onRemoveTerm.bind(this);
     this.state = {
-      search: '',
+      search: props.location.query.search || '',
       expanded: false,
       terms: Immutable.List.of(), // TODO: Derive from location params
     };
@@ -37,6 +39,17 @@ export default class FilterParams extends React.Component {
 
   onRemoveTerm(index) {
     this.setState({ terms: this.state.terms.remove(index) });
+  }
+
+  onKeyDown(e) {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      if (this.state.search.length > 0) {
+        browserHistory.push({ ...this.props.location, query: { search: this.state.search } });
+      } else {
+        browserHistory.push({ ...this.props.location, query: { search: undefined } });
+      }
+    }
   }
 
   renderFilterTerms() {
@@ -72,7 +85,8 @@ export default class FilterParams extends React.Component {
               className="search"
               placeholder="Search"
               value={this.state.search}
-              onChange={this.onChangeSearch} />
+              onChange={this.onChangeSearch}
+              onKeyDown={this.onKeyDown} />
         </header>
         {this.renderFilterTerms()}
       </section>);
@@ -91,6 +105,9 @@ FilterParams.propTypes = {
   }).isRequired,
   location: PropTypes.shape({
     pathname: PropTypes.string.isRequired,
+    query: PropTypes.shape({
+      search: PropTypes.string,
+    }).isRequired,
   }).isRequired,
   params: PropTypes.shape({
     label: PropTypes.string,
