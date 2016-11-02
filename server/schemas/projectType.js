@@ -1,4 +1,4 @@
-const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLID, GraphQLNonNull }
+const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLID, GraphQLNonNull, GraphQLBoolean }
     = require('graphql');
 const GraphQLDate = require('graphql-date');
 const templateType = require('./templateType');
@@ -47,6 +47,10 @@ module.exports = new GraphQLObjectType({
     workflow: {
       type: workflowType,
       description: 'Workflow configuration for this project.',
+    },
+    public: {
+      type: GraphQLBoolean,
+      description: 'If true, indicates that this project is visible to the public.',
     },
   },
 });

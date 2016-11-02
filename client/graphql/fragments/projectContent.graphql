@@ -4,6 +4,7 @@ fragment projectContent on Project {
   owningUser
   owningOrg
   role
+  public
   created updated
   template {
     name project

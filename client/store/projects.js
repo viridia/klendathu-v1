@@ -37,10 +37,10 @@ export function deleteProject(id) {
   });
 }
 
-export function saveProject(pid, variables) {
+export function updateProject(id, project) {
   return client.mutate({
     mutation: UpdateProjectMutation,
-    variables: { ...variables, id: pid },
-    fragments: [ProjectContent],
+    variables: { id, project },
+    fragments: ProjectContent,
   });
 }

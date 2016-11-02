@@ -145,6 +145,7 @@ const resolverMethods = {
           issueIdCounter: 0,
           labelIdCounter: 0,
           deleted: false,
+          public: !!project.public,
         };
         if (!project.owningUser) {
           newProject.owningUser = this.user.username;
@@ -202,13 +203,16 @@ const resolverMethods = {
       if (project.description) {
         updates.description = project.description;
       }
+      if (project.public !== undefined) {
+        updates.public = project.public;
+      }
       // TODO: owning user, owning org, template name, workflow name
       // All of which need validation
       return projects.updateOne({ _id: proj._id }, {
         $set: updates,
       }).then(() => {
         return projects.findOne({ _id: proj._id }).then(result => {
-          return serialize(result);
+          return serialize(result, { role });
         });
       }, error => {
         logger.error('Error updating project', id, proj.name, error);
@@ -244,6 +248,7 @@ const resolverMethods = {
       return Promise.all([
         this.db.collection('issues').deleteMany({ project: pid }),
         this.db.collection('labels').deleteMany({ project: pid }),
+        this.db.collection('projectMemberships').deleteMany({ project: pid }),
       ]);
     })
     .then(() => {

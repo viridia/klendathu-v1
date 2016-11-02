@@ -1,26 +1,28 @@
 import React, { PropTypes } from 'react';
 import Button from 'react-bootstrap/lib/Button';
+import Checkbox from 'react-bootstrap/lib/Checkbox';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FormControl from 'react-bootstrap/lib/FormControl';
-import { saveProject } from '../../store/projects';
-import pick from '../../lib/pick';
+import { updateProject } from '../../store/projects';
 
 export default class ProjectInfoEdit extends React.Component {
   constructor(props) {
     super();
     this.onChangeTitle = this.onChangeTitle.bind(this);
     this.onChangeDescription = this.onChangeDescription.bind(this);
+    this.onChangePublic = this.onChangePublic.bind(this);
     this.onSave = this.onSave.bind(this);
     this.state = {
       description: props.project.description,
       title: props.project.title || '',
+      public: props.project.public,
     };
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.project.id !== this.props.project.id) {
       const { title, description } = nextProps.project;
-      this.setState({ title, description });
+      this.setState({ title, description, public: !!nextProps.project.public });
     }
   }
 
@@ -32,20 +34,23 @@ export default class ProjectInfoEdit extends React.Component {
     this.setState({ description: e.target.value });
   }
 
+  onChangePublic(e) {
+    this.setState({ public: e.target.checked });
+  }
+
   onSave(e) {
     e.preventDefault();
     e.stopPropagation();
-    const state = pick(this.state, ['title', 'description']);
-    saveProject(this.props.project.id, state).then(resp => {
-      this.setState(pick(resp.data.updateProject, ['title', 'description']));
-    });
+    const { title, description } = this.state;
+    updateProject(this.props.project.id, { title, description, public: this.state.public });
   }
 
   render() {
     const { project } = this.props;
     const modified =
         project.title !== this.state.title ||
-        project.description !== this.state.description;
+        project.description !== this.state.description ||
+        project.public !== this.state.public;
     return (
       <section className="settings-tab-pane">
         <header>
@@ -79,6 +84,14 @@ export default class ProjectInfoEdit extends React.Component {
               </td>
             </tr>
             <tr>
+              <th />
+              <td>
+                <Checkbox checked={this.state.public} onChange={this.onChangePublic}>
+                  Public
+                </Checkbox>
+              </td>
+            </tr>
+            <tr>
               <th className="header"><ControlLabel>Owner:</ControlLabel></th>
               <td className="owner single-static">
                 {project.owningUser}
@@ -99,5 +112,6 @@ ProjectInfoEdit.propTypes = {
     description: PropTypes.string.isRequired,
     owningUser: PropTypes.string,
     owningOrg: PropTypes.string,
+    public: PropTypes.bool,
   }),
 };
