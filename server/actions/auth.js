@@ -194,7 +194,12 @@ module.exports = function (app, apiRouter) {
     });
 
     app.get('/auth/github/callback',
-      passport.authenticate('github', { failureRedirect: '/login' }),
+      (req, res, next) => {
+        passport.authenticate('github', {
+          failureRedirect: '/login',
+          callbackURL: makeCallbackUrl(req, '/auth/github/callback'),
+        })(req, res, next);
+      },
       (req, res) => {
         // console.log('req:', req.query);
         res.redirect('/');
