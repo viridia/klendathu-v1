@@ -132,7 +132,12 @@ module.exports = function (app, apiRouter) {
     });
 
     app.get('/auth/google/callback',
-      passport.authenticate('google', { failureRedirect: '/login' }),
+      (req, res, next) => {
+        passport.authenticate('google', {
+          failureRedirect: '/login',
+          callbackURL: makeCallbackUrl(req, '/auth/google/callback'),
+        })(req, res, next);
+      },
       (req, res) => {
         // console.log('req:', req.query);
         res.redirect('/');
