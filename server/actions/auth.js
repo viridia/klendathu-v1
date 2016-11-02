@@ -38,9 +38,10 @@ module.exports = function (app, apiRouter) {
   const config = Object.assign(loadAuthConfig(), process.env);
 
   function makeCallbackUrl(req, pathname) {
+    // logger.info('search:', req.search);
     const urlParams = {
       pathname,
-      search: req.search,
+      // search: req.search,
     };
     if (config.USE_HTTPS) {
       urlParams.protocol = 'https:';
