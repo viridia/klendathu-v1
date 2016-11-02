@@ -67,7 +67,7 @@ class SignUpPage extends React.Component {
           break;
         default: {
           this.props.client.resetStore();
-          const { next } = this.props.location.state;
+          const { next } = this.props.location.state || {};
           browserHistory.push(next || { pathname: '/' });
           return;
         }
@@ -99,14 +99,14 @@ class SignUpPage extends React.Component {
   }
 
   render() {
-    const { next } = this.props.location.state;
+    const { next } = this.props.location.state || {};
     return (<div className="kdt page">
       <Header location={this.props.location} params={this.props.params} />
       <div className="login-content">
         <div className="login-spacer-before" />
         <div className="login card">
           <form className="login-form" onSubmit={this.onSubmit}>
-            <FormGroup controlId="name" validationState={this.state.userNameError && 'error'}>
+            <FormGroup controlId="username" validationState={this.state.userNameError && 'error'}>
               <ControlLabel>User name</ControlLabel>
               <FormControl
                   type="text"

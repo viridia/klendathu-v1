@@ -79,7 +79,7 @@ class LoginPage extends React.Component {
         <div className="login-spacer-before" />
         <div className="login card">
           <form className="login-form" onSubmit={this.onSubmit}>
-            <FormGroup controlId="userName" validationState={this.state.userNameError && 'error'}>
+            <FormGroup controlId="username" validationState={this.state.userNameError && 'error'}>
               <ControlLabel>User name</ControlLabel>
               <FormControl
                   type="text"
@@ -95,7 +95,8 @@ class LoginPage extends React.Component {
                   type="password"
                   value={this.state.password}
                   placeholder="Enter password"
-                  onChange={this.onChangePassword} />
+                  onChange={this.onChangePassword}
+                  name="password" />
               <FormControl.Feedback />
               <HelpBlock>{this.state.passwordError}</HelpBlock>
             </FormGroup>

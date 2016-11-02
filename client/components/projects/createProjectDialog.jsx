@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from 'react-bootstrap/lib/Button';
+import Checkbox from 'react-bootstrap/lib/Checkbox';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import FormGroup from 'react-bootstrap/lib/FormGroup';
@@ -16,12 +17,14 @@ export default class CreateProjectDialog extends React.Component {
     this.onChangeOwner = this.onChangeOwner.bind(this);
     this.onChangeProjectName = this.onChangeProjectName.bind(this);
     this.onChangeProjectTitle = this.onChangeProjectTitle.bind(this);
+    this.onChangePublic = this.onChangePublic.bind(this);
     this.state = {
       owner: '',
       projectName: '',
       projectNameError: null,
       projectTitle: '',
       projectTitleError: null,
+      public: false,
       busy: false,
     };
   }
@@ -38,6 +41,7 @@ export default class CreateProjectDialog extends React.Component {
       owningUser: this.state.owner,
       name: this.state.projectName,
       title: this.state.projectTitle,
+      public: this.state.public,
     }).then(_resp => {
       newState.projectName = '';
       newState.projectTitle = '';
@@ -84,6 +88,10 @@ export default class CreateProjectDialog extends React.Component {
     this.setState({ projectName: e.target.value });
   }
 
+  onChangePublic(e) {
+    this.setState({ public: e.target.checked });
+  }
+
   onChangeProjectTitle(e) {
     this.setState({ projectTitle: e.target.value });
   }
@@ -96,7 +104,7 @@ export default class CreateProjectDialog extends React.Component {
           onHide={this.props.onHide}
           dialogClassName="create-project">
         <Modal.Header closeButton>
-          <Modal.Title>Create Label</Modal.Title>
+          <Modal.Title>Create Project</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <form className="create-project-form">
@@ -134,6 +142,9 @@ export default class CreateProjectDialog extends React.Component {
                 <option value="org">organization</option>
               </FormControl>
             </FormGroup>
+            <Checkbox checked={this.state.public} onChange={this.onChangePublic}>
+              Public
+            </Checkbox>
           </form>
         </Modal.Body>
         <Modal.Footer>
