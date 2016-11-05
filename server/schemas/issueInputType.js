@@ -1,4 +1,4 @@
-const { GraphQLInputObjectType, GraphQLInt, GraphQLString, GraphQLList,
+const { GraphQLInputObjectType, GraphQLBoolean, GraphQLInt, GraphQLString, GraphQLList,
     GraphQLNonNull } = require('graphql');
 const relationType = require('./relationType');
 
@@ -90,6 +90,14 @@ module.exports = new GraphQLInputObjectType({
     comments: {
       type: new GraphQLList(new GraphQLNonNull(commentInputType)),
       description: 'List of comments on this issue.',
+    },
+    attachments: {
+      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+      description: 'List of attachments for this issue, as URLs.',
+    },
+    public: {
+      type: GraphQLBoolean,
+      description: 'Whether this issue should be visible to non-members of the project.',
     },
   },
 });

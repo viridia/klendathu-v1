@@ -10,6 +10,7 @@ const compression = require('compression');
 const graphql = require('express-graphql');
 const fallback = require('express-history-api-fallback');
 const authActions = require('./actions/auth');
+const filesActions = require('./actions/files');
 const schema = require('./schema');
 const RootResolver = require('./resolvers/root');
 const logger = require('./common/logger');
@@ -69,6 +70,7 @@ mongo.then(db => {
 
   // TODO: Break passport initialization into it's own module.
   authActions(app, apiRouter);
+  filesActions(app, apiRouter);
 
   // Register GraphQL middleware
   apiRouter.use('/gql', graphql(req => ({

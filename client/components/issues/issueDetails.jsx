@@ -16,6 +16,7 @@ import CommentEdit from './commentEdit.jsx';
 import { Role } from '../../lib/role';
 import IssueDetailsQuery from '../../graphql/queries/issueDetails.graphql';
 import LinkedIssues from './linkedIssues.jsx';
+import ShowAttachments from '../files/showAttachments.jsx';
 import { IssueContent } from '../../store/fragments';
 import { addComment } from '../../store/issue';
 import './issueDetails.scss';
@@ -126,7 +127,14 @@ class IssueDetails extends React.Component {
     if (!issue) {
       return <section className="kdt issue-details" />;
     }
-    const { labels = [], comments = [], changes = [], linked = [], custom = [] } = issue;
+    const {
+      labels = [],
+      comments = [],
+      changes = [],
+      linked = [],
+      custom = [],
+      attachmentsData = [],
+    } = issue;
     const issueType = project.template.typesById.get(issue.type);
     const backLink = (location.state && location.state.back) || { pathname: '..' };
     return (<section className="kdt issue-details">
@@ -223,14 +231,12 @@ class IssueDetails extends React.Component {
                   </td>
                 </tr>
               )}
-              <tr>
-                <th className="header">Attachments:</th>
-                <td>
-                  <div className="upload">
-                    Drop files here to upload (or click)
-                  </div>
-                </td>
-              </tr>
+              {attachmentsData.length > 0 && (
+                <tr>
+                  <th className="header">Attachments:</th>
+                  <td><ShowAttachments attachments={attachmentsData} /></td>
+                </tr>
+              )}
               {linked.length > 0 && <tr>
                 <th className="header linked">Linked Issues:</th>
                 <td>

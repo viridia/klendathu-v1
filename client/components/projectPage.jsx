@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react';
 import 'react-redux-toastr/src/less/index.less';
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 import { graphql } from 'react-apollo';
 import ErrorDisplay from './debug/errorDisplay.jsx';
 import LeftNav from './common/leftNav.jsx';
@@ -41,9 +43,9 @@ ProjectPage.contextTypes = {
   }),
 };
 
-export default graphql(ProjectQuery, {
+export default DragDropContext(HTML5Backend)(graphql(ProjectQuery, { // eslint-disable-line
   options: ({ params }) => ({
     variables: { project: params.project },
     fragments: [ProjectContent],
   }),
-})(ProjectPage);
+})(ProjectPage));

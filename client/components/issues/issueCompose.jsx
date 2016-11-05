@@ -17,6 +17,7 @@ import TypeSelector from './typeSelector.jsx';
 import CustomEnumField from './customEnumField.jsx';
 import CommentEdit from './commentEdit.jsx';
 import LinkedIssues from './linkedIssues.jsx';
+import UploadAttachments from '../files/uploadAttachments.jsx';
 import Relation from '../../lib/relation';
 import './issueCompose.scss';
 import '../common/card.scss';
@@ -276,8 +277,9 @@ export default class IssueCompose extends React.Component {
       cc: this.state.cc.map(cc => cc.username),
       labels: this.state.labels.map(label => label.id),
       linked: this.linkedIssueList,
+      attachments: this.attachments.files(),
       custom: [],
-      // public: false,
+      public: this.state.public,
       // comments
     };
     const { project } = this.props;
@@ -326,6 +328,7 @@ export default class IssueCompose extends React.Component {
         comments: issue.comments,
         public: !!issue.public,
       });
+      this.attachments.setFiles(issue.attachmentsData || []);
     } else {
       const initialState = project.workflow.start || 'new';
       this.setState({
@@ -345,8 +348,9 @@ export default class IssueCompose extends React.Component {
         linkedIssue: null,
         linkedIssueMap: Immutable.OrderedMap.of(),
         relation: Relation.BLOCKED_BY,
-        public: false,
+        public: !!project.public,
       });
+      this.attachments.setFiles([]);
     }
   }
 
@@ -530,9 +534,7 @@ export default class IssueCompose extends React.Component {
                   <tr>
                     <th className="header"><ControlLabel>Attach files:</ControlLabel></th>
                     <td>
-                      <div className="upload">
-                        Drop files here to upload (or click)
-                      </div>
+                      <UploadAttachments ref={el => { this.attachments = el; }} project={project} />
                     </td>
                   </tr>
                   <tr>

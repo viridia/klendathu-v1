@@ -199,6 +199,8 @@ const resolverMethods = {
           labels: issue.labels || [],
           linked: issue.linked || [],
           custom: issue.custom || [],
+          attachments: issue.attachments || [],
+          public: !!issue.public,
           comments: (issue.comments || []).map(comment => ({
             id: () => { commentIndex += 1; return commentIndex; },
             body: comment.body,
@@ -376,6 +378,22 @@ const resolverMethods = {
           });
           if (customChange.length > 0) {
             change.custom = customChange;
+            change.at = record.updated;
+          }
+        }
+
+        if (issue.attachments) {
+          const existingAttachments = existing.attachments || [];
+          record.attachments = issue.attachments;
+          const attachmentsPrev = new Set(existingAttachments);
+          const attachmentsNext = new Set(issue.attachments);
+          issue.attachments.forEach(attachments => attachmentsPrev.delete(attachments));
+          existingAttachments.forEach(attachments => attachmentsNext.delete(attachments));
+          if (attachmentsNext.size > 0 || attachmentsPrev.size > 0) {
+            change.attachments = {
+              added: Array.from(attachmentsNext),
+              removed: Array.from(attachmentsPrev),
+            };
             change.at = record.updated;
           }
         }

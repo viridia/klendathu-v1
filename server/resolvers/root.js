@@ -10,8 +10,9 @@ class RootResolver {
   }
 }
 
-require('../resolvers/label')(RootResolver);
+require('../resolvers/attachments')(RootResolver);
 require('../resolvers/issue')(RootResolver);
+require('../resolvers/label')(RootResolver);
 require('../resolvers/project')(RootResolver);
 require('../resolvers/projectMembership')(RootResolver);
 require('../resolvers/template')(RootResolver);

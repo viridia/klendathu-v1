@@ -10,6 +10,18 @@ query issueDetailsQuery($project: ID!, $id: Int!) {
       owner { before after }
       cc { added removed }
       labels { added removed }
+      attachments {
+        added
+        removed
+        addedData {
+          id
+          filename
+        }
+        removedData {
+          id
+          filename
+        }
+      }
       custom { name before after }
       linked { to before after }
     }

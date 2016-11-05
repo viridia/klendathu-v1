@@ -1,10 +1,11 @@
-const { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLID, GraphQLList, GraphQLNonNull }
-    = require('graphql');
+const { GraphQLObjectType, GraphQLBoolean, GraphQLInt, GraphQLString, GraphQLID, GraphQLList,
+    GraphQLNonNull } = require('graphql');
 const GraphQLDate = require('graphql-date');
 const relationType = require('./relationType');
 const changeType = require('./changeType');
 const userType = require('./userType');
 const labelType = require('./labelType');
+const attachmentType = require('./attachmentType');
 
 const linkedIssueType = new GraphQLObjectType({
   name: 'LinkedIssue',
@@ -142,6 +143,24 @@ module.exports = new GraphQLObjectType({
     comments: {
       type: new GraphQLList(new GraphQLNonNull(commentType)),
       description: 'List of comments on this issue.',
+    },
+    attachments: {
+      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+      description: 'List of attachments for this issue, as URLs.',
+    },
+    attachmentsData: {
+      type: new GraphQLList(new GraphQLNonNull(attachmentType)),
+      description: 'Details for the list of attachments.',
+      resolve(issue, args, context, options) {
+        if (!issue.attachments || issue.attachments.length === 0) {
+          return [];
+        }
+        return options.rootValue.attachmentsById({ idList: issue.attachments });
+      },
+    },
+    public: {
+      type: GraphQLBoolean,
+      description: 'Whether this issue should be visible to non-members of the project.',
     },
     changes: {
       type: new GraphQLList(new GraphQLNonNull(changeType)),

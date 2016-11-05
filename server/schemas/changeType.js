@@ -2,6 +2,7 @@ const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLID, GraphQLList, Gr
     = require('graphql');
 const GraphQLDate = require('graphql-date');
 const relationType = require('./relationType');
+const attachmentType = require('./attachmentType');
 
 const scalarChangeType = new GraphQLObjectType({
   name: 'ScalarChange',
@@ -83,6 +84,42 @@ module.exports = new GraphQLObjectType({
     labels: {
       type: intListChangeType,
       description: 'Change to the list of issue labels.',
+    },
+    attachments: {
+      type: new GraphQLObjectType({
+        name: 'AttachmentsChange',
+        fields: {
+          added: {
+            type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+            description: 'List of attachments that were added to the issue.',
+          },
+          addedData: {
+            type: new GraphQLList(new GraphQLNonNull(attachmentType)),
+            description: 'Details about the attachments that were added to the issue.',
+            resolve(change, args, context, options) {
+              if (change.added.length === 0) {
+                return [];
+              }
+              return options.rootValue.attachmentsById({ idList: change.added });
+            },
+          },
+          removed: {
+            type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+            description: 'List of attachments that were remove from the issue.',
+          },
+          removedData: {
+            type: new GraphQLList(new GraphQLNonNull(attachmentType)),
+            description: 'Details about the attachments that were removed from the issue.',
+            resolve(change, args, context, options) {
+              if (change.removed.length === 0) {
+                return [];
+              }
+              return options.rootValue.attachmentsById({ idList: change.removed });
+            },
+          },
+        },
+      }),
+      description: 'Change to the issue attachment list.',
     },
     custom: {
       type: new GraphQLList(new GraphQLNonNull(new GraphQLObjectType({
