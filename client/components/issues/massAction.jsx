@@ -24,11 +24,11 @@ const ACTION_TYPES = new Immutable.OrderedMap({
   },
   addCC: {
     caption: 'Add CC',
-    type: 'user[]',
+    type: 'users',
   },
   removeCC: {
     caption: 'Remove CC',
-    type: 'user[]',
+    type: 'users',
   },
   deleteIssue: {
     caption: 'Delete',
@@ -40,12 +40,18 @@ export default class MassAction extends React.Component {
   constructor() {
     super();
     this.onSelectActionType = this.onSelectActionType.bind(this);
+    this.onChangeValue = this.onChangeValue.bind(this);
     this.onRemove = this.onRemove.bind(this);
   }
 
   onSelectActionType(id) {
     const { index, action } = this.props;
-    this.props.onChange(index, { ...action, id });
+    this.props.onChange(index, { ...action, value: null, id });
+  }
+
+  onChangeValue(value) {
+    const { index, action } = this.props;
+    this.props.onChange(index, { ...action, value });
   }
 
   onRemove(e) {
@@ -58,7 +64,7 @@ export default class MassAction extends React.Component {
   }
 
   render() {
-    const { index, action, project, onChange } = this.props;
+    const { index, action, project } = this.props;
     const items = [];
     ACTION_TYPES.forEach((at, id) => {
       items.push(<MenuItem eventKey={id} key={id}>{at.caption}</MenuItem>);
@@ -78,7 +84,7 @@ export default class MassAction extends React.Component {
           type={actionInfo.type}
           value={action.value}
           project={project}
-          onChange={onChange} />)}
+          onChange={this.onChangeValue} />)}
       <div className="flex" />
       {index !== undefined &&
         <button className="remove" onClick={this.onRemove}><CloseIcon /></button>}
@@ -90,7 +96,7 @@ MassAction.propTypes = {
   index: PropTypes.number,
   action: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    value: PropTypes.string,
+    value: PropTypes.any,
   }),
   project: PropTypes.shape({
     id: PropTypes.string.isRequired,

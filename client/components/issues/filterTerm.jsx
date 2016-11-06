@@ -32,11 +32,11 @@ const FIELD_TYPES = new Immutable.OrderedMap({
   },
   cc: {
     caption: 'CC',
-    type: 'user[]',
+    type: 'users',
   },
   labels: {
     caption: 'Labels',
-    type: 'label[]',
+    type: 'label',
   },
   keywords: {
     caption: 'Keywords',
@@ -54,12 +54,18 @@ export default class FilterTerm extends React.Component {
   constructor() {
     super();
     this.onSelectField = this.onSelectField.bind(this);
+    this.onChangeValue = this.onChangeValue.bind(this);
     this.onRemove = this.onRemove.bind(this);
   }
 
   onSelectField(field) {
     const { index, term } = this.props;
     this.props.onChange(index, { ...term, field });
+  }
+
+  onChangeValue(value) {
+    const { index, term } = this.props;
+    this.props.onChange(index, { ...term, value });
   }
 
   onRemove(e) {
@@ -102,7 +108,7 @@ export default class FilterTerm extends React.Component {
   }
 
   render() {
-    const { index, term, project, onChange } = this.props;
+    const { index, term, project } = this.props;
     const items = [];
     FIELD_TYPES.forEach((ft, id) => {
       items.push(<MenuItem eventKey={id} key={id}>{ft.caption}</MenuItem>);
@@ -123,7 +129,7 @@ export default class FilterTerm extends React.Component {
           type={fieldInfo.type}
           value={term.value}
           project={project}
-          onChange={onChange} />)}
+          onChange={this.onChangeValue} />)}
       <div className="flex" />
       {index !== undefined &&
         <button className="remove" onClick={this.onRemove}><CloseIcon /></button>}
@@ -134,7 +140,7 @@ export default class FilterTerm extends React.Component {
 FilterTerm.propTypes = {
   term: PropTypes.shape({
     field: PropTypes.string.isRequired,
-    value: PropTypes.string,
+    value: PropTypes.any,
   }),
   index: PropTypes.number,
   project: PropTypes.shape({

@@ -37,7 +37,7 @@ $bgColor: #c7b8e6;
       display: flex;
 
       > .dropdown {
-        align-self: flex-start;
+        align-self: center;
       }
 
       .dropdown-toggle {
@@ -46,6 +46,10 @@ $bgColor: #c7b8e6;
         align-items: center;
         justify-content: space-between;
         margin-right: 8px;
+      }
+
+      > .label-selector, > .user {
+        flex: 40;
       }
 
       > .flex {

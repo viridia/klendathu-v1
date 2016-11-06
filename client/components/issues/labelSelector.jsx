@@ -75,7 +75,7 @@ class LabelSelector extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="label-selector">
         {this.state.showModal && (
           <LabelDialog
               project={this.props.project}
