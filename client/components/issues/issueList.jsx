@@ -209,14 +209,7 @@ class IssueList extends React.Component {
   }
 
   renderIssueList() {
-    const { issues, loading, error } = this.props.data;
-    if (error) {
-      return <ErrorDisplay error={error} />;
-    }
-    if (loading) {
-      return null;
-    }
-
+    const { issues } = this.props.data;
     if (!issues || issues.length === 0) {
       return (
         <div className="card report">
@@ -239,9 +232,17 @@ class IssueList extends React.Component {
   }
 
   render() {
+    const { issues, loading, error } = this.props.data;
+    if (error) {
+      return <ErrorDisplay error={error} />;
+    }
+    if (loading) {
+      return <section className="kdt issue-list" />;
+    }
+
     return (<section className="kdt issue-list">
       <FilterParams {...this.props} />
-      <MassEdit {...this.props} />
+      <MassEdit {...this.props} issues={issues} />
       {this.renderIssueList()}
     </section>);
   }

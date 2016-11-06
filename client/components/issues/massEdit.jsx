@@ -5,6 +5,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import Button from 'react-bootstrap/lib/Button';
 import Collapse from 'react-bootstrap/lib/Collapse';
 import MassAction from './massAction.jsx';
+import { updateIssue } from '../../store/issue';
 import './massEdit.scss';
 
 class MassEdit extends React.Component {
@@ -12,6 +13,7 @@ class MassEdit extends React.Component {
     super();
     this.onChangeAction = this.onChangeAction.bind(this);
     this.onRemoveAction = this.onRemoveAction.bind(this);
+    this.onSave = this.onSave.bind(this);
     this.state = {
       expanded: true,
       actions: Immutable.List.of(), // TODO: Derive from location params
@@ -30,6 +32,31 @@ class MassEdit extends React.Component {
     this.setState({ actions: this.state.actions.remove(index) });
   }
 
+  onSave(e) {
+    e.preventDefault();
+    const { selection, issues, project } = this.props;
+    const promises = [];
+    for (const issue of issues) {
+      let changed = false;
+      let deleted = false;
+      if (selection.has(issue.id)) {
+        const updates = {};
+        this.state.actions.forEach(action => {
+          if (action.id === 'delete') {
+            deleted = true;
+          } else {
+            changed = action.apply(issue, updates, action.value) || changed;
+          }
+        });
+        if (deleted) {
+          console.error('Implement issue deletion.');
+        } else if (changed) {
+          promises.push(updateIssue(project.id, issue.id, updates));
+        }
+      }
+    }
+  }
+
   render() {
     const { selection } = this.props;
     return (
@@ -39,8 +66,10 @@ class MassEdit extends React.Component {
             <div className="title">
               Mass Edit ({selection.size} issues)
             </div>
-            <Button bsStyle="default">Reset</Button>
-            <Button bsStyle="primary">Execute</Button>
+            <Button
+                bsStyle="primary"
+                disabled={this.state.actions.size === 0}
+                onClick={this.onSave}>Save All Changes</Button>
           </header>
           <section className="action-list">
             {this.state.actions.map((action, index) => (
@@ -68,6 +97,7 @@ MassEdit.propTypes = {
       types: PropTypes.arrayOf(PropTypes.shape({})),
     }),
   }).isRequired,
+  issues: PropTypes.arrayOf(PropTypes.shape({})),
   selection: ImmutablePropTypes.set.isRequired,
 };
 

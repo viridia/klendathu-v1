@@ -5,34 +5,78 @@ import MenuItem from 'react-bootstrap/lib/MenuItem';
 import CloseIcon from 'icons/ic_close_black_24px.svg';
 import EditOperand from './editOperand.jsx';
 
+function append(issue, updates, fieldName, values) {
+  const before = new Immutable.OrderedSet(issue[fieldName]);
+  const after = before.union(values);
+  if (before !== after) {
+    updates[fieldName] = after.toArray();
+    return true;
+  }
+  return false;
+}
+
+function remove(issue, updates, fieldName, values) {
+  const before = new Immutable.OrderedSet(issue[fieldName]);
+  const after = before.subtract(values);
+  if (before !== after) {
+    updates[fieldName] = after.toArray();
+    return true;
+  }
+  return false;
+}
+
 const ACTION_TYPES = new Immutable.OrderedMap({
   addLabel: {
     caption: 'Add Label',
     type: 'label',
+    apply: (issue, update, value) => {
+      return append(issue, update, 'labels', value.map(v => v.id));
+    },
   },
   removeLabel: {
     caption: 'Remove Label',
     type: 'label',
+    apply: (issue, update, value) => {
+      return remove(issue, update, 'labels', value.map(v => v.id));
+    },
   },
   state: {
     caption: 'Change State',
     type: 'state',
+    apply: (issue, update, value) => {
+      update.state = value;
+    },
   },
   owner: {
     caption: 'Change Owner',
     type: 'user',
+    apply: (issue, update, value) => {
+      const user = value ? value.username : null;
+      if (issue.owner !== user) {
+        update.owner = user;
+        return true;
+      }
+      return false;
+    },
   },
   addCC: {
     caption: 'Add CC',
     type: 'users',
+    apply: (issue, update, value) => {
+      return append(issue, update, 'cc', value.map(user => user.username));
+    },
   },
   removeCC: {
     caption: 'Remove CC',
     type: 'users',
+    apply: (issue, update, value) => {
+      return remove(issue, update, 'cc', value.map(user => user.username));
+    },
   },
-  deleteIssue: {
+  delete: {
     caption: 'Delete',
     action: 'delete',
+    apply: () => {},
   },
 });
 
@@ -46,7 +90,12 @@ export default class MassAction extends React.Component {
 
   onSelectActionType(id) {
     const { index, action } = this.props;
-    this.props.onChange(index, { ...action, value: null, id });
+    const newAction = ACTION_TYPES.get(id);
+    if (!action || newAction.type !== action.type) {
+      this.props.onChange(index, { ...newAction, value: null, id });
+    } else {
+      this.props.onChange(index, { ...newAction, value: action.value, id });
+    }
   }
 
   onChangeValue(value) {
@@ -69,8 +118,7 @@ export default class MassAction extends React.Component {
     ACTION_TYPES.forEach((at, id) => {
       items.push(<MenuItem eventKey={id} key={id}>{at.caption}</MenuItem>);
     });
-    const actionInfo = (action && action.id && ACTION_TYPES.get(action.id));
-    const caption = (actionInfo && actionInfo.caption) || 'Choose action...';
+    const caption = (action && action.caption) || 'Choose action...';
 
     return (<section className="mass-action">
       <DropdownButton
@@ -80,8 +128,8 @@ export default class MassAction extends React.Component {
           onSelect={this.onSelectActionType}>
         {items}
       </DropdownButton>
-      {actionInfo && (<EditOperand
-          type={actionInfo.type}
+      {action && (<EditOperand
+          type={action.type}
           value={action.value}
           project={project}
           onChange={this.onChangeValue} />)}
