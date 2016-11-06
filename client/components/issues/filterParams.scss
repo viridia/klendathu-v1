@@ -14,15 +14,38 @@
       flex: 2;
     }
 
-    > .search {
+    > .search-group {
+      position: relative;
       flex: 1;
-      background-color: lighten($b1, 5%);
-      border-color: desaturate($b4, 30%);
-      color: black;
-      padding: 2px 8px;
-      height: 28px;
-      &::-webkit-input-placeholder {
-        color: desaturate($b3, 30%);
+      display: flex;
+
+      > .search {
+        flex: 1;
+        background-color: lighten($b1, 5%);
+        border-color: desaturate($b4, 30%);
+        color: black;
+        padding: 2px 32px 2px 8px;
+        height: 28px;
+        &::-webkit-input-placeholder {
+          color: desaturate($b3, 30%);
+        }
+      }
+
+      > .clear {
+        position: absolute;
+        padding: 2px;
+        top: 2px;
+        bottom: 2px;
+        right: 2px;
+        border: none;
+        background-color: transparent;
+        outline: none;
+        > .svg-icon > svg {
+          fill: desaturate($b4, 30%);
+        }
+        &:hover > .svg-icon > svg {
+          fill: desaturate($b6, 30%);
+        }
       }
     }
   }

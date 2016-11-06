@@ -1,7 +1,9 @@
 import React, { PropTypes } from 'react';
 import { browserHistory } from 'react-router';
 import Immutable from 'immutable';
+import Button from 'react-bootstrap/lib/Button';
 import FormControl from 'react-bootstrap/lib/FormControl';
+import CloseIcon from 'icons/ic_close_black_24px.svg';
 import DiscloseButton from '../common/discloseButton.jsx';
 import FilterTerm from './filterTerm.jsx';
 import './filterParams.scss';
@@ -10,6 +12,7 @@ export default class FilterParams extends React.Component {
   constructor(props) {
     super(props);
     this.onChangeSearch = this.onChangeSearch.bind(this);
+    this.onClearSearch = this.onClearSearch.bind(this);
     this.onChangeExpanded = this.onChangeExpanded.bind(this);
     this.onChangeTerm = this.onChangeTerm.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
@@ -23,6 +26,12 @@ export default class FilterParams extends React.Component {
 
   onChangeSearch(e) {
     this.setState({ search: e.target.value });
+  }
+
+  onClearSearch(e) {
+    e.preventDefault();
+    this.setState({ search: '' });
+    browserHistory.push({ ...this.props.location, query: { search: undefined } });
   }
 
   onChangeExpanded() {
@@ -81,12 +90,15 @@ export default class FilterParams extends React.Component {
           <DiscloseButton checked={this.state.expanded} onClick={this.onChangeExpanded} />
           Filters
           <div className="separator" />
-          <FormControl
-              className="search"
-              placeholder="Search"
-              value={this.state.search}
-              onChange={this.onChangeSearch}
-              onKeyDown={this.onKeyDown} />
+          <div className="search-group">
+            <FormControl
+                className="search"
+                placeholder="Search"
+                value={this.state.search}
+                onChange={this.onChangeSearch}
+                onKeyDown={this.onKeyDown} />
+            <Button className="clear" onClick={this.onClearSearch}><CloseIcon /></Button>
+          </div>
         </header>
         {this.renderFilterTerms()}
       </section>);

@@ -2,8 +2,6 @@
   real issues (and not worry about having to wipe the db during development?)
   -- liking comments
   -- liking issues
-* Per-user project settings
-  * Label hot list
 * Make sure that queries are invalidated by updated.
   * Mostly this applies to plural queries.
 * Get rid of typeahead
@@ -17,7 +15,6 @@
   * Issue list
   * User list (in autocomplete).
   * Filtering and sorting?
-* Flesh out issue details
 * Issue compose needs role checks on individual fields.
 * Custom suggest field / enter key support.
   * Will be easier once we have some data
