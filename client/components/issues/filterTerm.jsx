@@ -1,27 +1,26 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
-import Checkbox from 'react-bootstrap/lib/Checkbox';
 import DropdownButton from 'react-bootstrap/lib/DropdownButton';
-import FormControl from 'react-bootstrap/lib/FormControl';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
 import CloseIcon from 'icons/ic_close_black_24px.svg';
+import EditOperand from './editOperand.jsx';
 
 const FIELD_TYPES = new Immutable.OrderedMap({
   state: {
     caption: 'State',
-    type: 'issueState',
+    type: 'stateSet',
   },
   type: {
     caption: 'Type',
-    type: 'issueType',
+    type: 'typeSet',
   },
   summary: {
     caption: 'Summary',
-    type: 'text',
+    type: 'searchText',
   },
   description: {
     caption: 'Description',
-    type: 'text',
+    type: 'searchText',
   },
   reporter: {
     caption: 'Reporter',
@@ -102,51 +101,14 @@ export default class FilterTerm extends React.Component {
     }
   }
 
-  renderOpValue(fieldInfo) {
-    if (!fieldInfo) {
-      return null;
-    }
-    const { project } = this.props;
-    switch (fieldInfo.type) {
-      case 'text':
-        return (
-          <FormControl
-              className="match-text"
-              placeholder="text to match"
-              value={this.props.term.value}
-              onChange={this.onChangeValue} />
-        );
-      case 'issueState': {
-        return (
-          <div className="states">
-            {project.workflow.states.map(st => (
-              <Checkbox key={st.id} checked={false} onChange={this.onChangePublic}>
-                {st.caption}
-              </Checkbox>))}
-          </div>);
-      }
-      case 'issueType': {
-        return (
-          <div className="types">
-            {project.template.types.map(t => (
-              !t.abstract && <Checkbox key={t.id} checked={false} onChange={this.onChangePublic}>
-                {t.caption}
-              </Checkbox>))}
-          </div>);
-      }
-      default:
-        return null;
-    }
-  }
-
   render() {
-    const { index, term } = this.props;
+    const { index, term, project, onChange } = this.props;
     const items = [];
     FIELD_TYPES.forEach((ft, id) => {
       items.push(<MenuItem eventKey={id} key={id}>{ft.caption}</MenuItem>);
     });
     const fieldInfo = (term && term.field && FIELD_TYPES.get(term.field));
-    const caption = (fieldInfo && fieldInfo.caption) || 'Set filter term...';
+    const caption = (fieldInfo && fieldInfo.caption) || 'Search by...';
 
     return (<section className="filter-term">
       <DropdownButton
@@ -157,7 +119,11 @@ export default class FilterTerm extends React.Component {
         {items}
       </DropdownButton>
       {this.renderOpSelector(fieldInfo)}
-      {this.renderOpValue(fieldInfo)}
+      {fieldInfo && (<EditOperand
+          type={fieldInfo.type}
+          value={term.value}
+          project={project}
+          onChange={onChange} />)}
       <div className="flex" />
       {index !== undefined &&
         <button className="remove" onClick={this.onRemove}><CloseIcon /></button>}

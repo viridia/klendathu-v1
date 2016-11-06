@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { browserHistory } from 'react-router';
 import Immutable from 'immutable';
 import Button from 'react-bootstrap/lib/Button';
+import Collapse from 'react-bootstrap/lib/Collapse';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import CloseIcon from 'icons/ic_close_black_24px.svg';
 import DiscloseButton from '../common/discloseButton.jsx';
@@ -62,24 +63,23 @@ export default class FilterParams extends React.Component {
   }
 
   renderFilterTerms() {
-    if (!this.state.expanded) {
-      return null;
-    }
     return (
-      <section className="term-list">
-        {this.state.terms.map((term, index) => (
+      <Collapse className="term-list" in={this.state.expanded}>
+        <section className="term-list">
+          {this.state.terms.map((term, index) => (
+            <FilterTerm
+                index={index}
+                key={index}
+                term={term}
+                project={this.props.project}
+                onRemove={this.onRemoveTerm}
+                onChange={this.onChangeTerm} />))}
           <FilterTerm
-              index={index}
-              key={index}
-              term={term}
               project={this.props.project}
               onRemove={this.onRemoveTerm}
-              onChange={this.onChangeTerm} />))}
-        <FilterTerm
-            project={this.props.project}
-            onRemove={this.onRemoveTerm}
-            onChange={this.onChangeTerm} />
-      </section>
+              onChange={this.onChangeTerm} />
+        </section>
+      </Collapse>
     );
   }
 

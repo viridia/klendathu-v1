@@ -1,4 +1,8 @@
 import React, { PropTypes } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
 import { Link } from 'react-router';
 import { graphql } from 'react-apollo';
@@ -6,7 +10,10 @@ import classNames from 'classnames';
 import LabelName from '../common/labelName.jsx';
 import ErrorDisplay from '../debug/errorDisplay.jsx';
 import FilterParams from './filterParams.jsx';
+import MassEdit from './massEdit.jsx';
 import IssueListQuery from '../../graphql/queries/issueList.graphql';
+import { clearSelection, selectIssues, deselectIssues } from '../../store/issueSelection';
+
 import './issueList.scss';
 import './../common/card.scss';
 
@@ -36,6 +43,8 @@ class ColumnRenderer {
 class IssueList extends React.Component {
   constructor(props) {
     super(props);
+    this.onChangeSelection = this.onChangeSelection.bind(this);
+    this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
     this.state = {
       columns: ['priority', 'severity'],
       search: '',
@@ -44,13 +53,34 @@ class IssueList extends React.Component {
     this.buildIssueIdList(props);
   }
 
+  componentDidMount() {
+    this.updateSelectAll();
+  }
+
   componentWillReceiveProps(nextProps) {
     this.buildColumns(nextProps.project);
     this.buildIssueIdList(nextProps);
   }
 
-  onChangeSearch(e) {
-    this.setState({ search: e.target.value });
+  componentDidUpdate() {
+    this.updateSelectAll();
+  }
+
+  onChangeSelection(e) {
+    const id = parseInt(e.target.dataset.id, 10);
+    if (e.target.checked) {
+      this.props.selectIssues([id]);
+    } else {
+      this.props.deselectIssues([id]);
+    }
+  }
+
+  onChangeSelectAll(e) {
+    if (e.target.checked) {
+      this.props.selectIssues(this.issueIds);
+    } else {
+      this.props.clearSelection();
+    }
   }
 
   buildColumns(project) {
@@ -73,13 +103,34 @@ class IssueList extends React.Component {
     } else {
       this.issueIds = issues.map(i => i.id);
     }
+    this.issueIdSet = new Immutable.Set(this.issueIds);
+  }
+
+  // Checkbox 'indeterminate' state can only be set programmatically.
+  updateSelectAll() {
+    const { selection } = this.props;
+    if (this.selectAll) {
+      const noneSelected = selection.size === 0;
+      const allSelected = this.issueIdSet.isSubset(selection);
+      this.selectAll.indeterminate = !allSelected && !noneSelected;
+    }
   }
 
   renderHeader() {
+    const { selection } = this.props;
     return (
       <thead>
         <tr className="heading">
-          <th className="selected"><Checkbox bsClass="cbox" /></th>
+          <th className="selected">
+            <label htmlFor="all-issues">
+              <Checkbox
+                  id="all-issues"
+                  bsClass="cbox"
+                  checked={selection.size > 0}
+                  inputRef={el => { this.selectAll = el; }}
+                  onChange={this.onChangeSelectAll} />
+            </label>
+          </th>
           <th className="id">#</th>
           <th className="type">Type</th>
           <th className="owner">Owner</th>
@@ -102,7 +153,7 @@ class IssueList extends React.Component {
   }
 
   renderIssue(issue) {
-    const project = this.props.project;
+    const { project, selection } = this.props;
     const linkTarget = {
       pathname: `/project/${project.name}/issues/${issue.id}`,
       state: {
@@ -110,9 +161,19 @@ class IssueList extends React.Component {
         idList: this.issueIds,
       },
     };
+    const issueId = `issue-${issue.id}`;
     return (
       <tr key={issue.id}>
-        <td className="selected"><Checkbox bsClass="cbox" /></td>
+        <td className="selected">
+          <label htmlFor={issueId}>
+            <Checkbox
+                id={issueId}
+                bsClass="cbox"
+                data-id={issue.id}
+                checked={selection.has(issue.id)}
+                onChange={this.onChangeSelection} />
+          </label>
+        </td>
         <td className="id">
           <Link to={linkTarget}>{issue.id}</Link>
         </td>
@@ -180,13 +241,11 @@ class IssueList extends React.Component {
   render() {
     return (<section className="kdt issue-list">
       <FilterParams {...this.props} />
+      <MassEdit {...this.props} />
       {this.renderIssueList()}
     </section>);
   }
 }
-
-// linked: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
-// custom: new GraphQLList(new GraphQLNonNull(customSearch)),
 
 IssueList.propTypes = {
   data: PropTypes.shape({
@@ -214,6 +273,10 @@ IssueList.propTypes = {
     project: PropTypes.string,
     states: PropTypes.string,
   }).isRequired,
+  selection: ImmutablePropTypes.set.isRequired,
+  clearSelection: PropTypes.func.isRequired,
+  selectIssues: PropTypes.func.isRequired,
+  deselectIssues: PropTypes.func.isRequired,
 };
 
 function defaultStates(project) {
@@ -244,4 +307,9 @@ export default graphql(IssueListQuery, {
       },
     };
   },
-})(IssueList);
+})(connect(
+  (state) => ({
+    selection: state.issueSelection,
+  }),
+  dispatch => bindActionCreators({ clearSelection, selectIssues, deselectIssues }, dispatch),
+)(IssueList));
