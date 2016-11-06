@@ -16,5 +16,13 @@ fragment projectContent on Project {
   workflow {
     name project extends start
     states { id caption closed transitions }
+    actions {
+      caption
+      state
+      owner
+      require {
+        state
+      }
+    }
   }
 }

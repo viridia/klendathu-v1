@@ -28,7 +28,7 @@
 
   > .right {
     border: 1px solid $b1;
-    width: 20%;
+    flex: .2;
     margin: 4px;
     padding: 8px;
     overflow-y: auto;
@@ -37,7 +37,6 @@
 
 .create-issue-table {
   width: 100%;
-
   .issue-type {
     margin-top: 6px;
   }

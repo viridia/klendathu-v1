@@ -16,9 +16,10 @@ import CommentEdit from './commentEdit.jsx';
 import { Role } from '../../lib/role';
 import IssueDetailsQuery from '../../graphql/queries/issueDetails.graphql';
 import LinkedIssues from './linkedIssues.jsx';
+import WorkflowActions from './workflowActions.jsx';
 import ShowAttachments from '../files/showAttachments.jsx';
 import { IssueContent } from '../../store/fragments';
-import { addComment } from '../../store/issue';
+import { addComment, updateIssue } from '../../store/issue';
 import './issueDetails.scss';
 
 // Global options for marked.
@@ -37,6 +38,7 @@ class IssueDetails extends React.Component {
   constructor(props) {
     super(props);
     this.onAddComment = this.onAddComment.bind(this);
+    this.onExecAction = this.onExecAction.bind(this);
     this.state = this.navState(props);
   }
 
@@ -44,9 +46,47 @@ class IssueDetails extends React.Component {
     this.setState(this.navState(nextProps));
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.prevIssue !== nextState.prevIssue) {
+      return true;
+    }
+    if (this.state.nextIssue !== nextState.nextIssue) {
+      return true;
+    }
+    if (this.props.data.issue === nextProps.data.issue) {
+      return false;
+    }
+    if (this.props.data.issue !== null && nextProps.data.issue !== null) {
+      const thisIssue = this.props.data.issue;
+      const nextIssue = nextProps.data.issue;
+      if (thisIssue.id !== nextIssue.id ||
+          thisIssue.state !== nextIssue.state ||
+          thisIssue.summary !== nextIssue.summary ||
+          thisIssue.description !== nextIssue.description ||
+          thisIssue.owner !== nextIssue.owner ||
+          thisIssue.report !== nextIssue.reporter) {
+        return true;
+      }
+      // Works because issues only contain arrays and plain objects.
+      return JSON.stringify(thisIssue) !== JSON.stringify(nextIssue);
+    }
+    return true;
+  }
+
   onAddComment(newComment) {
     const { project, data: { issue } } = this.props;
     return addComment(project.id, issue.id, newComment).then(() => {
+      this.props.data.refetch();
+    });
+  }
+
+  onExecAction(action) {
+    const { project, data: { issue } } = this.props;
+    const updates = {
+      state: action.state,
+      owner: action.owner,
+    };
+    return updateIssue(project.id, issue.id, updates).then(() => {
       this.props.data.refetch();
     });
   }
@@ -178,90 +218,105 @@ class IssueDetails extends React.Component {
           </ButtonGroup>
         </header>
         <section className="content">
-          <table className="create-issue-table form-table">
-            <tbody>
-              {issue.summary.length > 0 && (
+          <div className="left">
+            <table className="create-issue-table form-table">
+              <tbody>
                 <tr>
-                  <th className="header">Summary:</th>
-                  <td>{issue.summary}</td>
-                </tr>
-              )}
-              {issue.description.length > 0 && (
-                <tr>
-                  <th className="header">Description:</th>
-                  {this.renderDescription(issue.description)}
-                </tr>
-              )}
-              <tr>
-                <th className="header">Created:</th>
-                <td className="changes">
-                  <RelativeDate date={new Date(issue.created)} />
-                </td>
-              </tr>
-              <tr>
-                <th className="header">Reporter:</th>
-                <td className="reporter">
-                  {issue.reporter
-                    ? <UserName user={issue.reporter} full />
-                    : <span className="unassigned">unassigned</span>}
-                </td>
-              </tr>
-              <tr>
-                <th className="header">Owner:</th>
-                <td>
-                  {issue.owner
-                    ? <UserName user={issue.owner} full />
-                    : <span className="unassigned">unassigned</span>}
-                </td>
-              </tr>
-              {issue.cc.length > 0 && (
-                <tr>
-                  <th className="header">CC:</th>
-                  <td>{issue.cc.map(cc => <UserName user={cc} key={cc} full />)}
+                  <th className="header">State:</th>
+                  <td className="state">
+                    {project.workflow.statesById.get(issue.state).caption}
                   </td>
                 </tr>
-              )}
-              {this.renderTemplateFields(issueType, custom)}
-              {labels.length > 0 && (
+                {issue.summary.length > 0 && (
+                  <tr>
+                    <th className="header">Summary:</th>
+                    <td>{issue.summary}</td>
+                  </tr>
+                )}
+                {issue.description.length > 0 && (
+                  <tr>
+                    <th className="header">Description:</th>
+                    {this.renderDescription(issue.description)}
+                  </tr>
+                )}
                 <tr>
-                  <th className="header labels">Labels:</th>
+                  <th className="header">Created:</th>
+                  <td className="changes">
+                    <RelativeDate date={new Date(issue.created)} />
+                  </td>
+                </tr>
+                <tr>
+                  <th className="header">Reporter:</th>
+                  <td className="reporter">
+                    {issue.reporter
+                      ? <UserName user={issue.reporter} full />
+                      : <span className="unassigned">unassigned</span>}
+                  </td>
+                </tr>
+                <tr>
+                  <th className="header">Owner:</th>
                   <td>
-                    {labels.map(label =>
-                      <LabelName label={label} project={project.id} key={label} />)}
+                    {issue.owner
+                      ? <UserName user={issue.owner} full />
+                      : <span className="unassigned">unassigned</span>}
                   </td>
                 </tr>
-              )}
-              {attachmentsData.length > 0 && (
+                {issue.cc.length > 0 && (
+                  <tr>
+                    <th className="header">CC:</th>
+                    <td>{issue.cc.map(cc => <UserName user={cc} key={cc} full />)}
+                    </td>
+                  </tr>
+                )}
+                {this.renderTemplateFields(issueType, custom)}
+                {labels.length > 0 && (
+                  <tr>
+                    <th className="header labels">Labels:</th>
+                    <td>
+                      {labels.map(label =>
+                        <LabelName label={label} project={project.id} key={label} />)}
+                    </td>
+                  </tr>
+                )}
+                {attachmentsData.length > 0 && (
+                  <tr>
+                    <th className="header">Attachments:</th>
+                    <td><ShowAttachments attachments={attachmentsData} /></td>
+                  </tr>
+                )}
+                {linked.length > 0 && <tr>
+                  <th className="header linked">Linked Issues:</th>
+                  <td>
+                    <LinkedIssues
+                        project={project}
+                        links={linked}
+                        onRemoveLink={this.onRemoveLinkedIssue} />
+                  </td>
+                </tr>}
+                {((comments || []).length > 0 || (changes || []).length > 0) && <tr>
+                  <th className="header history">Issue History:</th>
+                  <td>
+                    <IssueChanges
+                        issue={issue} comments={comments} changes={changes}
+                        project={project} onAddComment={this.onAddComment} />
+                  </td>
+                </tr>}
                 <tr>
-                  <th className="header">Attachments:</th>
-                  <td><ShowAttachments attachments={attachmentsData} /></td>
+                  <th className="header" />
+                  <td>
+                    <CommentEdit issue={issue} project={project} onAddComment={this.onAddComment} />
+                  </td>
                 </tr>
-              )}
-              {linked.length > 0 && <tr>
-                <th className="header linked">Linked Issues:</th>
-                <td>
-                  <LinkedIssues
-                      project={project}
-                      links={linked}
-                      onRemoveLink={this.onRemoveLinkedIssue} />
-                </td>
-              </tr>}
-              {(comments || changes) && <tr>
-                <th className="header history">Issue History:</th>
-                <td>
-                  <IssueChanges
-                      issue={issue} comments={comments} changes={changes}
-                      project={project} onAddComment={this.onAddComment} />
-                </td>
-              </tr>}
-              <tr>
-                <th className="header" />
-                <td>
-                  <CommentEdit issue={issue} project={project} onAddComment={this.onAddComment} />
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
+          <aside className="right">
+            <WorkflowActions
+                project={project}
+                state={issue.state}
+                issue={issue}
+                onExecAction={this.onExecAction} />
+          </aside>
         </section>
       </section>
     </section>);

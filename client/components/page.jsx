@@ -35,6 +35,8 @@ class Page extends React.Component {
     const { children, location, params, data: { error, profile } } = this.props;
     if (error) {
       return <ErrorDisplay error={error} />;
+    } else if (!children) {
+      return null;
     }
     const child = React.Children.only(children);
     const main = React.cloneElement(child, { params, profile });
@@ -54,7 +56,7 @@ Page.propTypes = {
     }),
     loading: PropTypes.bool,
   }).isRequired,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.element.isRequired,
   location: PropTypes.shape({}).isRequired,
   params: PropTypes.shape({}).isRequired,
 };

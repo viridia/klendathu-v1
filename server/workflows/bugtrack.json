@@ -11,8 +11,7 @@
       "transitions": [
         "assigned",
         "in_progress"
-      ],
-      "actions": []
+      ]
     },
     {
       "id": "assigned",
@@ -28,8 +27,7 @@
         "duplicate",
         "working_as_intended",
         "deferred"
-      ],
-      "actions": []
+      ]
     },
     {
       "id": "in_progress",
@@ -46,8 +44,7 @@
         "working_as_intended",
         "deferred",
         "cannot_reproduce"
-      ],
-      "actions": []
+      ]
     },
     {
       "id": "needs_more_info",
@@ -60,8 +57,7 @@
         "working_as_intended",
         "deferred",
         "cannot_reproduce"
-      ],
-      "actions": []
+      ]
     },
     {
       "id": "review",
@@ -72,8 +68,7 @@
         "in_progress",
         "qa",
         "verified"
-      ],
-      "actions": []
+      ]
     },
     {
       "id": "qa",
@@ -83,10 +78,7 @@
         "assigned",
         "in_progress",
         "verified"
-      ],
-      "actions": {
-        "owner": "{reporter}"
-      }
+      ]
     },
     {
       "id": "verified",
@@ -95,10 +87,7 @@
       "transitions": [
         "assigned",
         "in_progress"
-      ],
-      "actions": {
-        "owner": null
-      }
+      ]
     },
     {
       "id": "duplicate",
@@ -107,8 +96,7 @@
       "transitions": [
         "assigned",
         "in_progress"
-      ],
-      "actions": []
+      ]
     },
     {
       "id": "working_as_intended",
@@ -117,8 +105,7 @@
       "transitions": [
         "assigned",
         "in_progress"
-      ],
-      "actions": []
+      ]
     },
     {
       "id": "deferred",
@@ -127,8 +114,7 @@
       "transitions": [
         "assigned",
         "in_progress"
-      ],
-      "actions": []
+      ]
     },
     {
       "id": "cannot_reproduce",
@@ -137,8 +123,72 @@
       "transitions": [
         "assigned",
         "in_progress"
-      ],
-      "actions": []
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "caption": "Assign to me",
+      "owner": "{me}"
+    },
+    {
+      "caption": "Begin Work",
+      "state": "in_progress",
+      "owner": "{me}"
+    },
+    {
+      "require": {
+        "state": [
+          "assigned",
+          "in_progress",
+          "qa"
+        ]
+      },
+      "caption": "Close: Working As Intended",
+      "state": "working_as_intended",
+      "owner": "{reporter}"
+    },
+    {
+      "require": {
+        "state": [
+          "assigned",
+          "in_progress",
+          "qa"
+        ]
+      },
+      "caption": "Close: Cannot Reproduce",
+      "state": "cannot_reproduce",
+      "owner": "{reporter}"
+    },
+    {
+      "caption": "Finish: In Review",
+      "state": "review"
+    },
+    {
+      "caption": "Finish: QA",
+      "state": "qa",
+      "owner": "{reporter}"
+    },
+    {
+      "caption": "Not Fixed",
+      "state": "assigned",
+      "owner": "{previous}",
+      "require": {
+        "state": [
+          "qa",
+          "review",
+          "working_as_intended"
+        ]
+      }
+    },
+    {
+      "caption": "Verify",
+      "state": "verified",
+      "owner": null
+    },
+    {
+      "caption": "Unassign",
+      "owner": "{none}"
     }
   ]
 }

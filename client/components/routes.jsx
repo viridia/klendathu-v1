@@ -4,6 +4,7 @@ import { ApolloProvider } from 'react-apollo';
 import { AppContainer } from 'react-hot-loader';
 import Page from './page.jsx';
 import ProjectPage from './projectPage.jsx';
+import DashboardPage from './dashboard/dashboardPage.jsx';
 import Dashboard from './dashboard/dashboard.jsx';
 import IssueDetails from './issues/issueDetails.jsx';
 import IssueCreate from './issues/issueCreate.jsx';
@@ -38,7 +39,7 @@ const Routes = (
             <Route component={ProjectSettings} path="/project/:project/settings" />
             <IndexRoute component={Dashboard} />
           </Route>
-          <IndexRoute component={Dashboard} />
+          <IndexRoute component={DashboardPage} />
           <Route component={ProfilePage} path="/profile" />
           <Route component={NotFound} path="*" />
         </Route>
