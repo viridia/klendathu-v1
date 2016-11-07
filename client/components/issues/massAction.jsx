@@ -44,7 +44,22 @@ const ACTION_TYPES = new Immutable.OrderedMap({
     caption: 'Change State',
     type: 'state',
     apply: (issue, update, value) => {
-      update.state = value;
+      if (issue.state !== value) {
+        update.state = value;
+        return true;
+      }
+      return false;
+    },
+  },
+  type: {
+    caption: 'Change Type',
+    type: 'type',
+    apply: (issue, update, value) => {
+      if (issue.type !== value) {
+        update.type = value;
+        return true;
+      }
+      return false;
     },
   },
   owner: {

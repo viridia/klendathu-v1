@@ -7,7 +7,7 @@
 * Get rid of typeahead
   * We'll need a slightly different autocomplete than the one we use for labels and users.
     (One which allows new items and editable suggestions).
-* Adding comments in the edit page.
+* Adding comments in the compose page.
 * A way to delete an issue
   * Individual delete - make sure to unlink related items.
   * Mass edit

@@ -1,7 +1,9 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
+import DropdownButton from 'react-bootstrap/lib/DropdownButton';
 import FormControl from 'react-bootstrap/lib/FormControl';
+import MenuItem from 'react-bootstrap/lib/MenuItem';
 import LabelSelector from './labelSelector.jsx';
 import UserAutoComplete from '../common/userAutoComplete.jsx';
 import './editOperand.scss';
@@ -58,6 +60,34 @@ export default class EditOperand extends React.Component {
                 {t.caption}
               </Checkbox>))}
           </div>);
+      }
+      case 'state': {
+        const items = project.workflow.states.map(st => (
+          <MenuItem eventKey={st.id} key={st.id}>{st.caption}</MenuItem>
+        ));
+        const selectedState = project.workflow.statesById.get(value);
+        return (
+          <DropdownButton
+              bsSize="small"
+              title={selectedState ? selectedState.caption : 'Choose state...'}
+              id="action-id"
+              onSelect={this.props.onChange}>
+            {items}
+          </DropdownButton>);
+      }
+      case 'type': {
+        const items = project.template.types.map(t => (
+          !t.abstract && <MenuItem eventKey={t.id} key={t.id}>{t.caption}</MenuItem>
+        ));
+        const selectedType = project.template.typesById.get(value);
+        return (
+          <DropdownButton
+              bsSize="small"
+              title={selectedType ? selectedType.caption : 'Choose type...'}
+              id="action-id"
+              onSelect={this.props.onChange}>
+            {items}
+          </DropdownButton>);
       }
       case 'label': {
         return (
