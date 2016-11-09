@@ -86,7 +86,7 @@ class FilterParams extends React.Component {
   onClearFilter(e) {
     e.preventDefault();
     this.setState({ terms: Immutable.List.of() });
-    browserHistory.push({ ...this.props.location });
+    browserHistory.push({ ...this.props.location, query: {} });
   }
 
   renderFilterTerms() {
