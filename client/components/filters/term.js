@@ -1,6 +1,8 @@
 import Immutable from 'immutable';
 import { defaultValueForType } from './editOperand.jsx';
 
+// NOTE: this is a sketch, this code is not currently used or referenced.
+
 /** Base class which represents a single term in a filter expression. */
 class FilterTerm {
   constructor(project, profile) {

@@ -17,6 +17,23 @@
             text-decoration: underline;
           }
         }
+
+      }
+
+      th {
+        padding: 0;
+        vertical-align: middle;
+        position: relative;
+        > button {
+          margin: 0;
+          width: 100%;
+          background-color: transparent;
+          border: none;
+          outline: none;
+          > .sort {
+            color: desaturate(lighten($b6, 25%), 20%);
+          }
+        }
       }
 
       .pad {

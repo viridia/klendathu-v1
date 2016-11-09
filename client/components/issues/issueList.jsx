@@ -4,9 +4,10 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
-import { Link } from 'react-router';
+import { Link, browserHistory } from 'react-router';
 import classNames from 'classnames';
 import LabelName from '../common/labelName.jsx';
+import ColumnSort from '../common/columnSort.jsx';
 import { clearSelection, selectIssues, deselectIssues } from '../../store/issueSelection';
 
 import './issueList.scss';
@@ -40,6 +41,7 @@ class IssueList extends React.Component {
     super(props);
     this.onChangeSelection = this.onChangeSelection.bind(this);
     this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
+    this.onChangeSort = this.onChangeSort.bind(this);
     this.state = {
       columns: ['priority', 'severity'],
     };
@@ -78,6 +80,13 @@ class IssueList extends React.Component {
     }
   }
 
+  onChangeSort(column, descending) {
+    const { query = {} } = this.props.location;
+    const sort = `${descending ? '-' : ''}${column}`;
+    browserHistory.replace({ ...this.props.location, query: { ...query, sort } });
+    // this.setState({ sort: column, descending });
+  }
+
   buildColumns(project) {
     this.columnRenderers = {};
     if (project) {
@@ -113,6 +122,11 @@ class IssueList extends React.Component {
 
   renderHeader() {
     const { selection } = this.props;
+    const { query = {} } = this.props.location;
+    const sortOrder = query.sort || '-updated';
+    const descending = sortOrder.startsWith('-');
+    const sort = descending ? sortOrder.slice(1) : sortOrder;
+    // const { sort, descending } = this.state;
     return (
       <thead>
         <tr className="heading">
@@ -127,21 +141,59 @@ class IssueList extends React.Component {
             </label>
           </th>
           <th className="id">#</th>
-          <th className="type">Type</th>
-          <th className="owner">Owner</th>
-          <th className="state">State</th>
+          <th className="type">
+            <ColumnSort
+                column="type"
+                sortKey={sort}
+                descending={descending}
+                onChangeSort={this.onChangeSort}>
+              Type
+            </ColumnSort>
+          </th>
+          <th className="owner">
+            <ColumnSort
+                column="owner"
+                sortKey={sort}
+                descending={descending}
+                onChangeSort={this.onChangeSort}>
+              Owner
+            </ColumnSort>
+          </th>
+          <th className="state">
+            <ColumnSort
+                column="state"
+                sortKey={sort}
+                descending={descending}
+                onChangeSort={this.onChangeSort}>
+              State
+            </ColumnSort>
+          </th>
           {this.state.columns.map(cname => {
             const cr = this.columnRenderers[`custom.${cname}`];
             if (cr) {
               return (<th
                   className={classNames('custom', { center: cr.center })}
                   key={cname}>
-                {cr.title}
+                <ColumnSort
+                    column={`custom.${cr.field.id}`}
+                    sortKey={sort}
+                    descending={descending}
+                    onChangeSort={this.onChangeSort}>
+                  {cr.title}
+                </ColumnSort>
               </th>);
             }
             return <th className="custom cener" key={cname}>--</th>;
           })}
-          <th className="summary">Summary</th>
+          <th className="summary">
+            <ColumnSort
+                column="summary"
+                sortKey={sort}
+                descending={descending}
+                onChangeSort={this.onChangeSort}>
+              Summary
+            </ColumnSort>
+          </th>
         </tr>
       </thead>
     );
@@ -238,7 +290,9 @@ IssueList.propTypes = {
       types: PropTypes.arrayOf(PropTypes.shape({})),
     }),
   }).isRequired,
-  location: PropTypes.shape({}).isRequired,
+  location: PropTypes.shape({
+    query: PropTypes.shape({}),
+  }).isRequired,
   selection: ImmutablePropTypes.set.isRequired,
   clearSelection: PropTypes.func.isRequired,
   selectIssues: PropTypes.func.isRequired,

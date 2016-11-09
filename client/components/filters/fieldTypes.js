@@ -37,7 +37,8 @@ const FIELD_TYPES = new Immutable.OrderedMap({
       }
     },
     parseQuery(query) {
-      return { ...this, value: new Immutable.Set(query.type.split(',')) };
+      const type = query.get('type');
+      return { ...this, value: new Immutable.Set(type.split(',')) };
     },
   },
   summary: {
@@ -122,13 +123,13 @@ const FIELD_TYPES = new Immutable.OrderedMap({
       console.log(term);
     },
   },
-  keywords: {
-    caption: 'Keywords',
-    type: 'text[]',
-    buildQuery: (query, term) => {
-      console.log(term);
-    },
-  },
+  // keywords: {
+  //   caption: 'Keywords',
+  //   type: 'text[]',
+  //   buildQuery: (query, term) => {
+  //     console.log(term);
+  //   },
+  // },
 });
 
 export function parseQuery(project, profile, client, query) {

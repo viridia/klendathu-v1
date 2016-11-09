@@ -1,5 +1,7 @@
 * What do we need to do to finalize the db format enough that we can start collecting
   real issues (and not worry about having to wipe the db during development?)
+  -- in order to make sorting of custom fields work, we have to change how custom fields
+      are represented.
   -- liking comments
   -- liking issues
 * Make sure that queries are invalidated by updated.
@@ -14,7 +16,7 @@
 * UpdateQueries
   * Issue list
   * User list (in autocomplete).
-  * Filtering and sorting?
+  * Sorting?
 * Issue compose needs role checks on individual fields.
 * Custom suggest field / enter key support.
   * Will be easier once we have some data

@@ -139,6 +139,13 @@ module.exports = new GraphQLObjectType({
     custom: {
       type: new GraphQLList(new GraphQLNonNull(customFieldType)),
       description: 'List of custom fields for this issue.',
+      resolve(issue) {
+        const result = [];
+        Object.keys(issue.custom).forEach(name => {
+          result.push({ name, value: issue.custom[name] });
+        });
+        return result;
+      },
     },
     comments: {
       type: new GraphQLList(new GraphQLNonNull(commentType)),

@@ -120,6 +120,7 @@ export default graphql(IssueListQuery, {
       description, descriptionPred,
       label, search,
       owner, reporter,
+      sort,
     } = query || {};
     return {
       variables: {
@@ -137,7 +138,7 @@ export default graphql(IssueListQuery, {
         labels: label && label.split(','),
         comment: undefined,
         commentPred: undefined,
-        sort: ['-updated'],
+        sort: [sort || '-updated'],
       },
     };
   },

@@ -1,7 +1,7 @@
 const { ObjectId } = require('mongodb');
 const logger = require('../common/logger');
 const Role = require('../common/role');
-const { NotFound, Forbidden, BadRequest, NotImplemented, InternalError, Unauthorized, Errors } =
+const { NotFound, Forbidden, BadRequest, InternalError, Unauthorized, Errors } =
     require('../common/errors');
 const escapeRegExp = require('../lib/escapeRegExp');
 
@@ -46,12 +46,30 @@ function symbolicUserName(user, username) {
   }
 }
 
+function customArrayToMap(custom) {
+  const result = {};
+  custom.forEach(({ name, value }) => { result[name] = value; });
+  return result;
+}
+
+function mapFromObject(obj) {
+  const map = new Map();
+  Object.keys(obj).forEach(key => {
+    map.set(key, obj[key]);
+  });
+  return map;
+}
+
 const VALID_SORT_KEYS = new Set([
   'id',
   'type',
+  'state',
+  'summary',
   'description',
   'created',
   'updated',
+  'owner',
+  'reporter',
   // How to do author and reporter?
 ]);
 
@@ -144,10 +162,9 @@ const resolverMethods = {
             dir = -1;
           }
           if (!VALID_SORT_KEYS.has(sortKey)) {
-            if (sortKey.startsWith('custom.')) {
-              return Promise.reject(new NotImplemented());
+            if (!sortKey.startsWith('custom.')) {
+              return Promise.reject(new BadRequest(Errors.INVALID_SORT_KEY));
             }
-            return Promise.reject(new BadRequest(Errors.INVALID_SORT_KEY));
           }
           sort.push([sortKey, dir]);
         }
@@ -208,7 +225,7 @@ const resolverMethods = {
           cc: (issue.cc || []),
           labels: issue.labels || [],
           linked: issue.linked || [],
-          custom: issue.custom || [],
+          custom: issue.custom ? customArrayToMap(issue.custom) : {},
           attachments: issue.attachments || [],
           public: !!issue.public,
           comments: (issue.comments || []).map(comment => ({
@@ -364,9 +381,9 @@ const resolverMethods = {
         }
 
         if (issue.custom !== undefined) {
-          record.custom = issue.custom;
-          const customPrev = new Map(existing.custom.map(custom => [custom.name, custom.value]));
-          const customNext = new Map(issue.custom.map(custom => [custom.name, custom.value]));
+          record.custom = customArrayToMap(issue.custom);
+          const customPrev = mapFromObject(existing.custom);
+          const customNext = mapFromObject(record.custom);
           const customChange = [];
           customNext.forEach((value, name) => {
             if (customPrev.has(name)) {

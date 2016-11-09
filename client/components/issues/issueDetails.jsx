@@ -56,7 +56,7 @@ class IssueDetails extends React.Component {
     if (this.props.data.issue === nextProps.data.issue) {
       return false;
     }
-    if (this.props.data.issue !== null && nextProps.data.issue !== null) {
+    if (this.props.data.issue && nextProps.data.issue) {
       const thisIssue = this.props.data.issue;
       const nextIssue = nextProps.data.issue;
       if (thisIssue.id !== nextIssue.id ||
