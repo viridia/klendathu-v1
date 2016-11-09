@@ -41,7 +41,7 @@ class LeftNav extends React.Component {
           icon={<PersonIcon />}
           title="My Open Issues"
           path={`/project/${project.name}/issues`}
-          query={{ owner: 'me', status: 'open' }} />
+          query={{ owner: 'me', state: 'open' }} />
       <NavItem
           icon={<LocalOfferIcon />}
           title="Labels"
@@ -57,7 +57,7 @@ class LeftNav extends React.Component {
       </ul>}
       <NavItem
           icon={<BookmarkIcon />}
-          title="Saved Queries"
+          title="Saved Filters"
           path={`/project/${project.name}/queries`} />
       <NavItem
           icon={<SettingsIcon />}

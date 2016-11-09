@@ -10,13 +10,13 @@
   display: flex;
   flex-wrap: wrap;
   > .checkbox {
-    margin: 4px 1em 4px 0;
+    margin: 4px 1em 4px 0 !important;
   }
 }
 
 .select-states {
   columns: 4;
   > .checkbox {
-    margin: 4px 1em 4px 0;
+    margin: 4px 1em 4px 0 !important;
   }
 }

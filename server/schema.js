@@ -70,15 +70,15 @@ module.exports = new GraphQLSchema({
             description: 'Query term that restricts the issue search to a set of states.',
           },
           owner: {
-            type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
+            type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
             description: 'Query term that restricts the issue search to a set of owners.',
           },
           reporter: {
-            type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
+            type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
             description: 'Query term that restricts the issue search to a set of reporters.',
           },
           cc: {
-            type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
+            type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
             description: 'Query term that restricts the issue search to a set of ccs.',
           },
           summary: {

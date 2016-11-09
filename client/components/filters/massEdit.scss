@@ -52,8 +52,13 @@ $bgColor: #c7b8e6;
         flex: 40;
       }
 
-      > .flex {
-        flex: 4;
+      > .action-operand {
+        flex: 1;
+
+        .chip {
+          line-height: 22px;
+          margin: 1px;
+        }
       }
 
       > .remove {

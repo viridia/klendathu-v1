@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import DropdownButton from 'react-bootstrap/lib/DropdownButton';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
 import CloseIcon from 'icons/ic_close_black_24px.svg';
-import EditOperand from './editOperand.jsx';
+import EditOperand, { defaultValueForType } from './editOperand.jsx';
 
 function append(issue, updates, fieldName, values) {
   const before = new Immutable.OrderedSet(issue[fieldName]);
@@ -104,10 +104,14 @@ export default class MassAction extends React.Component {
   }
 
   onSelectActionType(id) {
-    const { index, action } = this.props;
+    const { index, action, project } = this.props;
     const newAction = ACTION_TYPES.get(id);
     if (!action || newAction.type !== action.type) {
-      this.props.onChange(index, { ...newAction, value: null, id });
+      this.props.onChange(index, {
+        ...newAction,
+        value: defaultValueForType(project, newAction.type),
+        id,
+      });
     } else {
       this.props.onChange(index, { ...newAction, value: action.value, id });
     }
@@ -143,12 +147,13 @@ export default class MassAction extends React.Component {
           onSelect={this.onSelectActionType}>
         {items}
       </DropdownButton>
-      {action && (<EditOperand
-          type={action.type}
-          value={action.value}
-          project={project}
-          onChange={this.onChangeValue} />)}
-      <div className="flex" />
+      <section className="action-operand">
+        {action && (<EditOperand
+            type={action.type}
+            value={action.value}
+            project={project}
+            onChange={this.onChangeValue} />)}
+      </section>
       {index !== undefined &&
         <button className="remove" onClick={this.onRemove}><CloseIcon /></button>}
     </section>);

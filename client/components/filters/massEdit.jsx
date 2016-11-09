@@ -64,10 +64,11 @@ class MassEdit extends React.Component {
         <section className="card mass-edit">
           <header className="filters">
             <div className="title">
-              Mass Edit ({selection.size} issues)
+              Mass Edit ({selection.size} issues selected)
             </div>
             <Button
-                bsStyle="primary"
+                bsStyle="info"
+                bsSize="small"
                 disabled={this.state.actions.size === 0}
                 onClick={this.onSave}>Save All Changes</Button>
           </header>

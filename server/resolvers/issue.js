@@ -36,6 +36,16 @@ function inverseRelation(relation) {
   }
 }
 
+function symbolicUserName(user, username) {
+  if (username === 'me') {
+    return user.username;
+  } else if (username === 'none') {
+    return null;
+  } else {
+    return username;
+  }
+}
+
 const VALID_SORT_KEYS = new Set([
   'id',
   'type',
@@ -102,11 +112,11 @@ const resolverMethods = {
       }
 
       if (req.reporter) {
-        query.reporter = { $in: req.reporter.map(id => new ObjectId(id)) };
+        query.reporter = { $in: req.reporter.map(o => symbolicUserName(this.user, o)) };
       }
 
       if (req.owner) {
-        query.owner = { $in: req.owner.map(id => new ObjectId(id)) };
+        query.owner = { $in: req.owner.map(o => symbolicUserName(this.user, o)) };
       }
 
       // Must match *all* labels

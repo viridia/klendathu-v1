@@ -1,30 +1,105 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
 import DropdownButton from 'react-bootstrap/lib/DropdownButton';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
-import LabelSelector from './labelSelector.jsx';
+import LabelSelector from '../issues/labelSelector.jsx';
 import UserAutoComplete from '../common/userAutoComplete.jsx';
 import './editOperand.scss';
 
-/** Component which allows the user to enter a value for the filter and mass edit functions. */
-export default class EditOperand extends React.Component {
-  defaultValueForType(type) {
-    const { project } = this.props;
-    if (type === 'stateSet') {
-      return new Immutable.Set(project.workflow.states.filter(st => st.open).map(st => st.id));
-    } else if (type === 'typeSet') {
-      return new Immutable.Set(project.template.types.map(t => t.id));
-    } else if (type === 'label') {
-      return [];
-    } else if (type === 'user' || type === 'users') {
-      return [];
+export function defaultValueForType(project, type) {
+  if (type === 'stateSet') {
+    return new Immutable.Set(project.workflow.states.filter(st => !st.closed).map(st => st.id));
+  } else if (type === 'typeSet') {
+    return new Immutable.Set(project.template.types.map(t => t.id));
+  } else if (type === 'label') {
+    return [];
+  } else if (type === 'user' || type === 'users') {
+    return [];
+  } else {
+    return '';
+  }
+}
+
+class StateSetEditor extends React.Component {
+  constructor() {
+    super();
+    this.onChange = this.onChange.bind(this);
+  }
+
+  onChange(e) {
+    if (e.target.checked) {
+      this.props.onChange(this.props.value.add(e.target.dataset.id));
     } else {
-      return '';
+      this.props.onChange(this.props.value.remove(e.target.dataset.id));
     }
   }
 
+  render() {
+    const { project, value } = this.props;
+    return (
+      <div className="select-states">
+        {project.workflow.states.map(st => (
+          <Checkbox key={st.id} data-id={st.id} checked={value.has(st.id)} onChange={this.onChange}>
+            {st.caption}
+          </Checkbox>))}
+      </div>
+    );
+  }
+}
+
+StateSetEditor.propTypes = {
+  value: ImmutablePropTypes.set.isRequired,
+  project: PropTypes.shape({
+    workflow: PropTypes.shape({
+      states: PropTypes.arrayOf(PropTypes.shape({})),
+    }),
+  }).isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
+class TypeSetEditor extends React.Component {
+  constructor() {
+    super();
+    this.onChange = this.onChange.bind(this);
+  }
+
+  onChange(e) {
+    if (e.target.checked) {
+      this.props.onChange(this.props.value.add(e.target.dataset.id));
+    } else {
+      this.props.onChange(this.props.value.remove(e.target.dataset.id));
+    }
+  }
+
+  render() {
+    const { project, value } = this.props;
+    return (
+      <div className="select-types">
+        {project.template.types.map(t => (
+          !t.abstract &&
+            <Checkbox key={t.id} data-id={t.id} checked={value.has(t.id)} onChange={this.onChange}>
+              {t.caption}
+            </Checkbox>))}
+      </div>
+    );
+  }
+}
+
+TypeSetEditor.propTypes = {
+  value: ImmutablePropTypes.set.isRequired,
+  project: PropTypes.shape({
+    template: PropTypes.shape({
+      types: PropTypes.arrayOf(PropTypes.shape({})),
+    }),
+  }).isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
+/** Component which allows the user to enter a value for the filter and mass edit functions. */
+export default class EditOperand extends React.Component {
   render() {
     const { type, project, onChange } = this.props;
     if (!type) {
@@ -32,7 +107,7 @@ export default class EditOperand extends React.Component {
     }
     let value = this.props.value;
     if (value === null || value === undefined) {
-      value = this.defaultValueForType(type);
+      value = defaultValueForType(project, type);
     }
     switch (type) {
       case 'searchText':
@@ -41,25 +116,13 @@ export default class EditOperand extends React.Component {
               className="match-text"
               placeholder="text to match"
               value={value}
-              onChange={onChange} />
+              onChange={e => onChange(e.target.value)} />
         );
       case 'stateSet': {
-        return (
-          <div className="select-states">
-            {project.workflow.states.map(st => (
-              <Checkbox key={st.id} checked={false} onChange={onChange}>
-                {st.caption}
-              </Checkbox>))}
-          </div>);
+        return <StateSetEditor project={project} value={value} onChange={onChange} />;
       }
       case 'typeSet': {
-        return (
-          <div className="select-types">
-            {project.template.types.map(t => (
-              !t.abstract && <Checkbox key={t.id} checked={false} onChange={onChange}>
-                {t.caption}
-              </Checkbox>))}
-          </div>);
+        return <TypeSetEditor project={project} value={value} onChange={onChange} />;
       }
       case 'state': {
         const items = project.workflow.states.map(st => (

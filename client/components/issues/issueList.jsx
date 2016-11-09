@@ -5,13 +5,8 @@ import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
 import { Link } from 'react-router';
-import { graphql } from 'react-apollo';
 import classNames from 'classnames';
 import LabelName from '../common/labelName.jsx';
-import ErrorDisplay from '../debug/errorDisplay.jsx';
-import FilterParams from './filterParams.jsx';
-import MassEdit from './massEdit.jsx';
-import IssueListQuery from '../../graphql/queries/issueList.graphql';
 import { clearSelection, selectIssues, deselectIssues } from '../../store/issueSelection';
 
 import './issueList.scss';
@@ -47,7 +42,6 @@ class IssueList extends React.Component {
     this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
     this.state = {
       columns: ['priority', 'severity'],
-      search: '',
     };
     this.buildColumns(props.project);
     this.buildIssueIdList(props);
@@ -58,6 +52,7 @@ class IssueList extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    this.setState({ data: nextProps.data });
     this.buildColumns(nextProps.project);
     this.buildIssueIdList(nextProps);
   }
@@ -97,7 +92,7 @@ class IssueList extends React.Component {
   }
 
   buildIssueIdList(props) {
-    const { issues } = props.data;
+    const { issues } = props;
     if (!issues) {
       this.issueIds = [];
     } else {
@@ -208,9 +203,12 @@ class IssueList extends React.Component {
       </tr>);
   }
 
-  renderIssueList() {
-    const { issues } = this.props.data;
+  render() {
+    const { issues, loading } = this.props;
     if (!issues || issues.length === 0) {
+      if (loading) {
+        return <div className="card report" />;
+      }
       return (
         <div className="card report">
           <div className="no-issues">No issues found</div>
@@ -218,7 +216,6 @@ class IssueList extends React.Component {
       );
     }
 
-    // console.log(JSON.stringify(issues, null, 2));
     return (
       <div className="card report">
         <table className="issue">
@@ -230,87 +227,27 @@ class IssueList extends React.Component {
       </div>
     );
   }
-
-  render() {
-    const { issues, loading, error } = this.props.data;
-    if (error) {
-      return <ErrorDisplay error={error} />;
-    }
-    if (loading) {
-      return <section className="kdt issue-list" />;
-    }
-
-    return (<section className="kdt issue-list">
-      <FilterParams {...this.props} />
-      <MassEdit {...this.props} issues={issues} />
-      {this.renderIssueList()}
-    </section>);
-  }
 }
 
 IssueList.propTypes = {
-  data: PropTypes.shape({
-    error: PropTypes.shape({}),
-    loading: PropTypes.bool,
-    issues: PropTypes.arrayOf(PropTypes.shape({})),
-  }).isRequired,
+  loading: PropTypes.bool,
+  issues: PropTypes.arrayOf(PropTypes.shape({})),
   project: PropTypes.shape({
     id: PropTypes.string.isRequired,
     template: PropTypes.shape({
       types: PropTypes.arrayOf(PropTypes.shape({})),
     }),
   }).isRequired,
-  location: PropTypes.shape({
-    pathname: PropTypes.string.isRequired,
-    query: PropTypes.shape({
-      type: PropTypes.string,
-      state: PropTypes.string,
-      summary: PropTypes.string,
-      description: PropTypes.string,
-      labels: PropTypes.string,
-    }),
-  }).isRequired,
-  params: PropTypes.shape({
-    project: PropTypes.string,
-    states: PropTypes.string,
-  }).isRequired,
+  location: PropTypes.shape({}).isRequired,
   selection: ImmutablePropTypes.set.isRequired,
   clearSelection: PropTypes.func.isRequired,
   selectIssues: PropTypes.func.isRequired,
   deselectIssues: PropTypes.func.isRequired,
 };
 
-function defaultStates(project) {
-  // Default behavior is to show 'open' states.
-  return project.workflow.states.filter(st => !st.closed).map(st => st.id);
-}
-
-export default graphql(IssueListQuery, {
-  options: ({ project, location: { query } }) => {
-    const { type, state, summary, description, label, search } = query || {};
-    return {
-      variables: {
-        project: project.id,
-        search,
-        type: type && type.split(','),
-        state: state ? state.split(',') : defaultStates(project),
-        summary,
-        summaryPred: undefined,
-        description,
-        descriptionPred: undefined,
-        reporter: undefined,
-        owner: undefined,
-        cc: undefined,
-        labels: label && label.split(','),
-        comment: undefined,
-        commentPred: undefined,
-        sort: ['-updated'],
-      },
-    };
-  },
-})(connect(
+export default connect(
   (state) => ({
     selection: state.issueSelection,
   }),
   dispatch => bindActionCreators({ clearSelection, selectIssues, deselectIssues }, dispatch),
-)(IssueList));
+)(IssueList);

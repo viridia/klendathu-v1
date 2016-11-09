@@ -11,9 +11,11 @@ import './page.scss';
 
 class ProjectPage extends React.Component {
   render() {
-    const { children, params, data: { project, error } } = this.props;
+    const { children, params, data: { project, error, loading } } = this.props;
     if (error) {
       return <ErrorDisplay error={error} />;
+    } else if (loading) {
+      return <div className="content" />;
     } else if (!this.context.profile) {
       return <div className="content">Profile not loaded</div>;
     } else if (!project) {

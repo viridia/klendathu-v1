@@ -10,7 +10,7 @@ module.exports = new GraphQLEnumType({
     // REGEX: { value: 're' },
     STARTS_WITH: { value: 'sw' },
     ENDS_WITH: { value: 'ew' },
-    NOT_REGEX: { value: '!re' },
+    // NOT_REGEX: { value: '!re' },
     GREATER: { value: 'gt' },
     GREATER_EQUAL: { value: 'ge' },
     LESS: { value: 'lt' },

@@ -9,7 +9,7 @@ import Dashboard from './dashboard/dashboard.jsx';
 import IssueDetails from './issues/issueDetails.jsx';
 import IssueCreate from './issues/issueCreate.jsx';
 import IssueEdit from './issues/issueEdit.jsx';
-import IssueList from './issues/issueList.jsx';
+import IssueSummaryView from './issues/issueSummaryView.jsx';
 import LabelList from './labels/labelList.jsx';
 import ProjectSettings from './settings/projectSettings.jsx';
 import ProfilePage from './profile/profilePage.jsx';
@@ -34,7 +34,7 @@ const Routes = (
             <Route component={IssueCreate} path="/project/:project/new" />
             <Route component={IssueEdit} path="/project/:project/edit/:id" />
             <Route component={IssueDetails} path="/project/:project/issues/:id" />
-            <Route component={IssueList} path="/project/:project/issues" />
+            <Route component={IssueSummaryView} path="/project/:project/issues" />
             <Route component={LabelList} path="/project/:project/labels" />
             <Route component={ProjectSettings} path="/project/:project/settings" />
             <IndexRoute component={Dashboard} />
