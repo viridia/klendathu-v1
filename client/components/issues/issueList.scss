@@ -7,6 +7,10 @@
   .card {
     > .issue {
 
+      th {
+        font-size: 90%;
+      }
+
       td, th {
         a {
           padding: 5px 7px;
@@ -17,7 +21,10 @@
             text-decoration: underline;
           }
         }
+      }
 
+      td.pad {
+        padding: 5px 7px;
       }
 
       th {
@@ -36,12 +43,12 @@
         }
       }
 
-      .pad {
-        padding: 5px 7px;
+      .selected, .id, .type, .state, .owner, .created, .updated {
+        text-align: center;
       }
 
-      .selected, .id, .type, .state, .owner {
-        text-align: center;
+      .date {
+        white-space: nowrap;
       }
 
       .selected {

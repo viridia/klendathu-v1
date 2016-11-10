@@ -8,31 +8,98 @@ import { Link, browserHistory } from 'react-router';
 import classNames from 'classnames';
 import LabelName from '../common/labelName.jsx';
 import ColumnSort from '../common/columnSort.jsx';
+import RelativeDate from '../common/relativeDate.jsx';
 import { clearSelection, selectIssues, deselectIssues } from '../../store/issueSelection';
 
 import './issueList.scss';
 import './../common/card.scss';
 
-class ColumnRenderer {
+class StdColumnRenderer {
+  constructor(title, fieldName, className) {
+    this.title = title;
+    this.fieldName = fieldName;
+    this.className = className;
+  }
+
+  renderHeader(sort, descending, onChangeSort) {
+    return (
+      <th className={this.className} key={this.fieldName}>
+        <ColumnSort
+            column={this.fieldName}
+            sortKey={sort}
+            descending={descending}
+            onChangeSort={onChangeSort}>
+          {this.title}
+        </ColumnSort>
+      </th>
+    );
+  }
+}
+
+class TextColumnRenderer extends StdColumnRenderer {
+  render(issue) {
+    return (
+      <td className={this.className} key={this.fieldName}>
+        {issue[this.fieldName]}
+      </td>
+    );
+  }
+}
+
+class UserColumnRenderer extends StdColumnRenderer {
+  render(issue) {
+    return (
+      <td className={this.className} key={this.fieldName}>
+        {issue[this.fieldName] || <div className="unassigned">unassigned</div>}
+      </td>
+    );
+  }
+}
+
+class DateColumnRenderer extends StdColumnRenderer {
+  render(issue) {
+    return (
+      <td className={this.className} key={this.fieldName}>
+        <RelativeDate date={new Date(issue[this.fieldName])} brief />
+      </td>
+    );
+  }
+}
+
+class CustomColumnRenderer {
   constructor(field) {
     this.field = field;
+    this.title = this.field.caption;
+    this.className = classNames('custom pad', { center: this.center });
   }
 
-  get title() {
-    return this.field.caption;
-  }
-
-  get center() {
-    return this.field.align === 'center';
+  renderHeader(sort, descending, onChangeSort) {
+    return (
+      <th className={this.className} key={this.field.id}>
+        <ColumnSort
+            column={`custom.${this.field.id}`}
+            sortKey={sort}
+            descending={descending}
+            onChangeSort={onChangeSort}>
+          {this.title}
+        </ColumnSort>
+      </th>
+    );
   }
 
   render(issue) {
-    for (const customField of issue.custom) {
-      if (customField.name === this.field.id) {
-        return customField.value;
+    if (issue.custom) {
+      for (const customField of issue.custom) {
+        if (customField.name === this.field.id) {
+          return (<td
+              className={this.className}
+              key={this.field.id}>
+            {customField.value}
+          </td>);
+        }
       }
     }
-    return '';
+    return <td className="custom" key={this.field.id} />;
   }
 }
 
@@ -43,7 +110,7 @@ class IssueList extends React.Component {
     this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
     this.onChangeSort = this.onChangeSort.bind(this);
     this.state = {
-      columns: ['priority', 'severity'],
+      columns: ['updated', 'type', 'owner', 'state', 'custom.priority', 'custom.severity'],
     };
     this.buildColumns(props.project);
     this.buildIssueIdList(props);
@@ -88,12 +155,19 @@ class IssueList extends React.Component {
   }
 
   buildColumns(project) {
-    this.columnRenderers = {};
+    this.columnRenderers = {
+      state: new TextColumnRenderer('State', 'state', 'state pad'),
+      type: new TextColumnRenderer('Type', 'type', 'type pad'),
+      reporter: new UserColumnRenderer('Reporter', 'reporter', 'reporter pad'),
+      owner: new UserColumnRenderer('Owner', 'owner', 'owner pad'),
+      created: new DateColumnRenderer('Created', 'created', 'created pad'),
+      updated: new DateColumnRenderer('Updated', 'updated', 'updated pad'),
+    };
     if (project) {
       for (const type of this.props.project.template.types) {
         if (type.fields) {
           for (const field of type.fields) {
-            this.columnRenderers[`custom.${field.id}`] = new ColumnRenderer(field);
+            this.columnRenderers[`custom.${field.id}`] = new CustomColumnRenderer(field);
           }
         }
       }
@@ -140,50 +214,21 @@ class IssueList extends React.Component {
                   onChange={this.onChangeSelectAll} />
             </label>
           </th>
-          <th className="id">#</th>
-          <th className="type">
+          <th className="id">
             <ColumnSort
-                column="type"
+                column="id"
                 sortKey={sort}
                 descending={descending}
                 onChangeSort={this.onChangeSort}>
-              Type
-            </ColumnSort>
-          </th>
-          <th className="owner">
-            <ColumnSort
-                column="owner"
-                sortKey={sort}
-                descending={descending}
-                onChangeSort={this.onChangeSort}>
-              Owner
-            </ColumnSort>
-          </th>
-          <th className="state">
-            <ColumnSort
-                column="state"
-                sortKey={sort}
-                descending={descending}
-                onChangeSort={this.onChangeSort}>
-              State
+              #
             </ColumnSort>
           </th>
           {this.state.columns.map(cname => {
-            const cr = this.columnRenderers[`custom.${cname}`];
+            const cr = this.columnRenderers[cname];
             if (cr) {
-              return (<th
-                  className={classNames('custom', { center: cr.center })}
-                  key={cname}>
-                <ColumnSort
-                    column={`custom.${cr.field.id}`}
-                    sortKey={sort}
-                    descending={descending}
-                    onChangeSort={this.onChangeSort}>
-                  {cr.title}
-                </ColumnSort>
-              </th>);
+              return cr.renderHeader(sort, descending, this.onChangeSort);
             }
-            return <th className="custom cener" key={cname}>--</th>;
+            return <th className="custom center" key={cname}>--</th>;
           })}
           <th className="summary">
             <ColumnSort
@@ -224,25 +269,10 @@ class IssueList extends React.Component {
         <td className="id">
           <Link to={linkTarget}>{issue.id}</Link>
         </td>
-        <td className="type">
-          <Link to={linkTarget}>{issue.type}</Link>
-        </td>
-        <td className="owner">
-          <div className="pad">
-            {issue.owner || <div className="unassigned">unassigned</div>}
-          </div>
-        </td>
-        <td className="state">
-          <Link to={linkTarget}>{issue.state}</Link>
-        </td>
         {this.state.columns.map(cname => {
-          const cr = this.columnRenderers[`custom.${cname}`];
+          const cr = this.columnRenderers[cname];
           if (cr) {
-            return (<td
-                className={classNames('custom', { center: cr.center })}
-                key={cname}>
-              <div className="pad">{cr.render(issue)}</div>
-            </td>);
+            return cr.render(issue);
           }
           return <td className="custom" key={cname} />;
         })}
@@ -272,9 +302,7 @@ class IssueList extends React.Component {
       <div className="card report">
         <table className="issue">
           {this.renderHeader()}
-          <tbody>
-            {issues.map(i => this.renderIssue(i))}
-          </tbody>
+          <tbody>{issues.map(i => this.renderIssue(i))}</tbody>
         </table>
       </div>
     );

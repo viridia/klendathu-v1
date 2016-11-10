@@ -107,7 +107,7 @@ export default class CreateProjectDialog extends React.Component {
           <Modal.Title>Create Project</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <form className="create-project-form">
+          <form className="create-project-form" onSubmit={this.onCreate}>
             <FormGroup
                 controlId="project_name"
                 validationState={this.state.projectNameError && 'error'}>
@@ -166,6 +166,5 @@ CreateProjectDialog.propTypes = {
 };
 
 CreateProjectDialog.contextTypes = {
-  profile: React.PropTypes.shape({
-  }),
+  profile: React.PropTypes.shape({}),
 };

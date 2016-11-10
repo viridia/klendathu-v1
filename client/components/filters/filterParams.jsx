@@ -10,6 +10,7 @@ import FormControl from 'react-bootstrap/lib/FormControl';
 import CloseIcon from 'icons/ic_close_black_24px.svg';
 import DiscloseButton from '../common/discloseButton.jsx';
 import FilterTerm from './filterTerm.jsx';
+import SaveFilterDialog from './saveFilterDialog.jsx';
 import { showFilters, addFilterTerm, updateFilterTerm, removeFilterTerm, setFilterTerms }
   from '../../store/filter';
 import './filterParams.scss';
@@ -26,8 +27,10 @@ class FilterParams extends React.Component {
     this.onApplyFilter = this.onApplyFilter.bind(this);
     this.onSaveFilter = this.onSaveFilter.bind(this);
     this.onClearFilter = this.onClearFilter.bind(this);
+    this.onCloseSaveDialog = this.onCloseSaveDialog.bind(this);
     this.state = {
       search: props.search || '',
+      showSaveDialog: false,
     };
   }
 
@@ -74,13 +77,16 @@ class FilterParams extends React.Component {
     this.props.terms.forEach(term => {
       term.buildQuery(query, term);
     });
-    // console.log('execute filter:', JSON.stringify(query, null, 2));
     browserHistory.push({ ...this.props.location, query });
   }
 
   onSaveFilter(e) {
     e.preventDefault();
-    console.log('implement save filter');
+    this.setState({ showSaveDialog: true });
+  }
+
+  onCloseSaveDialog() {
+    this.setState({ showSaveDialog: false });
   }
 
   onClearFilter(e) {
@@ -120,6 +126,7 @@ class FilterParams extends React.Component {
                 onClick={this.onApplyFilter}
                 disabled={this.props.terms.size === 0}>Apply Filter</Button>
           </FilterTerm>
+          {this.state.showSaveDialog && <SaveFilterDialog onHide={this.onCloseSaveDialog} />}
         </section>
       </Collapse>
     );
