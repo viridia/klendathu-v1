@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react';
+// import Perf from 'react-addons-perf';
 import 'react-redux-toastr/src/less/index.less';
+import equal from 'deep-equal';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { graphql } from 'react-apollo';
@@ -10,8 +12,29 @@ import { ProjectContent } from '../store/fragments';
 import './page.scss';
 
 class ProjectPage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.cachedProject = props.data.project;
+    // Perf.start();
+  }
+
+  componentDidMount() {
+    // setTimeout(() => {
+    //   Perf.stop();
+    //   Perf.printWasted(Perf.getLastMeasurements());
+    // }, 1000);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // Make sure that project pointer doesn't change unless value does. Allows shallow compares.
+    if (!equal(this.cachedProject, nextProps.data.project)) {
+      this.cachedProject = nextProps.data.project;
+    }
+  }
+
   render() {
-    const { children, params, data: { project, error, loading } } = this.props;
+    const { children, params, data: { error, loading } } = this.props;
+    const project = this.cachedProject;
     if (error) {
       return <ErrorDisplay error={error} />;
     } else if (loading) {

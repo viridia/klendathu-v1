@@ -20,6 +20,14 @@ class MassEdit extends React.Component {
     };
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.props.project !== nextProps.project
+        || this.props.issues !== nextProps.issues
+        || this.props.selection !== nextProps.selection
+        || this.state.expanded !== nextState.expanded
+        || this.state.actions !== nextState.action;
+  }
+
   onChangeAction(index, action) {
     if (index !== undefined) {
       this.setState({ actions: this.state.actions.set(index, action) });
@@ -97,6 +105,7 @@ MassEdit.propTypes = {
     template: PropTypes.shape({
       types: PropTypes.arrayOf(PropTypes.shape({})),
     }),
+    workflow: PropTypes.shape({}),
   }).isRequired,
   issues: PropTypes.arrayOf(PropTypes.shape({})),
   selection: ImmutablePropTypes.set.isRequired,

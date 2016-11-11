@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import Immutable from 'immutable';
 import { graphql, withApollo } from 'react-apollo';
 import ApolloClient from 'apollo-client';
+import equal from 'deep-equal';
 import ErrorDisplay from '../debug/errorDisplay.jsx';
 import FilterParams from '../filters/filterParams.jsx';
 import MassEdit from '../filters/massEdit.jsx';
@@ -34,6 +35,14 @@ class IssueSummaryView extends React.Component {
       this.query = query;
       this.parseQuery();
     }
+  }
+
+  shouldComponentUpdate(nextProps) {
+    return this.props.data.issues !== nextProps.data.issues
+        || this.props.data.loading !== nextProps.data.loading
+        || this.props.project !== nextProps.project
+        || !equal(this.props.data.error, nextProps.data.error)
+        || !equal(this.props.location, nextProps.location);
   }
 
   parseQuery() {

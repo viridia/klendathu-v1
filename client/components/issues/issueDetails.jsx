@@ -96,7 +96,7 @@ class IssueDetails extends React.Component {
     const { location: { state }, data: { issue } } = props;
     let prevIssue = null;
     let nextIssue = null;
-    if (issue && state.idList && state.idList.length > 0) {
+    if (issue && state && state.idList && state.idList.length > 0) {
       const index = Math.max(0, state.idList.indexOf(issue.id));
       if (index > 0) {
         prevIssue = state.idList[index - 1];

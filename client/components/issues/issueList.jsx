@@ -126,6 +126,17 @@ class IssueList extends React.Component {
     this.buildIssueIdList(nextProps);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      this.props.loading !== nextProps.loading ||
+      this.props.issues !== nextProps.issues ||
+      this.props.project !== nextProps.project ||
+      this.props.project.template !== nextProps.project.template ||
+      this.props.location !== nextProps.location ||
+      this.props.selection !== nextProps.selection ||
+      this.state.columns !== nextState.columns);
+  }
+
   componentDidUpdate() {
     this.updateSelectAll();
   }

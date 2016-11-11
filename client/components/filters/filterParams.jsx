@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import equal from 'deep-equal';
 import Button from 'react-bootstrap/lib/Button';
 import Collapse from 'react-bootstrap/lib/Collapse';
 import FormControl from 'react-bootstrap/lib/FormControl';
@@ -32,6 +33,16 @@ class FilterParams extends React.Component {
       search: props.search || '',
       showSaveDialog: false,
     };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.props.project !== nextProps.project
+        || !equal(this.props.location, nextProps.location)
+        || this.props.search !== nextProps.search
+        || this.props.visible !== nextProps.visible
+        || this.props.terms !== nextProps.terms
+        || this.state.search !== nextState.search
+        || this.state.showSaveDialog !== nextState.showSaveDialog;
   }
 
   onChangeSearch(e) {

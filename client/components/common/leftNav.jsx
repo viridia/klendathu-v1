@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import { graphql } from 'react-apollo';
+import equal from 'deep-equal';
 import AppsIcon from 'icons/ic_apps_black_24px.svg';
 import ListIcon from 'icons/ic_list_black_24px.svg';
 import BookmarkIcon from 'icons/ic_bookmark_border_black_24px.svg';
@@ -28,6 +29,12 @@ NavItem.propTypes = {
 };
 
 class LeftNav extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    return this.props.project.id !== nextProps.project.id
+        || this.props.project.name !== nextProps.project.name
+        || !equal(this.props.data.labels, nextProps.data.labels);
+  }
+
   render() {
     const { project } = this.props;
     const { labels } = this.props.data;
