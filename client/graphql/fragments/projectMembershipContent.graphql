@@ -2,7 +2,8 @@ fragment projectMembershipContent on ProjectMembership {
   user
   role
   labels
-  queries {
+  filters {
     name
+    value
   }
 }

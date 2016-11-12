@@ -22,7 +22,8 @@ export default class ErrorDisplay extends React.Component {
   renderGQLError(error, index) {
     return (
       <div key={index}>
-        <pre>{error.details.error}</pre>
+        {error.details && <pre>{error.details.error}</pre>}
+        {error.message && <pre>{error.message}</pre>}
         <pre className="stack">
           {error.stack}
         </pre>

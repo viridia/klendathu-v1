@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import { graphql } from 'react-apollo';
 import { toastr } from 'react-redux-toastr';
+import Immutable from 'immutable';
 import Button from 'react-bootstrap/lib/Button';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
 import Modal from 'react-bootstrap/lib/Modal';
@@ -10,12 +11,13 @@ import LabelDialog from './labelDialog.jsx';
 import LabelName from '../common/labelName.jsx';
 import LabelsQuery from '../../graphql/queries/labels.graphql';
 import { deleteLabel } from '../../store/label';
+import { updateProjectMembership } from '../../store/projectMembership';
 import './labelList.scss';
 import './../common/card.scss';
 
 class LabelList extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.onShowCreate = this.onShowCreate.bind(this);
     this.onHideCreate = this.onHideCreate.bind(this);
     this.onShowDelete = this.onShowDelete.bind(this);
@@ -23,13 +25,19 @@ class LabelList extends React.Component {
     this.onShowUpdate = this.onShowUpdate.bind(this);
     this.onCreateLabel = this.onCreateLabel.bind(this);
     this.onDeleteLabel = this.onDeleteLabel.bind(this);
+    this.onChangeVisible = this.onChangeVisible.bind(this);
     this.state = {
       showCreate: false,
       showDelete: false,
       labelToDelete: null,
       labelToUpdate: null,
+      visible: this.visibleSet(props),
       busy: false,
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({ visible: this.visibleSet(nextProps) });
   }
 
   onShowCreate(e) {
@@ -74,12 +82,34 @@ class LabelList extends React.Component {
     this.setState({ showCreate: true, labelToUpdate: label });
   }
 
+  onChangeVisible(e) {
+    const { project } = this.props;
+    const { username } = this.context.profile;
+    const id = parseInt(e.target.dataset.id, 10);
+    if (e.target.checked) {
+      updateProjectMembership(project.id, username, { addLabels: [id] });
+    } else {
+      updateProjectMembership(project.id, username, { removeLabels: [id] });
+    }
+  }
+
+  visibleSet(props) {
+    const { projectMembership } = props.data;
+    return new Immutable.Set(projectMembership ? projectMembership.labels : []);
+  }
+
   renderLabel(label) {
     // TODO: Role check on edit / delete
     return (
       <tr key={label.id}>
         <td className="label-id center">{label.id}</td>
-        <td className="visible center"><Checkbox bsClass="cbox" /></td>
+        <td className="visible center">
+          <Checkbox
+              bsClass="cbox"
+              data-id={label.id}
+              checked={this.state.visible.has(label.id)}
+              onChange={this.onChangeVisible} />
+        </td>
         <td className="name center"><LabelName project={label.project} label={label.id} /></td>
         <td className="creator center">label.creator</td>
         <td className="created center">{dateFormat(label.created, 'mmm dS, yyyy h:MM TT')}</td>
@@ -104,7 +134,7 @@ class LabelList extends React.Component {
         <thead>
           <tr className="heading">
             <th className="id center">#</th>
-            <th className="visible center">Visible</th>
+            <th className="visible center">Hotlist</th>
             <th className="name center">Label</th>
             <th className="owner center">Creator</th>
             <th className="created center">Created</th>
@@ -128,6 +158,7 @@ class LabelList extends React.Component {
         <LabelDialog
             project={this.props.project}
             label={this.state.labelToUpdate}
+            visible={this.state.visible.has(this.state.labelToUpdate.id)}
             onHide={this.onHideCreate}
             onInsertLabel={this.onCreateLabel} />)}
       {this.state.showDelete && (
@@ -161,7 +192,12 @@ LabelList.propTypes = {
   data: PropTypes.shape({
     error: PropTypes.shape({}),
     labels: PropTypes.arrayOf(PropTypes.shape({})),
+    projectMembership: PropTypes.shape({}),
   }).isRequired,
+};
+
+LabelList.contextTypes = {
+  profile: PropTypes.shape({}),
 };
 
 export default graphql(LabelsQuery, {

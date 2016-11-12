@@ -13,7 +13,7 @@ export function defaultValueForType(project, type) {
   if (type === 'stateSet') {
     return new Immutable.Set(project.workflow.states.filter(st => !st.closed).map(st => st.id));
   } else if (type === 'typeSet') {
-    return new Immutable.Set(project.template.types.map(t => t.id));
+    return new Immutable.Set(project.template.types.filter(t => !t.abstract).map(t => t.id));
   } else if (type === 'label') {
     return [];
   } else if (type === 'user' || type === 'users') {

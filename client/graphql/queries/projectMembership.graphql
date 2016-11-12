@@ -1,0 +1,17 @@
+query projectMembershipQuery($project: ID!, $user: String) {
+  projectMembership(project: $project, user: $user) {
+    user
+    role
+    inheritedRole
+    labels
+    labelsData {
+      id
+      name
+      color
+    }
+    filters {
+      name
+      value
+    }
+  }
+}

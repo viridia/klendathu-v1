@@ -256,7 +256,7 @@ class IssueList extends React.Component {
   }
 
   renderIssue(issue) {
-    const { project, selection } = this.props;
+    const { project, selection, labels } = this.props;
     const linkTarget = {
       pathname: `/project/${project.name}/issues/${issue.id}`,
       state: {
@@ -290,7 +290,9 @@ class IssueList extends React.Component {
         <td className="title">
           <Link to={linkTarget}>
             <span className="summary">{issue.summary}</span>
-            {issue.labels.map(l => <LabelName project={project.id} label={l} key={l} />)}
+            {issue.labels
+              .filter(l => labels.has(l))
+              .map(l => <LabelName project={project.id} label={l} key={l} />)}
           </Link>
         </td>
       </tr>);
@@ -332,6 +334,7 @@ IssueList.propTypes = {
   location: PropTypes.shape({
     query: PropTypes.shape({}),
   }).isRequired,
+  labels: ImmutablePropTypes.set.isRequired,
   selection: ImmutablePropTypes.set.isRequired,
   clearSelection: PropTypes.func.isRequired,
   selectIssues: PropTypes.func.isRequired,

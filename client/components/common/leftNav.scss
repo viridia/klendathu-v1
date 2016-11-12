@@ -30,12 +30,15 @@
     }
   }
 
-  .label-list {
+  .label-list, .filter-list {
     margin: 4px;
     padding-left: 26px;
   }
 
-  li.label-item {
+  li.label-item, li.filter-item {
     margin: 4px 0;
+    > a {
+      text-decoration: none;
+    }
   }
 }

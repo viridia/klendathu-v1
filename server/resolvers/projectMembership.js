@@ -6,7 +6,7 @@ const { NotFound, Forbidden, Unauthorized, InternalError, Errors } = require('..
 const resolverMethods = {
   projectMembership({ project, user }) {
     return this.db.collection('projectMemberships').findOne(
-        { user, project: new ObjectId(project) });
+        { user: user || this.user.username, project: new ObjectId(project) });
   },
 
   projectMemberships({ project }) {
@@ -43,17 +43,13 @@ const resolverMethods = {
 
       const pms = this.db.collection('projectMemberships');
       return pms.findOne(query).then(existing => {
-        const record = {
-          updated: new Date(),
-        };
+        const update = { $set: { updated: new Date() } };
 
         // Create if non-existent
         if (!existing) {
-          record.user = user;
-          record.project = proj._id;
-          record.role = null;
-          record.labels = [];
-          record.queries = [];
+          update.$set.user = user;
+          update.$set.project = proj._id;
+          update.$set.role = null;
         }
 
         // Role change
@@ -62,22 +58,51 @@ const resolverMethods = {
             logger.error('Access denied changing user role', project, this.user);
             return Promise.reject(new Forbidden(Errors.INSUFFICIENT_ACCESS));
           }
-          record.role = membership.role;
+          update.$set.role = membership.role;
         }
 
         // List of displayed labels (hot list)
         if (membership.labels) {
-          record.labels = membership.labels;
+          update.$set.labels = membership.labels;
         }
 
-        // Queries
-        if (membership.queries) {
-          record.queries = membership.queries;
+        if (membership.addLabels) {
+          update.$addToSet = { labels: { $each: membership.addLabels } };
         }
 
-        return pms.updateOne(query, {
-          $set: record,
-        }, { upsert: true }).then(() => {
+        if (membership.removeLabels) {
+          update.$pullAll = { labels: membership.removeLabels };
+        }
+
+        // Filters
+        if (membership.filters) {
+          update.$set.filters = {};
+          membership.filters.forEach(filter => {
+            update.$set.filters[filter.name] = filter.value;
+          });
+        }
+
+        if (membership.addFilters) {
+          if (!existing || !existing.filters) {
+            update.$set.filters = {};
+            membership.addFilters.forEach(filter => {
+              update.$set.filters[filter.name] = filter.value;
+            });
+          } else {
+            membership.addFilters.forEach(filter => {
+              update.$set[`filters.${filter.name}`] = filter.value;
+            });
+          }
+        }
+
+        if (membership.removeFilters) {
+          update.$unset = {};
+          membership.removeFilters.forEach(name => {
+            update.$unset[`filters.${name}`] = '';
+          });
+        }
+
+        return pms.updateOne(query, update, { upsert: true }).then(() => {
           return pms.findOne(query);
         }, error => {
           logger.error('Error updating project membership', user, proj.name, error);

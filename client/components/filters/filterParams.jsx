@@ -84,10 +84,7 @@ class FilterParams extends React.Component {
 
   onApplyFilter(e) {
     e.preventDefault();
-    const query = {};
-    this.props.terms.forEach(term => {
-      term.buildQuery(query, term);
-    });
+    const query = this.buildFilter();
     browserHistory.push({ ...this.props.location, query });
   }
 
@@ -106,7 +103,16 @@ class FilterParams extends React.Component {
     browserHistory.push({ ...this.props.location, query: {} });
   }
 
+  buildFilter() {
+    const query = {};
+    this.props.terms.forEach(term => {
+      term.buildQuery(query, term);
+    });
+    return query;
+  }
+
   renderFilterTerms() {
+    const { project } = this.props;
     return (
       <Collapse className="term-list" in={this.props.visible}>
         <section className="term-list">
@@ -137,7 +143,11 @@ class FilterParams extends React.Component {
                 onClick={this.onApplyFilter}
                 disabled={this.props.terms.size === 0}>Apply Filter</Button>
           </FilterTerm>
-          {this.state.showSaveDialog && <SaveFilterDialog onHide={this.onCloseSaveDialog} />}
+          {this.state.showSaveDialog &&
+            <SaveFilterDialog
+                project={project}
+                filter={JSON.stringify(this.buildFilter())}
+                onHide={this.onCloseSaveDialog} />}
         </section>
       </Collapse>
     );

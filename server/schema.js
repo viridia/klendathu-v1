@@ -167,7 +167,7 @@ module.exports = new GraphQLSchema({
           },
           user: {
             type: GraphQLString,
-            description: 'User name of the user.',
+            description: 'User name of the user. Defaults to current user.',
           },
         },
       },

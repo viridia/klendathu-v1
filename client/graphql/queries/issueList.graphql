@@ -46,4 +46,7 @@ query issueListQuery(
       value
     }
   }
+  projectMembership(project: $project) {
+    labels
+  }
 }

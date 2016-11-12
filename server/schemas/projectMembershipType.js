@@ -1,12 +1,17 @@
 const { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLList, GraphQLNonNull } =
     require('graphql');
+const labelType = require('./labelType');
 
-const savedQuery = new GraphQLObjectType({
-  name: 'SavedQuery',
+const savedFilter = new GraphQLObjectType({
+  name: 'SavedFilter',
   fields: {
     name: {
       type: new GraphQLNonNull(GraphQLString),
-      description: 'Access level for the this user.',
+      description: 'Name of this filter.',
+    },
+    value: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'JSON-encoded filter expression.',
     },
   },
 });
@@ -29,11 +34,30 @@ module.exports = new GraphQLObjectType({
     },
     labels: {
       type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
-      description: 'List of labels to display in the issue summary list.',
+      description: 'List of label names to display in the issue summary list.',
     },
-    queries: {
-      type: new GraphQLList(new GraphQLNonNull(savedQuery)),
+    labelsData: {
+      type: new GraphQLList(new GraphQLNonNull(labelType)),
+      description: 'List of labels to display in the issue summary list.',
+      resolve(pm, args, context, options) {
+        if (pm.labels.length === 0) {
+          return [];
+        }
+        return options.rootValue.labelsById({ project: pm.project, idList: pm.labels });
+      },
+    },
+    filters: {
+      type: new GraphQLList(new GraphQLNonNull(savedFilter)),
       description: 'List of saved queries.',
+      resolve(pm) {
+        const result = [];
+        if (pm.filters !== undefined) {
+          Object.keys(pm.filters).forEach(name => {
+            result.push({ name, value: pm.filters[name] });
+          });
+        }
+        return result;
+      },
     },
   },
 });

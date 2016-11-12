@@ -4,8 +4,9 @@ query projectMembershipQuery($project: ID!) {
     role
     inheritedRole
     labels
-    queries {
+    filters {
       name
+      value
     }
   }
 }

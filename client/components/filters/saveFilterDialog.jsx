@@ -5,7 +5,9 @@ import FormControl from 'react-bootstrap/lib/FormControl';
 import FormGroup from 'react-bootstrap/lib/FormGroup';
 import HelpBlock from 'react-bootstrap/lib/HelpBlock';
 import Modal from 'react-bootstrap/lib/Modal';
+import { toastr } from 'react-redux-toastr';
 import AddBoxIcon from 'icons/ic_add_box_black_24px.svg';
+import { updateProjectMembership } from '../../store/projectMembership';
 import './saveFilterDialog.scss';
 
 export default class SaveFilterDialog extends React.Component {
@@ -23,11 +25,30 @@ export default class SaveFilterDialog extends React.Component {
   onSave(ev) {
     console.log('save');
     ev.preventDefault();
+    const { project } = this.props;
     // const newState = {
     //   filterNameError: null,
     //   busy: false,
     // };
     this.setState({ busy: true });
+    return updateProjectMembership(project.id, this.context.profile.username, {
+      addFilters: [{ name: this.state.filterName, value: this.props.filter }],
+    })
+    .then(() => {
+      this.setState({ busy: false });
+      // if (this.props.onAddMember) {
+      //   this.props.onAddMember(result.data.updateProjectMembership);
+      // }
+      this.props.onHide();
+    }, error => {
+      console.error(error);
+      if (error.response && error.response.data && error.response.data.err) {
+        toastr.error('Operation failed.', `Server returned '${error.response.data.err}'`);
+      } else {
+        toastr.error('Operation failed.', error.message);
+      }
+    });
+
     // createFilter({
     //   owningUser: this.state.owner,
     //   name: this.state.filterName,
@@ -112,6 +133,10 @@ export default class SaveFilterDialog extends React.Component {
 }
 
 SaveFilterDialog.propTypes = {
+  project: React.PropTypes.shape({
+    id: React.PropTypes.string.isRequired,
+  }).isRequired,
+  filter: PropTypes.string.isRequired,
   onHide: PropTypes.func.isRequired,
 };
 

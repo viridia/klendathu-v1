@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { withApollo } from 'react-apollo';
 import Button from 'react-bootstrap/lib/Button';
+import Checkbox from 'react-bootstrap/lib/Checkbox';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import FormGroup from 'react-bootstrap/lib/FormGroup';
@@ -8,23 +9,24 @@ import Modal from 'react-bootstrap/lib/Modal';
 import classNames from 'classnames';
 import { toastr } from 'react-redux-toastr';
 import { createLabel, updateLabel } from '../../store/label';
+import { updateProjectMembership } from '../../store/projectMembership';
 import LABEL_COLORS from '../common/labelColors';
 import './labelDialog.scss';
 import '../common/ac/chip.scss';
-
-// UpdateLabelMutation
 
 class LabelDialog extends React.Component {
   constructor(props) {
     super(props);
     this.onChangeLabelText = this.onChangeLabelText.bind(this);
     this.onChangeLabelColor = this.onChangeLabelColor.bind(this);
+    this.onChangeVisible = this.onChangeVisible.bind(this);
     this.onUpdateLabel = this.onUpdateLabel.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     if (props.label) {
       this.state = {
         name: props.label.name,
         color: props.label.color,
+        visible: props.visible,
         busy: false,
       };
     } else {
@@ -32,12 +34,17 @@ class LabelDialog extends React.Component {
         name: '',
         color: '#e679f8',
         busy: false,
+        visible: false,
       };
     }
   }
 
   onChangeLabelText(e) {
     this.setState({ name: e.target.value });
+  }
+
+  onChangeVisible(e) {
+    this.setState({ visible: e.target.checked });
   }
 
   onChangeLabelColor(e) {
@@ -53,8 +60,8 @@ class LabelDialog extends React.Component {
   }
 
   onUpdateLabel() {
-    const { label } = this.props;
-    const { name, color } = this.state;
+    const { label, project } = this.props;
+    const { name, color, visible } = this.state;
     this.setState({ busy: true });
     let result;
     if (label) {
@@ -64,9 +71,24 @@ class LabelDialog extends React.Component {
     }
 
     result.then(resp => {
-      this.props.onInsertLabel(resp.data.newLabel);
-      this.setState({ busy: false });
-      this.props.onHide();
+      if (label.visible !== visible) {
+        const update = {};
+        if (visible) {
+          update.addLabels = [label.id];
+        } else {
+          update.removeLabels = [label.id];
+        }
+
+        updateProjectMembership(project.id, this.context.profile.username, update).then(() => {
+          this.props.onInsertLabel(resp.data.newLabel);
+          this.setState({ busy: false });
+          this.props.onHide();
+        });
+      } else {
+        this.props.onInsertLabel(resp.data.newLabel);
+        this.setState({ busy: false });
+        this.props.onHide();
+      }
     }, error => {
       console.error(error);
       if (error.response && error.response.data && error.response.data.err) {
@@ -112,6 +134,11 @@ class LabelDialog extends React.Component {
                 onKeyDown={this.onKeyDown} />
             <FormControl.Feedback />
           </FormGroup>
+          <FormGroup controlId="visible">
+            <Checkbox checked={this.state.visible} onChange={this.onChangeVisible}>
+              Show in hotlist
+            </Checkbox>
+          </FormGroup>
           <FormGroup controlId="color">
             <ControlLabel>Label color</ControlLabel>
             <div className="color-table">
@@ -149,16 +176,22 @@ class LabelDialog extends React.Component {
 }
 
 LabelDialog.propTypes = {
-  project: React.PropTypes.shape({
-    id: React.PropTypes.string.isRequired,
+  project: PropTypes.shape({
+    id: PropTypes.string.isRequired,
   }).isRequired,
-  label: React.PropTypes.shape({
-    id: React.PropTypes.number.isRequired,
-    name: React.PropTypes.string.isRequired,
-    color: React.PropTypes.string.isRequired,
+  label: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    color: PropTypes.string.isRequired,
+    visible: PropTypes.bool,
   }),
-  onHide: React.PropTypes.func.isRequired,
-  onInsertLabel: React.PropTypes.func.isRequired,
+  onHide: PropTypes.func.isRequired,
+  onInsertLabel: PropTypes.func.isRequired,
+  visible: PropTypes.bool,
+};
+
+LabelDialog.contextTypes = {
+  profile: PropTypes.shape({}),
 };
 
 export default withApollo(LabelDialog);

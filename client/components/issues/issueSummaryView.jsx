@@ -16,10 +16,8 @@ import FIELD_TYPES from '../filters/fieldTypes';
 class IssueSummaryView extends React.Component {
   constructor(props, context) {
     super(props, context);
-    this.state = {
-      issues: (props.data && props.data.issues) || [],
-    };
     this.query = new Immutable.Map(props.location.query || {});
+    this.hotlist = this.hotlistSet(props);
   }
 
   componentWillMount() {
@@ -27,14 +25,12 @@ class IssueSummaryView extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.data.issues && !nextProps.data.error) {
-      this.setState({ issues: nextProps.data.issues });
-    }
     const query = new Immutable.Map(nextProps.location.query || {});
     if (!Immutable.is(this.query, query)) {
       this.query = query;
       this.parseQuery();
     }
+    this.hotlist = this.hotlistSet(nextProps);
   }
 
   shouldComponentUpdate(nextProps) {
@@ -69,15 +65,27 @@ class IssueSummaryView extends React.Component {
     });
   }
 
+  hotlistSet(props) {
+    if (props.data && props.data.projectMembership) {
+      const labels = props.data.projectMembership.labels || [];
+      return new Immutable.Set(labels);
+    }
+    return Immutable.Set.of();
+  }
+
   render() {
     if (this.props.data.error) {
       return <ErrorDisplay error={this.props.data.error} />;
     }
-    const issues = this.state.issues;
+    const { issues } = this.props.data;
     return (<section className="kdt issue-list">
       <FilterParams {...this.props} query={this.query.get('search')} />
       <MassEdit {...this.props} issues={issues} />
-      <IssueList {...this.props} issues={issues} loading={this.props.data.loading} />
+      <IssueList
+          {...this.props}
+          issues={issues}
+          labels={this.hotlist}
+          loading={this.props.data.loading} />
     </section>);
   }
 }
@@ -87,6 +95,7 @@ IssueSummaryView.propTypes = {
     error: PropTypes.shape({}),
     loading: PropTypes.bool,
     issues: PropTypes.arrayOf(PropTypes.shape({})),
+    projectMembership: PropTypes.shape({}),
   }).isRequired,
   project: PropTypes.shape({
     id: PropTypes.string.isRequired,

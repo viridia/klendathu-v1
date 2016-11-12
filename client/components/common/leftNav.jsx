@@ -8,7 +8,7 @@ import BookmarkIcon from 'icons/ic_bookmark_border_black_24px.svg';
 import PersonIcon from 'icons/ic_person_black_24px.svg';
 import SettingsIcon from 'icons/ic_settings_black_24px.svg';
 import LocalOfferIcon from 'icons/ic_local_offer_black_24px.svg';
-import LabelsQuery from '../../graphql/queries/labels.graphql';
+import ProjectMembershipQuery from '../../graphql/queries/projectMembership.graphql';
 import LabelName from './labelName.jsx';
 import './leftNav.scss';
 
@@ -32,12 +32,15 @@ class LeftNav extends React.Component {
   shouldComponentUpdate(nextProps) {
     return this.props.project.id !== nextProps.project.id
         || this.props.project.name !== nextProps.project.name
-        || !equal(this.props.data.labels, nextProps.data.labels);
+        || this.props.data.loading !== nextProps.data.loading
+        || !equal(this.props.data.projectMembership, nextProps.data.projectMembership);
   }
 
   render() {
     const { project } = this.props;
-    const { labels } = this.props.data;
+    const { projectMembership } = this.props.data;
+    const filters = projectMembership ? projectMembership.filters : [];
+    const labels = projectMembership ? projectMembership.labelsData : [];
     return (<nav className="kdt left-nav">
       <NavItem
           icon={<ListIcon />}
@@ -66,11 +69,23 @@ class LeftNav extends React.Component {
           icon={<BookmarkIcon />}
           title="Saved Filters"
           path={`/project/${project.name}/queries`} />
+      {filters && filters.length > 0 && <ul className="filter-list">
+        {filters.map(filter => (
+          <li className="filter-item" key={filter.name}>
+            <Link
+                to={{
+                  pathname: `/project/${project.name}/issues`,
+                  query: JSON.parse(filter.value) }}>
+              {filter.name}
+            </Link>
+          </li>
+        ))}
+      </ul>}
       <NavItem
           icon={<SettingsIcon />}
           title="Project Settings"
           path={`/project/${project.name}/settings`} />
-      <NavItem icon={<AppsIcon />} title="Dashboard" onlyActiveOnIndex path="/" />
+      <NavItem icon={<AppsIcon />} title="Projects" onlyActiveOnIndex path="/" />
     </nav>);
   }
 }
@@ -81,10 +96,11 @@ LeftNav.propTypes = {
     name: PropTypes.string.isRequired,
   }).isRequired,
   data: PropTypes.shape({
-    labels: PropTypes.arrayOf(PropTypes.shape({})),
+    loading: PropTypes.bool,
+    projectMembership: PropTypes.shape({}),
   }).isRequired,
 };
 
-export default graphql(LabelsQuery, {
-  options: ({ project }) => ({ variables: { project: project.id } }),
+export default graphql(ProjectMembershipQuery, {
+  options: ({ project }) => ({ variables: { project: project.id, user: null } }),
 })(LeftNav);

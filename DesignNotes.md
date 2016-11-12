@@ -21,14 +21,13 @@
   * Get rid of typeahead
 * return key to navigate between fields (all dialogs)
 * escape to dismiss menus
-* make note about #hash tags and @mentions
+* add support for #hash tags and @mentions
 * Simplify rendering of suggestionsSuffix in autocomplete
 * Additional roles
   * Project membership
   * Create organizations
   * Org membership
 * Check roles client-side when editing / deleting labels
-* option to add label to hot list when creating it
 * Undo mode (set deleted flag) for issues, labels, projects.
 * Show linked issues hierarchically
 * Create Mongo indices programmatically. (Measure first).
