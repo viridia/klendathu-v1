@@ -28,6 +28,12 @@ export default class AutoCompleteChips extends React.Component {
     this.timer = null;
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.menu && !prevState.open && this.state.open) {
+      this.menu.scrollIntoView(false);
+    }
+  }
+
   componentWillUnmount() {
     clearTimeout(this.timer);
   }
@@ -302,6 +308,7 @@ export default class AutoCompleteChips extends React.Component {
             onBlur={this.onBlur} />
         <ul
             role="menu"
+            ref={el => { this.menu = el; }}
             className="ac-menu dropdown-menu"
             aria-labelledby="labels">
           {this.renderSuggestions()}
