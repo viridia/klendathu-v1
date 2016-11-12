@@ -69,7 +69,7 @@ module.exports = new GraphQLObjectType({
       description: 'Workflow that this is an extension of.',
     },
     start: {
-      type: GraphQLString,
+      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
       description: 'Starting state of this workflow.',
     },
     states: {

@@ -1,12 +1,14 @@
 * What do we need to do to finalize the db format enough that we can start collecting
   real issues (and not worry about having to wipe the db during development?)
-  -- liking comments
-  -- liking issues
-* Make sure that queries are invalidated by updated.
-  * Mostly this applies to plural queries.
+  -- liking comments (list of likes)
+  -- liking issues (list of likes)
+  -- other reactions?
+* User autocomplete has a bug where it gets stuck sometimes. (General ac problem).
 * Get rid of typeahead
   * We'll need a slightly different autocomplete than the one we use for labels and users.
     (One which allows new items and editable suggestions).
+* Custom suggest field / enter key support.
+  * Will be easier once we have some data
 * Adding comments in the compose page.
 * A way to delete an issue
   * Individual delete - make sure to unlink related items.
@@ -16,15 +18,11 @@
   * User list (in autocomplete).
   * Sorting?
 * Issue compose needs role checks on individual fields.
-* Custom suggest field / enter key support.
-  * Will be easier once we have some data
-  * Get rid of typeahead
 * return key to navigate between fields (all dialogs)
 * escape to dismiss menus
 * add support for #hash tags and @mentions
 * Simplify rendering of suggestionsSuffix in autocomplete
 * Additional roles
-  * Project membership
   * Create organizations
   * Org membership
 * Check roles client-side when editing / deleting labels
@@ -32,8 +30,6 @@
 * Show linked issues hierarchically
 * Create Mongo indices programmatically. (Measure first).
 * Delete project memberships when deleting projects and/or users.
-* Don't allow people to be added to project if they are already members.
-* User autocomplete has a bug where it gets stuck sometimes. (General ac problem).
 * Limit projects query to projects the user can see.
   * Partly done.
 * Make sure deleting an issue cascades to linked issues.
@@ -66,8 +62,6 @@ question about ownership of labels: who can create them?
   -- anyone with manager access to a project
 who can delete them?
   -- same.
-are labels stored with the project, or are they separate?
-  -- depends on how many labels we expect to have. Let's say max 1000 for now.
 
 collections:
   issues
@@ -105,29 +99,6 @@ client-side state:
 do we want orgs to contain users or users to contain orgs?
   -- what operations?
     -- list all projects accessible to user
-
-workflow:
-
-states: [
-  {
-    name: 'QA',
-    status: 'open',
-    enter: {
-      owner: "{verifier||reporter}"
-    }
-  },
-]
-
-issues: [
-  {
-    fields: [
-      {
-        milestone: ? (Need a way to add to milestones other than via editing template).
-          -- or is it just a label?
-      }
-    ],
-  }
-]
 
 Things to experiment with:
   -- TypeScript on the server? (Need to re-read the typescript language docs.)

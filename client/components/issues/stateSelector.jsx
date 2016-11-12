@@ -32,13 +32,15 @@ export default class StateSelector extends React.Component {
     const prevState = this.props.prevState || this.props.state;
     const nextState = this.props.state;
     const prevStateInfo = this.stateMap.get(prevState);
+    const transitions = (this.props.prevState && prevStateInfo)
+        ? prevStateInfo.transitions : this.props.workflow.start.filter(st => st !== nextState);
     return (<FormGroup controlId="state">
       <ControlLabel>State</ControlLabel>
       <Radio
           checked={prevState === nextState}
           data-state={prevState}
           onChange={this.onChange}>{caption(prevStateInfo)}</Radio>
-      {prevStateInfo.transitions.map(s => {
+      {transitions.map(s => {
         const toState = this.stateMap.get(s);
         return (<Radio
             key={toState.id}
@@ -56,6 +58,7 @@ StateSelector.propTypes = {
   project: PropTypes.shape({}),
   workflow: PropTypes.shape({
     states: PropTypes.arrayOf(PropTypes.shape({}).isRequired).isRequired,
+    start: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
   }).isRequired,
   onStateChanged: PropTypes.func.isRequired,
 };

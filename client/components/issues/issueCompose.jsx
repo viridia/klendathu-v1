@@ -123,7 +123,7 @@ export default class IssueCompose extends React.Component {
     this.onCreate = this.onCreate.bind(this);
     this.me = { id: context.profile.username, label: context.profile.username };
     this.state = {
-      prevState: 'new',
+      prevState: null,
       issueState: 'new',
       type: '',
       summary: '',
@@ -330,10 +330,10 @@ export default class IssueCompose extends React.Component {
       });
       this.attachments.setFiles(issue.attachmentsData || []);
     } else {
-      const initialState = project.workflow.start || 'new';
+      const { start = ['new'] } = project.workflow;
       this.setState({
-        prevState: initialState,
-        issueState: initialState,
+        prevState: null,
+        issueState: start[0],
         // If current type is valid then keep it, otherwise default to the first type.
         type: project.template.typesById.has(this.state.type)
             ? this.state.type : concreteTypes[0].id,
@@ -440,6 +440,7 @@ export default class IssueCompose extends React.Component {
   render() {
     const { project, issue, location } = this.props;
     const backLink = (location.state && location.state.back) || { pathname: '..' };
+    const canSave = this.state.summary && !this.state.linkedIssue;
     return (<section className="kdt issue-compose">
       <div className="card">
         <header>
@@ -607,11 +608,11 @@ export default class IssueCompose extends React.Component {
           {issue
             ? (<Button
                 bsStyle="primary"
-                disabled={!this.state.summary}
+                disabled={!canSave}
                 onClick={this.onCreate}>Save</Button>)
             : (<Button
                 bsStyle="primary"
-                disabled={!this.state.summary}
+                disabled={!canSave}
                 onClick={this.onCreate}>Create</Button>)}
         </footer>
       </div>

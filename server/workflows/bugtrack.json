@@ -2,7 +2,11 @@
   "name": "bugtrack",
   "project": "std",
   "extends": null,
-  "start": "new",
+  "start": [
+    "new",
+    "assigned",
+    "in_progress"
+  ],
   "states": [
     {
       "id": "new",
@@ -10,7 +14,9 @@
       "closed": false,
       "transitions": [
         "assigned",
-        "in_progress"
+        "in_progress",
+        "duplicate",
+        "working_as_intended"
       ]
     },
     {
@@ -139,6 +145,7 @@
     {
       "require": {
         "state": [
+          "new",
           "assigned",
           "in_progress",
           "qa"
@@ -151,6 +158,7 @@
     {
       "require": {
         "state": [
+          "new",
           "assigned",
           "in_progress",
           "qa"
@@ -161,8 +169,36 @@
       "owner": "{reporter}"
     },
     {
+      "require": {
+        "state": [
+          "new",
+          "assigned",
+          "in_progress",
+          "qa"
+        ]
+      },
+      "caption": "Close: Duplicate",
+      "state": "duplicate",
+      "owner": "{reporter}",
+      "ask": [
+        {
+          "id": "dup_of",
+          "caption": "Duplicates:",
+          "type": "issue"
+        }
+      ],
+      "linked": { "relation": "duplicate", "to": "{dup_of}" }
+    },
+    {
       "caption": "Finish: In Review",
-      "state": "review"
+      "state": "review",
+      "ask": [
+        {
+          "id": "reviewer",
+          "caption": "Reviewer:",
+          "type": "user"
+        }
+      ]
     },
     {
       "caption": "Finish: QA",
