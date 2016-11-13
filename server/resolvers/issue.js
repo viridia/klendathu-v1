@@ -475,11 +475,48 @@ const resolverMethods = {
           return issues.updateOne(query, update).then(() => {
             const result = issues.findOne(query);
             if (issue.linked) {
-              result.then(ni => this.reconcileLinks(ni, issueRefs));
+              return result.then(ni => this.reconcileLinks(ni, issueRefs));
             }
             return result;
           }, error => {
             logger.error('Error updating issue', id, proj.name, error);
+            return Promise.reject(new InternalError());
+          });
+        });
+      });
+    });
+  },
+
+  deleteIssue({ id, project }) {
+    if (!this.user) {
+      return Promise.reject(new Unauthorized());
+    }
+    return this.getProjectAndRole({ projectId: project }).then(([proj, role]) => {
+      if (!proj) {
+        logger.error('Error updating non-existent project', id, this.user);
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
+      } else if (role < Role.MANAGER) {
+        logger.error('Access denied deleting issue', id, this.user);
+        return Promise.reject(new Forbidden(Errors.INSUFFICIENT_ACCESS));
+      }
+
+      const query = { id, project: proj._id };
+      const issues = this.db.collection('issues');
+      return issues.findOne(query).then(existing => {
+        if (!existing) {
+          logger.error('Error deleting non-existent issue', id, this.user);
+          return Promise.reject(new NotFound(Errors.ISSUE_NOT_FOUND));
+        }
+
+        return this.findLinked(query.project, [], existing.linked).then(issueRefs => {
+          return issues.deleteOne(query).then(() => {
+            if (existing.linked) {
+              existing.linked = [];
+              return this.reconcileLinks(existing, issueRefs).then(() => id);
+            }
+            return id;
+          }, error => {
+            logger.error('Error deleting issue', id, proj.name, error);
             return Promise.reject(new InternalError());
           });
         });
@@ -510,6 +547,7 @@ const resolverMethods = {
       @param {issue} issue The issue we are updating.
       @param {Map} issueRefs A map containing all of the issues that this issue references. This
         includes all references from both before and after the update.
+      @return A promise which contains all of the update operations required.
   */
   reconcileLinks(issue, issueRefs) {
     const linksById = new Map(issue.linked.map(ln => [ln.to, ln.relation]));
@@ -541,6 +579,7 @@ const resolverMethods = {
       }
     });
     issueRefs.forEach(toIssue => {
+      // If the new issue no longer refers to toIssue, then delete the back-reference.
       if (!linksById.has(toIssue.id)) {
         const existingLink = toIssue.linked.find(ln => ln.to === issue.id);
         if (existingLink) {

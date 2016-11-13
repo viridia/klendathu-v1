@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { graphql } from 'react-apollo';
+import { browserHistory } from 'react-router';
 import marked from 'marked';
 import Button from 'react-bootstrap/lib/Button';
 import ButtonGroup from 'react-bootstrap/lib/ButtonGroup';
@@ -11,6 +12,7 @@ import ErrorDisplay from '../debug/errorDisplay.jsx';
 import UserName from '../common/userName.jsx';
 import LabelName from '../common/labelName.jsx';
 import RelativeDate from '../common/relativeDate.jsx';
+import ConfirmDialog from '../common/confirmDialog.jsx';
 import IssueChanges from './issueChanges.jsx';
 import CommentEdit from './commentEdit.jsx';
 import { Role } from '../../lib/role';
@@ -19,7 +21,7 @@ import LinkedIssues from './linkedIssues.jsx';
 import WorkflowActions from './workflowActions.jsx';
 import ShowAttachments from '../files/showAttachments.jsx';
 import { IssueContent } from '../../store/fragments';
-import { addComment, updateIssue } from '../../store/issue';
+import { addComment, updateIssue, deleteIssue } from '../../store/issue';
 import './issueDetails.scss';
 
 // Global options for marked.
@@ -39,7 +41,14 @@ class IssueDetails extends React.Component {
     super(props);
     this.onAddComment = this.onAddComment.bind(this);
     this.onExecAction = this.onExecAction.bind(this);
-    this.state = this.navState(props);
+    this.onDeleteIssue = this.onDeleteIssue.bind(this);
+    this.onConfirmDelete = this.onConfirmDelete.bind(this);
+    this.onCancelDelete = this.onCancelDelete.bind(this);
+    this.state = {
+      ...this.navState(props),
+      showDelete: false,
+      busyDelete: false,
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -47,10 +56,10 @@ class IssueDetails extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.prevIssue !== nextState.prevIssue) {
-      return true;
-    }
-    if (this.state.nextIssue !== nextState.nextIssue) {
+    if (this.state.prevIssue !== nextState.prevIssue ||
+        this.state.nextIssue !== nextState.nextIssue ||
+        this.state.showDelete !== nextState.showDelete ||
+        this.state.busyDelete !== nextState.busyDelete) {
       return true;
     }
     if (this.props.data.issue === nextProps.data.issue) {
@@ -89,6 +98,42 @@ class IssueDetails extends React.Component {
     return updateIssue(project.id, issue.id, updates).then(() => {
       this.props.data.refetch();
     });
+  }
+
+  onDeleteIssue(e) {
+    e.preventDefault();
+    this.setState({ showDelete: true, busyDelete: false });
+  }
+
+  onConfirmDelete() {
+    const { location, project, data: { issue } } = this.props;
+    this.setState({ busyDelete: true });
+    return deleteIssue(project.id, issue.id).then(() => {
+      const { prevIssue, nextIssue } = this.state;
+      this.setState({ showDelete: false, busyDelete: false });
+      if (prevIssue) {
+        browserHistory.replace({
+          ...location,
+          pathname: `/project/${project.name}/issues/${prevIssue}`,
+        });
+      } else if (nextIssue) {
+        browserHistory.replace({
+          ...location,
+          pathname: `/project/${project.name}/issues/${nextIssue}`,
+        });
+      } else if (location.state && location.state.back) {
+        browserHistory.replace(location.state.back);
+      } else {
+        browserHistory.replace({
+          ...location,
+          pathname: `/project/${project.name}/issues`,
+        });
+      }
+    });
+  }
+
+  onCancelDelete() {
+    this.setState({ showDelete: false, busyDelete: false });
   }
 
   /** Compute the next and previous issue id given the list of issue ids passed in. */
@@ -160,7 +205,7 @@ class IssueDetails extends React.Component {
   render() {
     const { location, project } = this.props;
     const { issue, error } = this.props.data;
-    const { prevIssue, nextIssue } = this.state;
+    const { prevIssue, nextIssue, showDelete, busyDelete } = this.state;
     if (error) {
       return <ErrorDisplay error={error} />;
     }
@@ -201,7 +246,8 @@ class IssueDetails extends React.Component {
             </LinkContainer>
             <Button
                 title="Delete issue" bsStyle="default"
-                disabled={project.role < Role.MANAGER}>Delete</Button>
+                disabled={project.role < Role.MANAGER}
+                onClick={this.onDeleteIssue}>Delete</Button>
           </ButtonGroup>
           <ButtonGroup className="issue-nav">
             <LinkContainer
@@ -322,6 +368,15 @@ class IssueDetails extends React.Component {
           </aside>
         </section>
       </section>
+      {showDelete && (<ConfirmDialog
+          title="Are you sure you want to delete this issue?"
+          confirmText="Delete"
+          cancelText="Cancel"
+          onConfirm={this.onConfirmDelete}
+          onCancel={this.onCancelDelete}
+          busy={busyDelete}>
+        This action cannot be undone.
+      </ConfirmDialog>)}
     </section>);
   }
 }

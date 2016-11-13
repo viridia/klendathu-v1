@@ -31,10 +31,11 @@ export function addComment(project, id, comment) {
   });
 }
 
-export function deleteIssue(id) {
+export function deleteIssue(project, id) {
   return client.mutate({
     mutation: DeleteIssueMutation,
-    variables: { id },
+    variables: { project, id },
+    refetchQueries: ['issueDetailsQuery'],
     updateQueries: {
       issueListQuery: (previousQueryResult, { mutationResult }) => {
         return {

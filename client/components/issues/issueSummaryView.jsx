@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import { bindActionCreators, compose } from 'redux';
 import Immutable from 'immutable';
 import { graphql, withApollo } from 'react-apollo';
 import ApolloClient from 'apollo-client';
@@ -130,39 +130,43 @@ function defaultStates(project) {
   return project.workflow.states.filter(st => !st.closed).map(st => st.id);
 }
 
-export default graphql(IssueListQuery, {
-  options: ({ project, location: { query } }) => {
-    const {
-      type, state,
-      summary, summaryPred,
-      description, descriptionPred,
-      label, search,
-      owner, reporter,
-      sort,
-    } = query || {};
-    return {
-      variables: {
-        project: project.id,
-        search,
-        type: type && type.split(','),
-        state: (state && state !== 'open') ? state.split(',') : defaultStates(project),
-        summary,
-        summaryPred,
-        description,
-        descriptionPred,
-        reporter,
-        owner,
-        cc: undefined,
-        labels: label && label.split(','),
-        comment: undefined,
-        commentPred: undefined,
-        sort: [sort || '-updated'],
-      },
-    };
-  },
-})(connect(
-  (state) => ({
-    selection: state.issueSelection,
+export default compose(
+  graphql(IssueListQuery, {
+    options: ({ project, location: { query } }) => {
+      const {
+        type, state,
+        summary, summaryPred,
+        description, descriptionPred,
+        label, search,
+        owner, reporter,
+        sort,
+      } = query || {};
+      return {
+        variables: {
+          project: project.id,
+          search,
+          type: type && type.split(','),
+          state: (state && state !== 'open') ? state.split(',') : defaultStates(project),
+          summary,
+          summaryPred,
+          description,
+          descriptionPred,
+          reporter,
+          owner,
+          cc: undefined,
+          labels: label && label.split(','),
+          comment: undefined,
+          commentPred: undefined,
+          sort: [sort || '-updated'],
+        },
+      };
+    },
   }),
-  dispatch => bindActionCreators({ setFilterTerms }, dispatch),
-)(withApollo(IssueSummaryView)));
+  connect(
+    (state) => ({
+      selection: state.issueSelection,
+    }),
+    dispatch => bindActionCreators({ setFilterTerms }, dispatch),
+  ),
+  withApollo,
+)(IssueSummaryView);

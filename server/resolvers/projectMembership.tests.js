@@ -4,7 +4,7 @@ const { ensure } = require('certainty');
 const { createRoot, createUser, reset } = require('../testing/fixtures');
 const schema = require('../schema');
 
-describe('resolvers/issue', function () {
+describe('resolvers/projectMembership', function () {
   // Reset the database, create a user and a root object.
   beforeEach(function () {
     return reset().then(() => {

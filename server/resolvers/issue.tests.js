@@ -5,6 +5,8 @@ const { createRoot, createUser, reset } = require('../testing/fixtures');
 const schema = require('../schema');
 
 describe('resolvers/issue', function () {
+  this.slow(250);
+
   // Reset the database, create a user and a root object.
   beforeEach(function () {
     return reset().then(() => {
@@ -50,6 +52,13 @@ describe('resolvers/issue', function () {
           }
         }`,
         this.root, null, { project: this.project._id, id, issue });
+      };
+      // Helper function to delete an issue via graphql
+      this.deleteIssue = (id) => {
+        return graphql(schema, `mutation deleteIssue($project: ID!, $id: Int!) {
+          deleteIssue(project: $project, id: $id)
+        }`,
+        this.root, null, { project: this.project._id, id });
       };
       // Helper function to retrieve an issue via graphql
       this.queryIssue = (id) => {
@@ -104,14 +113,14 @@ describe('resolvers/issue', function () {
   });
 
   // TODO: Move this.
-  describe('graphql.project', function () {
-    it('simple project query', function () {
-      graphql(schema, '{ projects { id name } }', this.root).then(result => {
-        ensure(result.data.projects).hasLength(1);
-        ensure(result.data.projects[0].name).equals('test-project');
-      });
-    });
-  });
+  // describe('graphql.project', function () {
+  //   it('simple project query', function () {
+  //     graphql(schema, '{ projects { id name } }', this.root).then(result => {
+  //       ensure(result.data.projects).hasLength(1);
+  //       ensure(result.data.projects[0].name).equals('test-project');
+  //     });
+  //   });
+  // });
 
   describe('graphql.newIssue', function () {
     it('minimal issue', function () {
@@ -312,7 +321,7 @@ describe('resolvers/issue', function () {
         return this.queryIssue(this.issue2.id).then(result => {
           this.checkResult(result);
           const { issue } = result.data;
-          ensure(issue.linked).named('linked').hasLength(0);
+          ensure(issue.linked).named('issue2.linked').hasLength(0);
           ensure(issue.changes).hasLength(2); // Includes previous change in beforeEach()
           ensure(issue.changes[1].linked).hasLength(1);
           ensure(issue.changes[1].linked[0]).hasField('to').withValue(updateIssue.id);
@@ -333,6 +342,54 @@ describe('resolvers/issue', function () {
           ensure(issue.changes[0].linked[0]).hasField('to').withValue(updateIssue.id);
           ensure(issue.changes[0].linked[0]).hasField('before').withValue(null);
           ensure(issue.changes[0].linked[0]).hasField('after').withValue('BLOCKS');
+        });
+      });
+    });
+  });
+
+  describe('graphql.deleteIssue', function () {
+    beforeEach(function () {
+      return this.createIssue({
+        type: 'bug',
+        state: 'new',
+        summary: 'summary',
+        owner: 'test-user',
+        cc: ['another-user', 'user3'],
+        labels: [1, 2, 3],
+        custom: [{ name: 'cname', value: 'cvalue' }],
+        linked: [{ to: this.issue2.id, relation: 'DUPLICATE' }],
+      }).then(result => {
+        this.checkResult(result);
+        this.issue = result.data.newIssue;
+      });
+    });
+
+    it('delete linked issues', function () {
+      const issue3 = this.issue3.id;
+      return this.updateIssue(this.issue.id, {
+        linked: [{ to: issue3, relation: 'BLOCKED_BY' }],
+      }).then(result => {
+        this.checkResult(result);
+        return this.deleteIssue(this.issue3.id);
+      }).then(() => {
+        // Make sure that issue3 got updated by the reconciler.
+        return this.queryIssue(this.issue3.id).then(result => {
+          this.checkResult(result);
+          const { issue } = result.data;
+          ensure(issue).isNull();
+        });
+      }).then(updateIssue => {
+        // Make sure that issue2 got updated by the reconciler.
+        return this.queryIssue(this.issue.id).then(result => {
+          this.checkResult(result);
+          const { issue } = result.data;
+          ensure(issue.linked).named('linked').hasLength(0);
+          ensure(issue.changes).hasLength(2); // Includes previous change in beforeEach()
+          ensure(issue.changes[1].linked).hasLength(1);
+          ensure(issue.changes[1].linked[0]).hasField('to').withValue(issue3);
+          ensure(issue.changes[1].linked[0]).hasField('before').withValue('BLOCKED_BY');
+          ensure(issue.changes[1].linked[0]).hasField('after').withValue(null);
+          return updateIssue;
         });
       });
     });
