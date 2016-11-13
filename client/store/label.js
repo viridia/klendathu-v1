@@ -31,6 +31,7 @@ export function deleteLabel(project, id) { // eslint-disable-line
   return client.mutate({
     mutation: DeleteLabelMutation,
     variables: { project, label: id },
+    refetchQueries: ['projectMembershipQuery'],
     updateQueries: {
       labelsQuery: (previousQueryResult, { mutationResult }) => {
         return {

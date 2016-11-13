@@ -34,7 +34,7 @@ class LabelDialog extends React.Component {
         name: '',
         color: '#e679f8',
         busy: false,
-        visible: false,
+        visible: true,
       };
     }
   }
@@ -71,12 +71,13 @@ class LabelDialog extends React.Component {
     }
 
     result.then(resp => {
-      if (label.visible !== visible) {
+      const updatedLabel = label || resp.data.newLabel;
+      if (!label || label.visible !== visible) {
         const update = {};
         if (visible) {
-          update.addLabels = [label.id];
+          update.addLabels = [updatedLabel.id];
         } else {
-          update.removeLabels = [label.id];
+          update.removeLabels = [updatedLabel.id];
         }
 
         updateProjectMembership(project.id, this.context.profile.username, update).then(() => {
