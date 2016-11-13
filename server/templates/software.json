@@ -1,3 +1,4 @@
+
 {
   "name": "software",
   "project": "std",
@@ -22,6 +23,7 @@
       "id": "bug",
       "caption": "Bug",
       "extends": "./issue",
+      "bg": "#ff91e6",
       "fields": [
         {
           "id": "severity",
@@ -53,23 +55,27 @@
     {
       "id": "feature",
       "caption": "Feature",
-      "extends": "./issue"
+      "extends": "./issue",
+      "bg": "#d2a6ff"
     },
     {
       "id": "task",
       "caption": "Task",
       "contains": [ "task" ],
-      "extends": "./issue"
+      "extends": "./issue",
+      "bg": "#ffb191"
     },
     {
       "id": "documentation",
       "caption": "Docs",
-      "extends": "./issue"
+      "extends": "./issue",
+      "bg": "#8fcfff"
     },
     {
       "id": "internal_cleanup",
       "caption": "Internal Cleanup",
-      "extends": "./issue"
+      "extends": "./issue",
+      "bg": "#b7df7a"
     }
   ]
 }

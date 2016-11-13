@@ -4,11 +4,6 @@
   -- liking issues (list of likes)
   -- other reactions?
 * User autocomplete has a bug where it gets stuck sometimes. (General ac problem).
-* Get rid of typeahead
-  * We'll need a slightly different autocomplete than the one we use for labels and users.
-    (One which allows new items and editable suggestions).
-* Custom suggest field / enter key support.
-  * Will be easier once we have some data
 * Adding comments in the compose page.
 * A way to delete an issue
   * Individual delete - make sure to unlink related items.
@@ -19,9 +14,7 @@
   * Sorting?
 * Issue compose needs role checks on individual fields.
 * return key to navigate between fields (all dialogs)
-* escape to dismiss menus
 * add support for #hash tags and @mentions
-* Simplify rendering of suggestionsSuffix in autocomplete
 * Additional roles
   * Create organizations
   * Org membership

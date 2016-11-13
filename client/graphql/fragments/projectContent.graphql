@@ -9,7 +9,7 @@ fragment projectContent on Project {
   template {
     name project
     types {
-      id caption abstract extends
+      id caption abstract bg extends
       fields { id type caption align default values }
     }
   }

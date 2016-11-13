@@ -158,7 +158,8 @@ class LabelList extends React.Component {
         <LabelDialog
             project={this.props.project}
             label={this.state.labelToUpdate}
-            visible={this.state.visible.has(this.state.labelToUpdate.id)}
+            visible={!this.state.labelToUpdate
+                || this.state.visible.has(this.state.labelToUpdate.id)}
             onHide={this.onHideCreate}
             onInsertLabel={this.onCreateLabel} />)}
       {this.state.showDelete && (

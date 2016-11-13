@@ -56,6 +56,10 @@ const issueType = new GraphQLObjectType({
       type: GraphQLString,
       description: 'Issue type that this inherits from.',
     },
+    bg: {
+      type: GraphQLString,
+      description: 'Background color for this type.',
+    },
     fields: {
       type: new GraphQLList(new GraphQLNonNull(fieldType)),
       description: 'List of field definitions for this issue type.',

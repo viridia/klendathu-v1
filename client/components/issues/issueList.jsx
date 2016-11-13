@@ -46,6 +46,22 @@ class TextColumnRenderer extends StdColumnRenderer {
   }
 }
 
+class TypeColumnRenderer extends StdColumnRenderer {
+  constructor(typesById) {
+    super('Type', 'type', 'type pad');
+    this.typesById = typesById;
+  }
+
+  render(issue) {
+    const typeInfo = this.typesById.get(issue.type);
+    return (
+      <td className="type" key="type">
+        <span style={{ backgroundColor: typeInfo.bg }}>{typeInfo.caption}</span>
+      </td>
+    );
+  }
+}
+
 class UserColumnRenderer extends StdColumnRenderer {
   render(issue) {
     return (
@@ -168,14 +184,14 @@ class IssueList extends React.Component {
   buildColumns(project) {
     this.columnRenderers = {
       state: new TextColumnRenderer('State', 'state', 'state pad'),
-      type: new TextColumnRenderer('Type', 'type', 'type pad'),
       reporter: new UserColumnRenderer('Reporter', 'reporter', 'reporter pad'),
       owner: new UserColumnRenderer('Owner', 'owner', 'owner pad'),
       created: new DateColumnRenderer('Created', 'created', 'created pad'),
       updated: new DateColumnRenderer('Updated', 'updated', 'updated pad'),
     };
     if (project) {
-      for (const type of this.props.project.template.types) {
+      this.columnRenderers.type = new TypeColumnRenderer(project.template.typesById);
+      for (const type of project.template.types) {
         if (type.fields) {
           for (const field of type.fields) {
             this.columnRenderers[`custom.${field.id}`] = new CustomColumnRenderer(field);

@@ -177,6 +177,7 @@ class IssueDetails extends React.Component {
     } = issue;
     const issueType = project.template.typesById.get(issue.type);
     const backLink = (location.state && location.state.back) || { pathname: '..' };
+    const typeInfo = project.template.typesById.get(issue.type);
     return (<section className="kdt issue-details">
       <section className="card">
         <header>
@@ -186,7 +187,9 @@ class IssueDetails extends React.Component {
           <div className="issue-id">Issue #{issue.id}: </div>
           <div className="summary">{issue.summary}</div>
           <div className="stretch">
-            <div className="issue-type">{issue.type}</div>
+            <div className="issue-type" style={{ backgroundColor: typeInfo.bg }}>
+              {typeInfo.caption}
+            </div>
           </div>
           <ButtonGroup className="issue-actions">
             <LinkContainer
