@@ -5,9 +5,6 @@
   -- other reactions?
 * User autocomplete has a bug where it gets stuck sometimes. (General ac problem).
 * Adding comments in the compose page.
-* A way to delete an issue
-  * Individual delete - make sure to unlink related items.
-  * Mass edit
 * UpdateQueries
   * Issue list
   * User list (in autocomplete).

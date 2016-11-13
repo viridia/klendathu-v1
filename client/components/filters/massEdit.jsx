@@ -5,7 +5,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import Button from 'react-bootstrap/lib/Button';
 import Collapse from 'react-bootstrap/lib/Collapse';
 import MassAction from './massAction.jsx';
-import { updateIssue } from '../../store/issue';
+import { updateIssue, deleteIssue } from '../../store/issue';
 import './massEdit.scss';
 
 class MassEdit extends React.Component {
@@ -57,7 +57,7 @@ class MassEdit extends React.Component {
           }
         });
         if (deleted) {
-          console.error('Implement issue deletion.');
+          promises.push(deleteIssue(project.id, issue.id));
         } else if (changed) {
           promises.push(updateIssue(project.id, issue.id, updates));
         }
