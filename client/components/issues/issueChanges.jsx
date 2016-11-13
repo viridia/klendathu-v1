@@ -173,11 +173,13 @@ export default class IssueChanges extends React.Component {
 IssueChanges.propTypes = {
   issue: PropTypes.shape({
     id: PropTypes.number.isRequired,
+    type: PropTypes.string.isRequired,
   }),
   comments: PropTypes.arrayOf(PropTypes.shape({}).isRequired),
   changes: PropTypes.arrayOf(PropTypes.shape({}).isRequired),
   project: PropTypes.shape({
     name: PropTypes.string.isRequired,
     role: PropTypes.number.isRequired,
+    template: PropTypes.shape({}),
   }),
 };

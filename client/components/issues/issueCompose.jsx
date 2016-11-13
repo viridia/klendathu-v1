@@ -8,13 +8,13 @@ import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import DropdownButton from 'react-bootstrap/lib/DropdownButton';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
-import Typeahead from 'react-bootstrap-typeahead';
 import IssueAutoComplete from './issueAutocomplete.jsx';
 import UserAutoComplete from '../common/userAutoComplete.jsx';
 import LabelSelector from './labelSelector.jsx';
 import StateSelector from './stateSelector.jsx';
 import TypeSelector from './typeSelector.jsx';
 import CustomEnumField from './customEnumField.jsx';
+import CustomSuggestField from './customSuggestField.jsx';
 import CommentEdit from './commentEdit.jsx';
 import LinkedIssues from './linkedIssues.jsx';
 import UploadAttachments from '../files/uploadAttachments.jsx';
@@ -22,80 +22,6 @@ import Relation from '../../lib/relation';
 import './issueCompose.scss';
 import '../common/card.scss';
 import '../common/table.scss';
-
-class CustomTextField extends React.Component {
-  constructor() {
-    super();
-    this.onChange = this.onChange.bind(this);
-  }
-
-  onChange(e) {
-    this.props.onChange(this.props.field.id, e.target.value);
-  }
-
-  render() {
-    const { value, field } = this.props;
-    return (
-      <FormControl
-          type="text"
-          value={value}
-          maxLength={field.max_length}
-          onChange={this.onChange} />
-    );
-  }
-}
-
-CustomTextField.propTypes = {
-  field: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    default: PropTypes.string,
-    max_length: PropTypes.number,
-  }).isRequired,
-  value: React.PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-};
-
-class CustomSuggestField extends React.Component {
-  constructor() {
-    super();
-    this.onChange = this.onChange.bind(this);
-    this.onInputChange = this.onInputChange.bind(this);
-  }
-
-  onChange(selected) {
-    console.log(selected);
-    // this.props.onChange(this.props.field.id, e.target.value);
-  }
-
-  onInputChange(text) {
-    console.log(text);
-  }
-
-  render() {
-    const { value } = this.props;
-    return (
-      <Typeahead
-          className="keywords ac-multi"
-          defaultSelected={[value]}
-          options={[]}
-          onChange={this.onChange}
-          onInputChange={this.onInputChange}
-          allowNew
-          newSelectionPrefix=""
-          emptyLabel="No suggestions" />
-    );
-  }
-}
-
-CustomSuggestField.propTypes = {
-  field: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    default: PropTypes.string,
-    max_length: PropTypes.number,
-  }).isRequired,
-  value: React.PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-};
 
 export default class IssueCompose extends React.Component {
   constructor(props, context) {
@@ -396,6 +322,7 @@ export default class IssueCompose extends React.Component {
   }
 
   renderCustomFields(issueType, result) {
+    const { project } = this.props;
     const fields = this.customFieldList(issueType);
     for (const field of fields) {
       let component = null;
@@ -405,7 +332,9 @@ export default class IssueCompose extends React.Component {
           component = (<CustomSuggestField
               value={value}
               field={field}
-              onChange={this.onChangeCustomField} />);
+              project={project}
+              onChange={this.onChangeCustomField}
+              onEnter={this.onFocusNext} />);
           break;
         case 'ENUM':
           component = (<CustomEnumField

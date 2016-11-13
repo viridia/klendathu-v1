@@ -48,7 +48,7 @@ export default class AutoCompleteChips extends React.Component {
     clearTimeout(this.timer);
     this.timer = setTimeout(() => {
       if (value !== this.searchValue) {
-        this.searchValue = this.state.value;
+        this.searchValue = value;
         this.props.onSearch(this.searchValue, this.onReceiveSuggestions);
       }
     }, 30);
@@ -72,12 +72,9 @@ export default class AutoCompleteChips extends React.Component {
     inputEl.focus();
   }
 
-  onClickSuggestion(e) {
+  onClickSuggestion(e, item) {
     e.preventDefault();
     e.stopPropagation();
-    const { suggestions, suggestionsSuffix } = this.state;
-    const suggestionIndex = parseInt(e.target.dataset.index, 10);
-    const item = suggestions.concat(suggestionsSuffix)[suggestionIndex];
     this.setState({
       value: '',
       open: false,
@@ -98,8 +95,8 @@ export default class AutoCompleteChips extends React.Component {
       suggestionIndex: uniqueSuggestions.length > 0 ? 0 : -1,
     });
     if (this.state.value !== this.searchValue) {
-      this.searchValue = this.value;
-      this.props.onSearch(this.state.value, this.onReceiveSuggestions);
+      this.searchValue = this.state.value;
+      this.props.onSearch(this.searchValue, this.onReceiveSuggestions);
     }
   }
 
@@ -149,6 +146,8 @@ export default class AutoCompleteChips extends React.Component {
             this.searchValue = '';
             this.chooseSuggestion(item);
           }
+        } else if (this.props.onEnter) {
+          this.props.onEnter();
         }
         break;
       case 8: // BACKSPACE
@@ -216,7 +215,7 @@ export default class AutoCompleteChips extends React.Component {
   selection() {
     if (Array.isArray(this.props.selection)) {
       return this.props.selection;
-    } else if (this.props.selection === null) {
+    } else if (this.props.selection === null || this.props.selection === undefined) {
       return [];
     } else {
       return [this.props.selection];
@@ -238,7 +237,7 @@ export default class AutoCompleteChips extends React.Component {
             tabIndex="-1"
             href=""
             data-index={index}
-            onClick={this.onClickSuggestion}>
+            onClick={e => this.onClickSuggestion(e, s)}>
           {onRenderSuggestion(s)}
         </a>
       </li>);

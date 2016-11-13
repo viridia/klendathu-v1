@@ -615,6 +615,37 @@ const resolverMethods = {
       });
     });
   },
+
+  searchCustomFields({ project, field, search }) {
+    return this.getProjectAndRole({ projectId: project }).then(([proj, role]) => {
+      if (proj === null || (!proj.public && role < Role.VIEWER)) {
+        return Promise.reject(new NotFound(Errors.PROJECT_NOT_FOUND));
+      }
+      const fieldPath = `custom.${field}`;
+      const terms = search.split(/\s+/).map(t => ({
+        [fieldPath]: { $regex: `(^|\\s)${escapeRegExp(t)}`, $options: 'i' },
+      }));
+      const query = {
+        project: new ObjectId(project),
+        $and: terms,
+      };
+      return this.db.collection('issues').find(query).toArray().then(issues => {
+        // Count number of occurances of each string
+        const results = new Map();
+        for (const i of issues) {
+          const text = i.custom[field];
+          const count = results.get(text) || 0;
+          results.set(text, count - 1); // We want most popular to be first
+        }
+        // Sort by popularity
+        const resultList = [];
+        results.forEach((count, key) => { resultList.push([count, key]); });
+        resultList.sort();
+        // Return most popular strings
+        return resultList.map(entry => entry[1]).slice(0, 5);
+      });
+    });
+  },
 };
 
 module.exports = function (rootClass) {

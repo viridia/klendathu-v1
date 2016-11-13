@@ -134,6 +134,15 @@ module.exports = new GraphQLSchema({
           search: { type: GraphQLString },
         },
       },
+      searchCustomFields: {
+        description: 'Search custom field text, used for auto completion.',
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))),
+        args: {
+          project: { type: new GraphQLNonNull(GraphQLID) },
+          field: { type: new GraphQLNonNull(GraphQLString) },
+          search: { type: new GraphQLNonNull(GraphQLString) },
+        },
+      },
       project: {
         description: 'Retrieve a project record by id or by name.',
         type: projectType,
