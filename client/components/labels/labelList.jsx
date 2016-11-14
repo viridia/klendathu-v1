@@ -10,6 +10,7 @@ import ErrorDisplay from '../debug/errorDisplay.jsx';
 import LabelDialog from './labelDialog.jsx';
 import LabelName from '../common/labelName.jsx';
 import LabelsQuery from '../../graphql/queries/labels.graphql';
+import { Role } from '../../lib/role';
 import { deleteLabel } from '../../store/label';
 import { updateProjectMembership } from '../../store/projectMembership';
 import './labelList.scss';
@@ -99,7 +100,7 @@ class LabelList extends React.Component {
   }
 
   renderLabel(label) {
-    // TODO: Role check on edit / delete
+    const { project } = this.props;
     return (
       <tr key={label.id}>
         <td className="label-id center">{label.id}</td>
@@ -113,14 +114,15 @@ class LabelList extends React.Component {
         <td className="name center"><LabelName project={label.project} label={label.id} /></td>
         <td className="creator center">label.creator</td>
         <td className="created center">{dateFormat(label.created, 'mmm dS, yyyy h:MM TT')}</td>
-        <td className="actions center">
+        {project.role >= Role.DEVELOPER && (<td className="actions center">
           <Button data-label={label.id} onClick={e => this.onShowUpdate(e, label)}>Edit</Button>
           <Button data-label={label.id} onClick={e => this.onShowDelete(e, label)}>Delete</Button>
-        </td>
+        </td>)}
       </tr>);
   }
 
   renderLabels() {
+    const { project } = this.props;
     const { labels } = this.props.data;
     if (!labels || labels.length === 0) {
       return (
@@ -138,7 +140,7 @@ class LabelList extends React.Component {
             <th className="name center">Label</th>
             <th className="owner center">Creator</th>
             <th className="created center">Created</th>
-            <th className="actions">Actions</th>
+            {project.role >= Role.DEVELOPER && <th className="actions">Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -150,6 +152,7 @@ class LabelList extends React.Component {
 
   render() {
     const { error } = this.props.data;
+    const { project } = this.props;
     if (error) {
       return <ErrorDisplay error={error} />;
     }
@@ -178,7 +181,7 @@ class LabelList extends React.Component {
       )}
       <header>
         <span className="title">Labels</span>
-        <Button onClick={this.onShowCreate}>New Label</Button>
+        {project.role >= Role.DEVELOPER && <Button onClick={this.onShowCreate}>New Label</Button>}
       </header>
       {this.renderLabels()}
     </section>);
@@ -189,6 +192,7 @@ LabelList.propTypes = {
   project: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+    role: PropTypes.number.isRequired,
   }).isRequired,
   data: PropTypes.shape({
     error: PropTypes.shape({}),

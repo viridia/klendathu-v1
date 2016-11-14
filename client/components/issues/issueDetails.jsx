@@ -359,13 +359,13 @@ class IssueDetails extends React.Component {
               </tbody>
             </table>
           </div>
-          <aside className="right">
+          {project.role >= Role.UPDATER && (<aside className="right">
             <WorkflowActions
                 project={project}
                 state={issue.state}
                 issue={issue}
                 onExecAction={this.onExecAction} />
-          </aside>
+          </aside>)}
         </section>
       </section>
       {showDelete && (<ConfirmDialog

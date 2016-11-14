@@ -40,7 +40,7 @@ module.exports = new GraphQLObjectType({
       type: new GraphQLList(new GraphQLNonNull(labelType)),
       description: 'List of labels to display in the issue summary list.',
       resolve(pm, args, context, options) {
-        if (pm.labels.length === 0) {
+        if (!pm.labels || pm.labels.length === 0) {
           return [];
         }
         return options.rootValue.labelsById({ project: pm.project, idList: pm.labels });

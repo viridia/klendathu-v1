@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/lib/Button';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FormControl from 'react-bootstrap/lib/FormControl';
+import { Role } from '../../lib/role';
 import { updateProject } from '../../store/projects';
 
 export default class ProjectInfoEdit extends React.Component {
@@ -55,7 +56,10 @@ export default class ProjectInfoEdit extends React.Component {
       <section className="settings-tab-pane">
         <header>
           <span className="title">{project.name}</span>
-          <Button bsStyle="primary" disabled={!modified} onClick={this.onSave}>
+          <Button
+              bsStyle="primary"
+              disabled={!modified || project.role < Role.MANAGER}
+              onClick={this.onSave}>
             Save
           </Button>
         </header>
@@ -68,6 +72,7 @@ export default class ProjectInfoEdit extends React.Component {
                     className="title"
                     type="text"
                     placeholder="title of the project"
+                    disabled={project.role < Role.MANAGER}
                     value={this.state.title}
                     onChange={this.onChangeTitle} />
               </td>
@@ -79,6 +84,7 @@ export default class ProjectInfoEdit extends React.Component {
                     className="description"
                     type="text"
                     placeholder="description of the project"
+                    disabled={project.role < Role.MANAGER}
                     value={this.state.description}
                     onChange={this.onChangeDescription} />
               </td>
@@ -86,7 +92,9 @@ export default class ProjectInfoEdit extends React.Component {
             <tr>
               <th />
               <td>
-                <Checkbox checked={this.state.public} onChange={this.onChangePublic}>
+                <Checkbox
+                    checked={this.state.public} onChange={this.onChangePublic}
+                    disabled={project.role < Role.MANAGER}>
                   Public
                 </Checkbox>
               </td>
@@ -108,6 +116,7 @@ ProjectInfoEdit.propTypes = {
   project: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+    role: PropTypes.number.isRequired,
     title: PropTypes.string,
     description: PropTypes.string.isRequired,
     owningUser: PropTypes.string,

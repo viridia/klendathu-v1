@@ -6,7 +6,7 @@ const { NotFound, Forbidden, Unauthorized, InternalError, Errors } = require('..
 const resolverMethods = {
   projectMembership({ project, user }) {
     return this.db.collection('projectMemberships').findOne(
-        { user: user || this.user.username, project: new ObjectId(project) });
+        { user: user || (this.user && this.user.username), project: new ObjectId(project) });
   },
 
   projectMemberships({ project }) {

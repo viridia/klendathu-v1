@@ -12,6 +12,7 @@ import MenuIcon from 'icons/ic_menu_black_24px.svg';
 import LabelName from '../common/labelName.jsx';
 import ColumnSort from '../common/columnSort.jsx';
 import RelativeDate from '../common/relativeDate.jsx';
+import { Role } from '../../lib/role';
 import { clearSelection, selectIssues, deselectIssues } from '../../store/issueSelection';
 
 import './issueList.scss';
@@ -225,7 +226,7 @@ class IssueList extends React.Component {
   }
 
   renderHeader() {
-    const { selection } = this.props;
+    const { selection, project } = this.props;
     const { query = {} } = this.props.location;
     const sortOrder = query.sort || '-updated';
     const descending = sortOrder.startsWith('-');
@@ -234,7 +235,7 @@ class IssueList extends React.Component {
     return (
       <thead>
         <tr className="heading">
-          <th className="selected">
+          {project.role >= Role.UPDATER && (<th className="selected">
             <label htmlFor="all-issues">
               <Checkbox
                   id="all-issues"
@@ -243,7 +244,7 @@ class IssueList extends React.Component {
                   inputRef={el => { this.selectAll = el; }}
                   onChange={this.onChangeSelectAll} />
             </label>
-          </th>
+          </th>)}
           <th className="id">
             <ColumnSort
                 column="id"
@@ -297,7 +298,7 @@ class IssueList extends React.Component {
     const issueId = `issue-${issue.id}`;
     return (
       <tr key={issue.id}>
-        <td className="selected">
+        {project.role >= Role.UPDATER && (<td className="selected">
           <label htmlFor={issueId}>
             <Checkbox
                 id={issueId}
@@ -306,7 +307,7 @@ class IssueList extends React.Component {
                 checked={selection.has(issue.id)}
                 onChange={this.onChangeSelection} />
           </label>
-        </td>
+        </td>)}
         <td className="id">
           <Link to={linkTarget}>{issue.id}</Link>
         </td>
@@ -357,6 +358,7 @@ IssueList.propTypes = {
   issues: PropTypes.arrayOf(PropTypes.shape({})),
   project: PropTypes.shape({
     id: PropTypes.string.isRequired,
+    role: PropTypes.number.isRequired,
     template: PropTypes.shape({
       types: PropTypes.arrayOf(PropTypes.shape({})),
     }),

@@ -3,7 +3,7 @@ import { graphql } from 'react-apollo';
 import Button from 'react-bootstrap/lib/Button';
 import ProjectMembershipsQuery from '../../graphql/queries/projectMemberships.graphql';
 import AddMemberDialog from './addMemberDialog.jsx';
-import { roleName } from '../../lib/role';
+import { roleName, Role } from '../../lib/role';
 
 class ProjectMemberList extends React.Component {
   constructor() {
@@ -40,6 +40,7 @@ class ProjectMemberList extends React.Component {
 
   render() {
     const { projectMemberships, loading } = this.props.data;
+    const { project } = this.props;
     if (loading || !projectMemberships) {
       return <section className="settings-tab-pane" />;
     }
@@ -52,7 +53,8 @@ class ProjectMemberList extends React.Component {
               onAddMember={this.onMemberAdded} />)}
         <header>
           <div className="title">Project members for {this.props.project.name}</div>
-          <Button onClick={this.onShowAddMember}>Add Member</Button>
+          {project.role >= Role.DEVELOPER &&
+            <Button onClick={this.onShowAddMember}>Add Member</Button>}
         </header>
         <div className="card report">
           <table>
@@ -81,6 +83,7 @@ ProjectMemberList.propTypes = {
   project: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+    role: PropTypes.number.isRequired,
   }).isRequired,
   params: PropTypes.shape({
     project: PropTypes.string,

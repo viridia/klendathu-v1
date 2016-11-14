@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 // import Perf from 'react-addons-perf';
 import 'react-redux-toastr/src/less/index.less';
 import equal from 'deep-equal';
+import Immutable from 'immutable';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { graphql } from 'react-apollo';
@@ -15,6 +16,7 @@ class ProjectPage extends React.Component {
   constructor(props) {
     super(props);
     this.cachedProject = props.data.project;
+    this.buildProjectMaps();
     // Perf.start();
   }
 
@@ -29,6 +31,21 @@ class ProjectPage extends React.Component {
     // Make sure that project pointer doesn't change unless value does. Allows shallow compares.
     if (!equal(this.cachedProject, nextProps.data.project)) {
       this.cachedProject = nextProps.data.project;
+      this.buildProjectMaps();
+    }
+  }
+
+  buildProjectMaps() {
+    const project = this.cachedProject;
+    if (project) {
+      // Add map of types by id
+      if (project.template) {
+        project.template.typesById = Immutable.Map(project.template.types.map(t => [t.id, t]));
+      }
+      // Add map of states by id
+      if (project.workflow) {
+        project.workflow.statesById = Immutable.Map(project.workflow.states.map(s => [s.id, s]));
+      }
     }
   }
 
