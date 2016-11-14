@@ -44,7 +44,7 @@
         padding: 0;
         vertical-align: middle;
         position: relative;
-        > button {
+        button {
           margin: 0;
           width: 100%;
           background-color: transparent;
@@ -52,6 +52,31 @@
           outline: none;
           > .sort {
             color: desaturate(lighten($b6, 25%), 20%);
+          }
+        }
+      }
+
+      th.summary {
+        > section {
+          display: flex;
+        }
+
+        li {
+          padding-left: 16px;
+          position: relative;
+          > a {
+            text-decoration: none;
+          }
+          &.disabled {
+            > a {
+              color: lighten($textDark, 30%);
+            }
+          }
+          &.checked:before {
+            position: absolute;
+            left: 9px;
+            top: 6px;
+            content: "\2713";
           }
         }
       }

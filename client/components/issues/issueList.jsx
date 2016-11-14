@@ -3,9 +3,12 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import Dropdown from 'react-bootstrap/lib/Dropdown';
+import MenuItem from 'react-bootstrap/lib/MenuItem';
 import Checkbox from 'react-bootstrap/lib/Checkbox';
 import { Link, browserHistory } from 'react-router';
 import classNames from 'classnames';
+import MenuIcon from 'icons/ic_menu_black_24px.svg';
 import LabelName from '../common/labelName.jsx';
 import ColumnSort from '../common/columnSort.jsx';
 import RelativeDate from '../common/relativeDate.jsx';
@@ -258,13 +261,24 @@ class IssueList extends React.Component {
             return <th className="custom center" key={cname}>--</th>;
           })}
           <th className="summary">
-            <ColumnSort
-                column="summary"
-                sortKey={sort}
-                descending={descending}
-                onChangeSort={this.onChangeSort}>
-              Summary
-            </ColumnSort>
+            <section>
+              <ColumnSort
+                  column="summary"
+                  sortKey={sort}
+                  descending={descending}
+                  onChangeSort={this.onChangeSort}>
+                Summary
+              </ColumnSort>
+              <Dropdown id="issue-menu" pullRight>
+                <Dropdown.Toggle noCaret>
+                  <MenuIcon />
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <MenuItem disabled className="not-checked">Show Issue Hierarchy</MenuItem>
+                  <MenuItem disabled>Arrange Columns&hellip;</MenuItem>
+                </Dropdown.Menu>
+              </Dropdown>
+            </section>
           </th>
         </tr>
       </thead>

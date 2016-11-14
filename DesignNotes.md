@@ -1,15 +1,6 @@
-* What do we need to do to finalize the db format enough that we can start collecting
-  real issues (and not worry about having to wipe the db during development?)
-  -- liking comments (list of likes)
-  -- liking issues (list of likes)
-  -- other reactions?
 * User autocomplete has a bug where it gets stuck sometimes. (General ac problem).
-* Adding comments in the compose page.
 * UpdateQueries
-  * Issue list
   * User list (in autocomplete).
-  * Sorting?
-* Issue compose needs role checks on individual fields.
 * return key to navigate between fields (all dialogs)
 * add support for #hash tags and @mentions
 * Additional roles
@@ -19,10 +10,8 @@
 * Undo mode (set deleted flag) for issues, labels, projects.
 * Show linked issues hierarchically
 * Create Mongo indices programmatically. (Measure first).
-* Delete project memberships when deleting projects and/or users.
 * Limit projects query to projects the user can see.
   * Partly done.
-* Make sure deleting an issue cascades to linked issues.
 
 URLS:
   https://github.com/mlabieniec/complexity
@@ -57,34 +46,19 @@ collections:
   issues
     -- linked issues
     -- labels
-    -- (opt) product
-      -- (opt) hardware
-      -- (opt) version
-      -- (opt) operating system
     -- (opt) browser
-    -- (opt) target milestone
     -- (opt) votes / likes
     -- (opt) fixed in version
     -- where to insert:
        -- after description
        -- after keywords
        -- after state
-  project.settings:
-    - user
-    - labels
-    - queries
-  project.members - users that belong to a project
-  project.orgs
   organizations
     - name
     - owner
     - members[]:
       - user
       - access
-
-client-side state:
-  list of projects - for top-level menu
-  list of organizations?
 
 do we want orgs to contain users or users to contain orgs?
   -- what operations?
@@ -96,7 +70,6 @@ Things to experiment with:
   -- New React Router? (Can't because we depend on LinkContainer)
 
 Filter rows:
-  [field][op][value][x]
   Row types:
     * enum (checkboxes?)
     * set (state, type) (checkboxes?)
