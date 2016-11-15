@@ -15,6 +15,10 @@ export default class ProfilePage extends React.Component {
   }
 
   render() {
+    const { profile } = this.context;
+    if (!profile) {
+      return <section className="kdt project-settings" />;
+    }
     return (<section className="kdt project-settings">
       <header>Profile</header>
       <Tabs
@@ -24,7 +28,7 @@ export default class ProfilePage extends React.Component {
           animation={false}>
         <Tab eventKey={1} title="Account">
           <div className="settings-tab-pane">
-            Account details.
+            Full Name: {profile.fullname}
           </div>
         </Tab>
         <Tab eventKey={2} title="Organizations">
@@ -39,6 +43,7 @@ export default class ProfilePage extends React.Component {
 
 ProfilePage.contextTypes = {
   profile: React.PropTypes.shape({
+    fullname: React.PropTypes.string,
     // username: React.PropTypes.string,
   }),
 };

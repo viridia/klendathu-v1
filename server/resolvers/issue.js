@@ -170,7 +170,11 @@ const resolverMethods = {
         }
       }
 
-      return this.db.collection('issues').find(query).sort(sort).toArray();
+      const issues = this.db.collection('issues');
+      if (req.subtasks) {
+        return this.findSubtasks(query, sort);
+      }
+      return issues.find(query).sort(sort).toArray();
     });
   },
 
@@ -540,6 +544,27 @@ const resolverMethods = {
         return Promise.reject(new BadRequest(Errors.INVALID_LINK));
       }
       return new Map(found.map(issue => [issue.id, issue]));
+    });
+  },
+
+  /* Given an initial query, finds all issues reachable via a subtask or supertask link. */
+  findSubtasks(query, sort) {
+    return this.db.collection('issues').find(query).sort(sort).toArray()
+    .then(issues => {
+      const idSet = new Set(issues.map(issue => issue.id));
+      let changed = false;
+      for (const issue of issues) {
+        for (const { relation, to } of issue.linked) {
+          if ((relation === 'included-by' || relation === 'includes') && !idSet.has(to)) {
+            changed = true;
+            idSet.add(to);
+          }
+        }
+      }
+      if (!changed) {
+        return Promise.resolve(issues);
+      }
+      return this.findSubtasks({ project: query.project, id: { $in: Array.from(idSet) } }, sort);
     });
   },
 

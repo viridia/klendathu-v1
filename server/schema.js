@@ -4,6 +4,7 @@ const {
     GraphQLInputObjectType,
     GraphQLInt,
     GraphQLString,
+    GraphQLBoolean,
     GraphQLList,
     GraphQLID,
     GraphQLNonNull,
@@ -123,6 +124,10 @@ module.exports = new GraphQLSchema({
           sort: {
             type: new GraphQLList(GraphQLString),
             description: 'Query term that specifies the field sort order.',
+          },
+          subtasks: {
+            type: GraphQLBoolean,
+            description: 'Whether to show issues hierarchically (subtasks).',
           },
         },
       },

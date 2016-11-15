@@ -139,7 +139,7 @@ export default compose(
         description, descriptionPred,
         label, search,
         owner, reporter,
-        sort,
+        sort, subtasks,
       } = query || {};
       return {
         variables: {
@@ -158,6 +158,7 @@ export default compose(
           comment: undefined,
           commentPred: undefined,
           sort: [sort || '-updated'],
+          subtasks: subtasks !== undefined,
         },
       };
     },

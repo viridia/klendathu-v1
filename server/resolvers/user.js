@@ -19,7 +19,10 @@ const resolverMethods = {
     const query = {};
     if (token) {
       const pattern = `\\b${escapeRegExp(token)}`;
-      query.fullname = { $regex: pattern, $options: 'i' };
+      query.$or = [
+        { fullname: { $regex: pattern, $options: 'i' } },
+        { username: { $regex: pattern, $options: 'i' } },
+      ];
     }
     return this.db.collection('users').find(query).sort({ fullname: 1 }).toArray()
     .then(users => users.map(serialize));

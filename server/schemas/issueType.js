@@ -136,6 +136,18 @@ module.exports = new GraphQLObjectType({
       type: new GraphQLList(new GraphQLNonNull(linkedIssueType)),
       description: 'List of issues linked to this one.',
     },
+    parent: {
+      type: GraphQLInt,
+      description: 'Linked issue that includes this one, for convenience.',
+      resolve(issue) {
+        for (const { relation, to } of issue.linked) {
+          if (relation === 'included-by') {
+            return to;
+          }
+        }
+        return null;
+      },
+    },
     custom: {
       type: new GraphQLList(new GraphQLNonNull(customFieldType)),
       description: 'List of custom fields for this issue.',

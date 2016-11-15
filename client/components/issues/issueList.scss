@@ -103,8 +103,17 @@
         text-align: left;
       }
 
-      .summary {
+      .title {
         font-weight: bold;
+        > a.child {
+          position: relative;
+        }
+        > a.child:before {
+          position: absolute;
+          left: -14px;
+          content: "\21D2";
+          color: lighten($textDarkDisabled, 20%);
+        }
       }
 
       .unassigned {

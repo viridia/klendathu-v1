@@ -104,9 +104,6 @@ class LoginPage extends React.Component {
               <LinkContainer to={{ ...this.props.location, pathname: '/signup' }}>
                 <Button bsStyle="link">Create Account</Button>
               </LinkContainer>
-              <LinkContainer to={next || { pathname: '/' }}>
-                <Button bsStyle="default">Cancel</Button>
-              </LinkContainer>
               <Button bsStyle="primary" type="submit" disabled={!canSubmit}>Sign In</Button>
             </div>
           </form>

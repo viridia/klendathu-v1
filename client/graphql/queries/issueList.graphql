@@ -45,6 +45,7 @@ query issueListQuery(
       name
       value
     }
+    parent
   }
   projectMembership(project: $project) {
     labels

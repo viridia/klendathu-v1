@@ -129,6 +129,7 @@ class IssueList extends React.Component {
     this.onChangeSelection = this.onChangeSelection.bind(this);
     this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
     this.onChangeSort = this.onChangeSort.bind(this);
+    this.onToggleSubtasks = this.onToggleSubtasks.bind(this);
     this.state = {
       columns: ['updated', 'type', 'owner', 'state', 'custom.priority', 'custom.severity'],
     };
@@ -183,6 +184,15 @@ class IssueList extends React.Component {
     const sort = `${descending ? '-' : ''}${column}`;
     browserHistory.replace({ ...this.props.location, query: { ...query, sort } });
     // this.setState({ sort: column, descending });
+  }
+
+  onToggleSubtasks() {
+    const { query = {} } = this.props.location;
+    if (query.subtasks === undefined) {
+      browserHistory.replace({ ...this.props.location, query: { ...query, subtasks: null } });
+    } else {
+      browserHistory.replace({ ...this.props.location, query: { ...query, subtasks: undefined } });
+    }
   }
 
   buildColumns(project) {
@@ -275,7 +285,9 @@ class IssueList extends React.Component {
                   <MenuIcon />
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                  <MenuItem disabled className="not-checked">Show Issue Hierarchy</MenuItem>
+                  <MenuItem
+                      className={classNames({ checked: query.subtasks !== undefined })}
+                      onClick={this.onToggleSubtasks}>Show Subtasks</MenuItem>
                   <MenuItem disabled>Arrange Columns&hellip;</MenuItem>
                 </Dropdown.Menu>
               </Dropdown>
@@ -286,7 +298,7 @@ class IssueList extends React.Component {
     );
   }
 
-  renderIssue(issue) {
+  renderIssue(issue, level = 0) {
     const { project, selection, labels } = this.props;
     const linkTarget = {
       pathname: `/project/${project.name}/issues/${issue.id}`,
@@ -296,6 +308,10 @@ class IssueList extends React.Component {
       },
     };
     const issueId = `issue-${issue.id}`;
+    const style = {};
+    if (level > 0) {
+      style.marginLeft = `${level * 32}px`;
+    }
     return (
       <tr key={issue.id}>
         {project.role >= Role.UPDATER && (<td className="selected">
@@ -319,7 +335,7 @@ class IssueList extends React.Component {
           return <td className="custom" key={cname} />;
         })}
         <td className="title">
-          <Link to={linkTarget}>
+          <Link to={linkTarget} className={classNames({ child: level > 0 })} style={style}>
             <span className="summary">{issue.summary}</span>
             {issue.labels
               .filter(l => labels.has(l))
@@ -327,6 +343,41 @@ class IssueList extends React.Component {
           </Link>
         </td>
       </tr>);
+  }
+
+  renderIssueList() {
+    const { issues, location } = this.props;
+    if (location.query.subtasks !== undefined) {
+      const childMap = new Map();
+      const topLevel = [];
+      for (const issue of issues) {
+        if (issue.parent) {
+          if (!childMap.has(issue.parent)) {
+            childMap.set(issue.parent, []);
+          }
+          childMap.get(issue.parent).push(issue);
+        } else {
+          topLevel.push(issue);
+        }
+      }
+      // return topLevel.map(i => this.renderIssue(i));
+      const issueList = [];
+      const renderChildren = (issue, level) => {
+        if (childMap.has(issue.id)) {
+          for (const child of childMap.get(issue.id)) {
+            issueList.push(this.renderIssue(child, level));
+            renderChildren(child, level + 1);
+          }
+        }
+      };
+      for (const issue of topLevel) {
+        issueList.push(this.renderIssue(issue, 0));
+        renderChildren(issue, 1);
+      }
+      return issueList;
+    }
+
+    return issues.map(i => this.renderIssue(i));
   }
 
   render() {
@@ -346,7 +397,7 @@ class IssueList extends React.Component {
       <div className="card report">
         <table className="issue">
           {this.renderHeader()}
-          <tbody>{issues.map(i => this.renderIssue(i))}</tbody>
+          <tbody>{this.renderIssueList()}</tbody>
         </table>
       </div>
     );
