@@ -65,6 +65,9 @@ class SignUpPage extends React.Component {
         case 'password-match':
           errState.password2Error = 'Confirmation password does not match.';
           break;
+        case 'password-too-short':
+          errState.password2Error = 'Password must be at least 5 characters.';
+          break;
         default: {
           this.props.client.resetStore();
           const { next } = this.props.location.state || {};

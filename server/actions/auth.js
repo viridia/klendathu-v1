@@ -8,6 +8,9 @@ const logger = require('../common/logger');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const srs = require('secure-random-string');
+const https = require('https');
+const FormData = require('form-data');
 
 function serializeProfile(profile) {
   return {
@@ -263,6 +266,8 @@ module.exports = function (app, apiRouter) {
       res.send({ err: 'username-too-short' });
     } else if (username.toLowerCase() !== username) {
       res.send({ err: 'username-lower-case' });
+    } else if (password.length < 5) {
+      res.send({ err: 'password-too-short' });
     } else if (password !== password2) {
       res.send({ err: 'password-match' });
     } else {
@@ -328,6 +333,120 @@ module.exports = function (app, apiRouter) {
             res.json({ err: 'internal' });
           });
         }
+      });
+    }
+  });
+
+  // Recover password handler
+  apiRouter.post('/recoverpw', (req, res) => {
+    const { email } = req.body;
+    if (email.length < 3) {
+      res.send({ err: 'invalid-email' });
+    } else {
+      users.findOne({ email }).then(user => {
+        if (!user) {
+          // No user with that email address.
+          res.status(401).send({ err: 'unauthorized' });
+          return;
+        }
+
+        const pwToken = srs();
+
+        users.updateOne({ _id: user._id }, { $set: { pwToken } }).then(() => {
+          const pwUrl = `http://${config.HOST}/resetpw?token=${pwToken}&user=${user.username}`;
+          const textBody = `
+            There was recently a request to change the password for your account.
+            Use this link to set a new password ${pwUrl}
+            If you did not make this request, you can ignore this message and your password will
+            remain the same.
+          `;
+
+          const htmlBody = `
+  <section>
+    <div>There was recently a request to change the password for your account.</div>
+    <a href="${pwUrl}">Click here to set a new password.</a>
+    <div>If you did not make this request, you can ignore this message and your password will
+    remain the same.</div>
+  </section>
+          `;
+
+          // Generate a token
+          // HTML email
+          const form = new FormData();
+          form.append('from', 'Klendathu <klendathu@noreply.org>');
+          form.append('to', email);
+          form.append('subject', 'Klendathu Password Reset');
+          form.append('text', textBody);
+          form.append('html', htmlBody);
+              // 'Someone has attempted to reset your password. Click to reset password');
+          const request = https.request({
+            host: 'api.mailgun.net',
+            path: `/v3/${config.MAILGUN_DOMAIN}/messages`,
+            auth: `api:${config.MAILGUN_API_KEY}`,
+            headers: form.getHeaders(),
+            method: 'POST',
+          });
+          form.pipe(request);
+          request.on('response', r => {
+            if (r.statusCode !== 200) {
+              r.on('data', d => {
+                logger.error(r.statusCode, JSON.parse(d).message);
+              });
+              res.json({ err: 'send-error' });
+            } else {
+              logger.info('Sent password recovery email to:', email);
+              res.status(200).end();
+            }
+          });
+        }, err => {
+          logger.error(err);
+          res.json({ err: 'send-error' });
+        });
+      });
+    }
+  });
+
+  // Reset password handler
+  apiRouter.post('/resetpw', (req, res) => {
+    const { password, password2, username, token } = req.body;
+    // TODO: Validate password length.
+    if (password.length < 5) {
+      res.send({ err: 'password-too-short' });
+    } else if (password !== password2) {
+      res.send({ err: 'password-match' });
+    } else {
+      users.findOne({ username }).then(user => {
+        if (!user) {
+          // No user with that username.
+          res.status(401).send({ err: 'unauthorized' });
+          return;
+        } else if (user.pwToken !== token) {
+          // Token expired
+          res.status(401).send({ err: 'unauthorized' });
+          return;
+        }
+
+        // Compute password hash
+        bcrypt.hash(password, 10, (err, hash) => {
+          if (err) {
+            logger.error('Password hash error:', err);
+            res.json({ err: 'internal' });
+          } else {
+            // Insert new user into the database.
+            users.updateOne({ username }, {
+              $set: { password: hash },
+              $reset: { pwToken: '' },
+            }).then(() => {
+              logger.info('Password change successful:', username);
+              return req.logIn(user, () => {
+                return res.end();
+              });
+            }, reason => {
+              logger.error('Password change error:', reason);
+              res.json({ err: 'internal' });
+            });
+          }
+        });
       });
     }
   });

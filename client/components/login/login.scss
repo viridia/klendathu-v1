@@ -10,12 +10,20 @@
 
 .login.card {
   display: flex;
-  padding: 8px;
+  padding: 8px 16px;
 
   > .login-form, .finish-signup-form {
     > .button-row {
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      > section {
+        display: flex;
+        flex-direction: column;
+        > a {
+          padding: 4px 8px;
+        }
+      }
       > button {
         margin-left: 8px;
       }

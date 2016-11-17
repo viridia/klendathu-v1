@@ -72,7 +72,6 @@ class LoginPage extends React.Component {
       }
       nextUrl = `?next=${encodeURIComponent(nextUrl)}`;
     }
-// http://localhost:8080/project/test-project/issues?label=18
     return (<div className="kdt page">
       <Header location={this.props.location} params={this.props.params} />
       <div className="login-content">
@@ -101,9 +100,14 @@ class LoginPage extends React.Component {
               <HelpBlock>{this.state.passwordError}</HelpBlock>
             </FormGroup>
             <div className="button-row">
-              <LinkContainer to={{ ...this.props.location, pathname: '/signup' }}>
-                <Button bsStyle="link">Create Account</Button>
-              </LinkContainer>
+              <section>
+                <LinkContainer to={{ ...this.props.location, pathname: '/signup' }}>
+                  <Button bsStyle="link">Create Account</Button>
+                </LinkContainer>
+                <LinkContainer to={{ ...this.props.location, pathname: '/recoverpw' }}>
+                  <Button bsStyle="link">Forgot Password?</Button>
+                </LinkContainer>
+              </section>
               <Button bsStyle="primary" type="submit" disabled={!canSubmit}>Sign In</Button>
             </div>
           </form>
