@@ -45,6 +45,7 @@ module.exports = {
       'media',
     ],
     extensions: ['.js', '.jsx'],
+    alias: { 'react/lib/ReactDOM': 'react-dom/lib/ReactDOM' },
   },
   plugins,
   // devtool: debug ? 'cheap-eval-source-map' : 'hidden-source-map',

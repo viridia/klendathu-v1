@@ -8,22 +8,22 @@ import BookmarkIcon from 'icons/ic_bookmark_border_black_24px.svg';
 import PersonIcon from 'icons/ic_person_black_24px.svg';
 import SettingsIcon from 'icons/ic_settings_black_24px.svg';
 import LocalOfferIcon from 'icons/ic_local_offer_black_24px.svg';
-import ProjectMembershipQuery from '../../graphql/queries/projectMembership.graphql';
+import LeftNavDataQuery from '../../graphql/queries/leftNavData.graphql';
 import LabelName from './labelName.jsx';
 import './leftNav.scss';
 
-export function NavItem({ title, icon, path, query = undefined, onlyActiveOnIndex = false }) {
+export function NavItem({ title, icon, pathname, query = undefined, onlyActiveOnIndex = false }) {
   return (<Link
       className="item"
       activeClassName="active"
       onlyActiveOnIndex={onlyActiveOnIndex}
-      to={{ pathname: path, query }}>{icon}{title}</Link>);
+      to={{ pathname, query }}>{icon}{title}</Link>);
 }
 
 NavItem.propTypes = {
   icon: PropTypes.node.isRequired,
   title: PropTypes.string.isRequired,
-  path: PropTypes.string.isRequired,
+  pathname: PropTypes.string.isRequired,
   query: PropTypes.shape({}),
   onlyActiveOnIndex: PropTypes.bool,
 };
@@ -38,24 +38,24 @@ class LeftNav extends React.Component {
 
   render() {
     const { project } = this.props;
-    const { projectMembership } = this.props.data;
+    const { projectMembership, projects } = this.props.data;
     const filters = projectMembership ? projectMembership.filters : [];
     const labels = projectMembership ? projectMembership.labelsData : [];
     return (<nav className="kdt left-nav">
       <NavItem
           icon={<ListIcon />}
           title="All Issues"
-          path={`/project/${project.name}/issues`}
+          pathname={`/project/${project.name}/issues`}
           query={{ owner: undefined }} />
       <NavItem
           icon={<PersonIcon />}
           title="My Open Issues"
-          path={`/project/${project.name}/issues`}
+          pathname={`/project/${project.name}/issues`}
           query={{ owner: 'me', state: 'open' }} />
       <NavItem
           icon={<LocalOfferIcon />}
           title="Labels"
-          path={`/project/${project.name}/labels`} />
+          pathname={`/project/${project.name}/labels`} />
       {labels && labels.length > 0 && <ul className="label-list">
         {labels.map(label => (
           <li className="label-item" key={label.id}>
@@ -68,7 +68,7 @@ class LeftNav extends React.Component {
       <NavItem
           icon={<BookmarkIcon />}
           title="Saved Filters"
-          path={`/project/${project.name}/queries`} />
+          pathname={`/project/${project.name}/queries`} />
       {filters && filters.length > 0 && <ul className="filter-list">
         {filters.map(filter => (
           <li className="filter-item" key={filter.name}>
@@ -84,8 +84,18 @@ class LeftNav extends React.Component {
       <NavItem
           icon={<SettingsIcon />}
           title="Project Settings"
-          path={`/project/${project.name}/settings`} />
-      <NavItem icon={<AppsIcon />} title="Projects" onlyActiveOnIndex path="/" />
+          pathname={`/project/${project.name}/settings`} />
+      <NavItem icon={<AppsIcon />} title="Projects" onlyActiveOnIndex pathname="/" />
+      {projects && projects.length > 0 && <ul className="project-list">
+        {projects.map(p => (
+          <li className="project-item" key={p.name}>
+            <Link
+                to={{ pathname: `/project/${p.name}/issues` }}>
+              {p.name}
+            </Link>
+          </li>
+        ))}
+      </ul>}
     </nav>);
   }
 }
@@ -98,9 +108,10 @@ LeftNav.propTypes = {
   data: PropTypes.shape({
     loading: PropTypes.bool,
     projectMembership: PropTypes.shape({}),
+    projects: PropTypes.arrayOf(PropTypes.shape({})),
   }).isRequired,
 };
 
-export default graphql(ProjectMembershipQuery, {
-  options: ({ project }) => ({ variables: { project: project.id, user: null } }),
+export default graphql(LeftNavDataQuery, {
+  options: ({ project }) => ({ variables: { project: project.id } }),
 })(LeftNav);
