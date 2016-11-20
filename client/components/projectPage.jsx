@@ -41,6 +41,19 @@ class ProjectPage extends React.Component {
       // Add map of types by id
       if (project.template) {
         project.template.typesById = Immutable.Map(project.template.types.map(t => [t.id, t]));
+        const fieldsById = new Map();
+        const fieldList = [];
+        project.template.types.forEach(t => {
+          if (t.fields) {
+            t.fields.forEach(f => {
+              fieldsById.set(f.id, f);
+              fieldList.push([f.caption, f.id]);
+            });
+          }
+        });
+        fieldList.sort();
+        project.template.customFieldsById = new Immutable.Map(fieldsById);
+        project.template.customFieldList = new Immutable.List(fieldList);
       }
       // Add map of states by id
       if (project.workflow) {

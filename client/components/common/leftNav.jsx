@@ -46,7 +46,7 @@ class LeftNav extends React.Component {
           icon={<ListIcon />}
           title="All Issues"
           pathname={`/project/${project.name}/issues`}
-          query={{ owner: undefined }} />
+          query={{ owner: undefined, label: undefined, type: undefined, state: undefined }} />
       <NavItem
           icon={<PersonIcon />}
           title="My Open Issues"
@@ -90,6 +90,7 @@ class LeftNav extends React.Component {
         {projects.map(p => (
           <li className="project-item" key={p.name}>
             <Link
+                activeClassName="active"
                 to={{ pathname: `/project/${p.name}/issues` }}>
               {p.name}
             </Link>

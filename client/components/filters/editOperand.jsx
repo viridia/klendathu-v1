@@ -9,7 +9,7 @@ import LabelSelector from '../issues/labelSelector.jsx';
 import UserAutoComplete from '../common/userAutoComplete.jsx';
 import './editOperand.scss';
 
-export function defaultValueForType(project, type) {
+export function defaultValueForType(project, type, customField) {
   if (type === 'stateSet') {
     return new Immutable.Set(project.workflow.states.filter(st => !st.closed).map(st => st.id));
   } else if (type === 'typeSet') {
@@ -18,6 +18,8 @@ export function defaultValueForType(project, type) {
     return [];
   } else if (type === 'user' || type === 'users') {
     return [];
+  } else if (type === 'enum') {
+    return new Immutable.Set(customField.values);
   } else {
     return '';
   }
@@ -98,16 +100,51 @@ TypeSetEditor.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
+class EnumSetEditor extends React.Component {
+  constructor() {
+    super();
+    this.onChange = this.onChange.bind(this);
+  }
+
+  onChange(e) {
+    if (e.target.checked) {
+      this.props.onChange(this.props.value.add(e.target.dataset.id));
+    } else {
+      this.props.onChange(this.props.value.remove(e.target.dataset.id));
+    }
+  }
+
+  render() {
+    const { field, value } = this.props;
+    return (
+      <div className="select-types">
+        {field.values.map(v => (
+          <Checkbox key={v} data-id={v} checked={value.has(v)} onChange={this.onChange}>
+            {v}
+          </Checkbox>))}
+      </div>
+    );
+  }
+}
+
+EnumSetEditor.propTypes = {
+  value: ImmutablePropTypes.set.isRequired,
+  field: PropTypes.shape({
+    values: PropTypes.arrayOf(PropTypes.string.isRequired),
+  }).isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
 /** Component which allows the user to enter a value for the filter and mass edit functions. */
 export default class EditOperand extends React.Component {
   render() {
-    const { type, project, onChange } = this.props;
+    const { type, customField, project, onChange } = this.props;
     if (!type) {
       return null;
     }
     let value = this.props.value;
     if (value === null || value === undefined) {
-      value = defaultValueForType(project, type);
+      value = defaultValueForType(project, type, customField);
     }
     switch (type) {
       case 'searchText':
@@ -115,6 +152,14 @@ export default class EditOperand extends React.Component {
           <FormControl
               className="match-text"
               placeholder="text to match"
+              value={value}
+              onChange={e => onChange(e.target.value)} />
+        );
+      case 'text':
+        return (
+          <FormControl
+              className="match-text"
+              placeholder="text to find"
               value={value}
               onChange={e => onChange(e.target.value)} />
         );
@@ -180,6 +225,9 @@ export default class EditOperand extends React.Component {
               multiple
               onSelectionChange={this.props.onChange} />);
       }
+      case 'enum': {
+        return <EnumSetEditor field={customField} value={value} onChange={onChange} />;
+      }
       default:
         return null;
     }
@@ -189,6 +237,7 @@ export default class EditOperand extends React.Component {
 EditOperand.propTypes = {
   type: PropTypes.string,
   value: PropTypes.any, // eslint-disable-line
+  customField: PropTypes.shape({}),
   project: PropTypes.shape({
     id: PropTypes.string.isRequired,
     template: PropTypes.shape({

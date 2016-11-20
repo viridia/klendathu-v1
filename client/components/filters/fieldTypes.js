@@ -132,17 +132,43 @@ const FIELD_TYPES = new Immutable.OrderedMap({
   // },
 });
 
-export function parseQuery(project, profile, client, query) {
-  let terms = Immutable.List.of();
-  for (const field of Object.keys(query)) {
-    const term = FIELD_TYPES.get(field);
-    if (term) {
-      const newTerm = { ...term.parseQuery(term, query, project, this.context.profile), field };
-      if (newTerm !== null) {
-        terms = terms.push(newTerm);
+export function getFieldType(project, fieldId) {
+  if (fieldId.startsWith('custom.')) {
+    const customField = project.template.customFieldsById.get(fieldId.slice(7));
+    if (customField) {
+      switch (customField.type) {
+        case 'ENUM':
+          return {
+            caption: customField.caption,
+            type: 'enum',
+            customField,
+            buildQuery: (query, term) => {
+              query[fieldId] = term.value.toArray().join(',');
+            },
+            parseQuery(query) {
+              const param = query.get(fieldId);
+              return { ...this, value: new Immutable.Set(param.split(',')) };
+            },
+          };
+        case 'TEXT':
+          return {
+            caption: customField.caption,
+            type: 'text',
+            customField,
+            buildQuery: (query, term) => {
+              query[fieldId] = term.value;
+            },
+            parseQuery(query) {
+              return { ...this, value: query.get(fieldId) };
+            },
+          };
+        default:
+          throw new Error(`Invalid custom field type: ${customField.type}`);
       }
     }
+    return null;
   }
+  return FIELD_TYPES.get(fieldId);
 }
 
 export default FIELD_TYPES;

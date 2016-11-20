@@ -13,6 +13,7 @@ query issueListQuery(
     $labels: [Int!],
     $comment: String,
     $commentPred: PREDICATE,
+    $custom: [CustomSearch!],
     $sort: [String!]) {
   issues(
       project: $project,
@@ -29,6 +30,7 @@ query issueListQuery(
       labels: $labels,
       comment: $comment,
       commentPred: $commentPred,
+      custom: $custom,
       sort: $sort) {
     id
     project

@@ -11,7 +11,7 @@ import MassEdit from '../filters/massEdit.jsx';
 import IssueList from './issueList.jsx';
 import IssueListQuery from '../../graphql/queries/issueList.graphql';
 import { setFilterTerms } from '../../store/filter';
-import FIELD_TYPES from '../filters/fieldTypes';
+import { getFieldType } from '../filters/fieldTypes';
 
 class IssueSummaryView extends React.Component {
   constructor(props, context) {
@@ -51,10 +51,9 @@ class IssueSummaryView extends React.Component {
     };
     const filterTerms = [];
     for (const field of this.query.keys()) {
-      const term = FIELD_TYPES.get(field);
+      const term = getFieldType(context.project, field);
       if (term) {
         const newTerm = { ...term.parseQuery(this.query, context), field };
-        // console.log(field, newTerm);
         if (newTerm !== null) {
           filterTerms.push(Promise.resolve(newTerm));
         }
@@ -141,6 +140,27 @@ export default compose(
         owner, reporter,
         sort, subtasks,
       } = query || {};
+      // Handle custom search
+      const custom = [];
+      for (const key of Object.keys(query)) {
+        if (key.startsWith('custom.')) {
+          const customFieldName = key.slice(7);
+          const customField = project.template.customFieldsById.get(customFieldName);
+          if (customField) {
+            if (customField.type === 'ENUM') {
+              custom.push({
+                name: customFieldName,
+                values: query[key].split(','),
+              });
+            } else if (customField.type === 'TEXT') {
+              custom.push({
+                name: customFieldName,
+                value: query[key],
+              });
+            }
+          }
+        }
+      }
       return {
         variables: {
           project: project.id,
@@ -157,6 +177,7 @@ export default compose(
           labels: label && label.split(','),
           comment: undefined,
           commentPred: undefined,
+          custom,
           sort: [sort || '-updated'],
           subtasks: subtasks !== undefined,
         },

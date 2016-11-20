@@ -144,12 +144,21 @@ const resolverMethods = {
 
       // Other things we might want to search by:
       // cc
-      // keywords
-      // custom fields
       // comments / commenter
       // linked
       // created
       // updated
+
+      if (req.custom) {
+        for (const term of req.custom) {
+          const { name, value, values } = term;
+          if (value) {
+            query[`custom.${name}`] = { $regex: escapeRegExp(value), $options: 'i' };
+          } else if (values) {
+            query[`custom.${name}`] = { $in: values };
+          }
+        }
+      }
 
       let sort = ['id', -1];
       if (req.sort) {

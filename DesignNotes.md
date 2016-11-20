@@ -8,7 +8,6 @@
   * Org membership
 * Check roles client-side when editing / deleting labels
 * Undo mode (set deleted flag) for issues, labels, projects.
-* Show linked issues hierarchically
 * Create Mongo indices programmatically. (Measure first).
 * Limit projects query to projects the user can see.
   * Partly done.

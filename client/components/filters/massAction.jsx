@@ -109,7 +109,7 @@ export default class MassAction extends React.Component {
     if (!action || newAction.type !== action.type) {
       this.props.onChange(index, {
         ...newAction,
-        value: defaultValueForType(project, newAction.type),
+        value: defaultValueForType(project, newAction.type, newAction.customField),
         id,
       });
     } else {

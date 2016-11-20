@@ -29,6 +29,14 @@ const customSearch = new GraphQLInputObjectType({
       type: new GraphQLNonNull(GraphQLString),
       description: 'Name of the custom field we are searching for.',
     },
+    value: {
+      type: GraphQLString,
+      description: 'Single values to search for. Default behavior is substring match.',
+    },
+    values: {
+      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+      description: 'List of values we are searching for. Used for enum values.',
+    },
   },
 });
 

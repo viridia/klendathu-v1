@@ -8,7 +8,7 @@ import MenuItem from 'react-bootstrap/lib/MenuItem';
 import CloseIcon from 'icons/ic_close_black_24px.svg';
 import { updateFilterTerm } from '../../store/filter';
 import EditOperand, { defaultValueForType } from './editOperand.jsx';
-import FIELD_TYPES from './fieldTypes';
+import FIELD_TYPES, { getFieldType } from './fieldTypes';
 
 const STRING_PREDICATES = new Immutable.OrderedMap({
   IN: 'contains',
@@ -33,12 +33,15 @@ class FilterTerm extends React.Component {
 
   onSelectField(field) {
     const { index, term, project } = this.props;
-    const newTerm = FIELD_TYPES.get(field);
-    if (!term || newTerm.type !== term.type) {
+    const newTerm = getFieldType(project, field);
+    if (!newTerm) {
+      throw new Error(`Invalid field id: ${field}`);
+    }
+    if (!term || newTerm.type !== term.type || newTerm.caption !== term.caption) {
       this.props.onChange(index, {
         ...newTerm,
         field,
-        value: defaultValueForType(project, newTerm.type),
+        value: defaultValueForType(project, newTerm.type, newTerm.customField),
       });
     } else {
       this.props.onChange(index, { ...term, field, value: term.value });
@@ -92,6 +95,11 @@ class FilterTerm extends React.Component {
       items.push(
         <MenuItem eventKey={id} key={id} disabled={termTypes.has(id)}>{ft.caption}</MenuItem>);
     });
+    project.template.customFieldList.forEach(([caption, id]) => {
+      const customId = `custom.${id}`;
+      items.push(<MenuItem
+          eventKey={customId} key={customId} disabled={termTypes.has(id)}>{caption}</MenuItem>);
+    });
     const caption = (term && term.caption) || 'Search by...';
 
     return (<section className="filter-term">
@@ -107,6 +115,7 @@ class FilterTerm extends React.Component {
         {term && (<EditOperand
             type={term.type}
             value={term.value}
+            customField={term.customField}
             project={project}
             onChange={this.onChangeValue} />)}
       </section>
