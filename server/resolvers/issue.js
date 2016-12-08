@@ -38,7 +38,7 @@ function inverseRelation(relation) {
 
 function symbolicUserName(user, username) {
   if (username === 'me') {
-    return user.username;
+    return user ? user.username : null;
   } else if (username === 'none') {
     return null;
   } else {
@@ -83,12 +83,13 @@ const resolverMethods = {
         id,
         project: new ObjectId(project),
       };
-      return this.db.collection('issues').findOne(query).then(issue => {
-        if (!issue) {
-          return null;
-        }
-        return issue;
-      });
+
+      if (role < Role.VIEWER) {
+        // If they are not a project member, only allow public issues to be viewed.
+        query.public = true;
+      }
+
+      return this.db.collection('issues').findOne(query);
     });
   },
 
@@ -102,6 +103,11 @@ const resolverMethods = {
       const query = {
         project: new ObjectId(req.project),
       };
+
+      if (role < Role.VIEWER) {
+        // If they are not a project member, only allow public issues to be viewed.
+        query.public = true;
+      }
 
       if (req.search) {
         query.$text = { $search: req.search };
@@ -197,6 +203,12 @@ const resolverMethods = {
         project: new ObjectId(project),
         $text: { $search: search },
       };
+
+      if (role < Role.VIEWER) {
+        // If they are not a project member, only allow public issues to be viewed.
+        query.public = true;
+      }
+
       const sort = { score: { $meta: 'textScore' } };
       return this.db.collection('issues')
         .find(query, { score: { $meta: 'textScore' } }).sort(sort).toArray();

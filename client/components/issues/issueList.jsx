@@ -130,9 +130,6 @@ class IssueList extends React.Component {
     this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
     this.onChangeSort = this.onChangeSort.bind(this);
     this.onToggleSubtasks = this.onToggleSubtasks.bind(this);
-    this.state = {
-      columns: ['updated', 'type', 'owner', 'state', 'custom.priority', 'custom.severity'],
-    };
     this.buildColumns(props.project);
     this.buildIssueIdList(props);
   }
@@ -147,7 +144,7 @@ class IssueList extends React.Component {
     this.buildIssueIdList(nextProps);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps) {
     return (
       this.props.loading !== nextProps.loading ||
       this.props.issues !== nextProps.issues ||
@@ -155,7 +152,7 @@ class IssueList extends React.Component {
       this.props.project.template !== nextProps.project.template ||
       this.props.location !== nextProps.location ||
       this.props.selection !== nextProps.selection ||
-      this.state.columns !== nextState.columns);
+      this.props.columns !== nextProps.columns);
   }
 
   componentDidUpdate() {
@@ -264,7 +261,7 @@ class IssueList extends React.Component {
               #
             </ColumnSort>
           </th>
-          {this.state.columns.map(cname => {
+          {this.props.columns.map(cname => {
             const cr = this.columnRenderers[cname];
             if (cr) {
               return cr.renderHeader(sort, descending, this.onChangeSort);
@@ -327,7 +324,7 @@ class IssueList extends React.Component {
         <td className="id">
           <Link to={linkTarget}>{issue.id}</Link>
         </td>
-        {this.state.columns.map(cname => {
+        {this.props.columns.map(cname => {
           const cr = this.columnRenderers[cname];
           if (cr) {
             return cr.render(issue);
@@ -418,6 +415,7 @@ IssueList.propTypes = {
     query: PropTypes.shape({}),
   }).isRequired,
   labels: ImmutablePropTypes.set.isRequired,
+  columns: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
   selection: ImmutablePropTypes.set.isRequired,
   clearSelection: PropTypes.func.isRequired,
   selectIssues: PropTypes.func.isRequired,

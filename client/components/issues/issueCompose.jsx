@@ -521,10 +521,10 @@ export default class IssueCompose extends React.Component {
                 state={this.state.issueState}
                 prevState={this.state.prevState}
                 onStateChanged={this.onChangeState} />
-            <ControlLabel>Visbility</ControlLabel>
-            <Checkbox checked={this.state.public} onChange={this.onChangePublic}>
+            {project.public && <ControlLabel>Visbility</ControlLabel>}
+            {project.public && <Checkbox checked={this.state.public} onChange={this.onChangePublic}>
               Public
-            </Checkbox>
+            </Checkbox>}
           </aside>
         </section>
         <footer className="submit-buttons">

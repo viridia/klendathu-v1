@@ -77,7 +77,7 @@ class FilterParams extends React.Component {
       if (this.state.search.length > 0) {
         browserHistory.push({ ...this.props.location, query: { search: this.state.search } });
       } else {
-        browserHistory.push({ ...this.props.location, query: null });
+        browserHistory.push({ ...this.props.location, query: { search: undefined } });
       }
     }
   }

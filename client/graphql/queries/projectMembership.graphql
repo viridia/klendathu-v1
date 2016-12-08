@@ -1,8 +1,9 @@
-query projectMembershipQuery($project: ID!, $user: String) {
-  projectMembership(project: $project, user: $user) {
+query projectMembershipQuery($project: ID!) {
+  projectMembership(project: $project) {
     user
     role
     inheritedRole
+    columns
     labels
     labelsData {
       id

@@ -102,6 +102,11 @@ const resolverMethods = {
           });
         }
 
+        // Columns change
+        if (membership.columns) {
+          update.$set.columns = membership.columns;
+        }
+
         return pms.updateOne(query, update, { upsert: true }).then(() => {
           return pms.findOne(query);
         }, error => {

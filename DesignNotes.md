@@ -36,11 +36,6 @@ URLS:
       level = user.projects[project.id].rank
       level = user.orgs[project.owningOrg].rank
 
-question about ownership of labels: who can create them?
-  -- anyone with manager access to a project
-who can delete them?
-  -- same.
-
 collections:
   issues
     -- linked issues
@@ -70,8 +65,6 @@ Things to experiment with:
 
 Filter rows:
   Row types:
-    * enum (checkboxes?)
-    * set (state, type) (checkboxes?)
     * users
       * contains any of (list of users)
       * contains all of (list of users)

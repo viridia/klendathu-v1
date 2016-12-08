@@ -18,6 +18,7 @@ class IssueSummaryView extends React.Component {
     super(props, context);
     this.query = new Immutable.Map(props.location.query || {});
     this.hotlist = this.hotlistSet(props);
+    this.defaultColumns = ['updated', 'type', 'owner', 'state'];
   }
 
   componentWillMount() {
@@ -77,6 +78,8 @@ class IssueSummaryView extends React.Component {
       return <ErrorDisplay error={this.props.data.error} />;
     }
     const { issues } = this.props.data;
+    const columns = (this.props.data && this.props.data.projectMembership &&
+        this.props.data.projectMembership.columns) || this.defaultColumns;
     return (<section className="kdt issue-list">
       <FilterParams {...this.props} query={this.query.get('search')} />
       <MassEdit {...this.props} issues={issues} />
@@ -84,6 +87,7 @@ class IssueSummaryView extends React.Component {
           {...this.props}
           issues={issues}
           labels={this.hotlist}
+          columns={columns}
           loading={this.props.data.loading} />
     </section>);
   }
@@ -94,7 +98,9 @@ IssueSummaryView.propTypes = {
     error: PropTypes.shape({}),
     loading: PropTypes.bool,
     issues: PropTypes.arrayOf(PropTypes.shape({})),
-    projectMembership: PropTypes.shape({}),
+    projectMembership: PropTypes.shape({
+      columns: PropTypes.arrayOf(PropTypes.string.isRequired),
+    }),
   }).isRequired,
   project: PropTypes.shape({
     id: PropTypes.string.isRequired,

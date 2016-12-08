@@ -28,6 +28,7 @@ describe('resolvers/projectMembership', function () {
             user
             role
             labels
+            columns
             filters {
               name
               value
@@ -44,6 +45,18 @@ describe('resolvers/projectMembership', function () {
           throw result.errors[0];
         }
       };
+    });
+  });
+
+  describe('graphql.columns', function () {
+    it('set columns from empty', function () {
+      return this.updateProjectMembership({
+        columns: ['owner', 'state'],
+      }).then(result => {
+        this.checkResult(result);
+        const { updateProjectMembership: pm } = result.data;
+        ensure(pm.columns).containsExactly('owner', 'state').inOrder();
+      });
     });
   });
 

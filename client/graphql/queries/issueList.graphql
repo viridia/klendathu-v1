@@ -51,5 +51,6 @@ query issueListQuery(
   }
   projectMembership(project: $project) {
     labels
+    columns
   }
 }

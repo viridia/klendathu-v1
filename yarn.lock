@@ -4,6 +4,10 @@
   version "2.0.32"
   resolved "https://registry.yarnpkg.com/@types/async/-/async-2.0.32.tgz#bb7be943784ca63d0c7b1358ce598b5f3cebc059"
 
+"@types/chai@^3.4.32":
+  version "3.4.34"
+  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-3.4.34.tgz#d5335792823bb09cddd5e38c3d211b709183854d"
+
 "@types/isomorphic-fetch@0.0.30":
   version "0.0.30"
   resolved "https://registry.yarnpkg.com/@types/isomorphic-fetch/-/isomorphic-fetch-0.0.30.tgz#a21717624cde9a48c2db53a4e500fc5c32a99bbc"
@@ -109,42 +113,26 @@ anymatch@^1.3.0:
     arrify "^1.0.0"
     micromatch "^2.1.5"
 
-apollo-client:
-  version "0.5.6"
-  resolved "https://registry.yarnpkg.com/apollo-client/-/apollo-client-0.5.6.tgz#02733b7419cab9a1e8c23d65c7ab48d7d5ffda03"
+apollo-client@^0.5.12:
+  version "0.5.12"
+  resolved "https://registry.yarnpkg.com/apollo-client/-/apollo-client-0.5.12.tgz#1869382f0948f703316aec1c2a23f8892166adc4"
   dependencies:
-    graphql-anywhere "^0.3.0"
-    graphql-tag "^0.1.17"
-    lodash.assign "^4.0.8"
-    lodash.clonedeep "^4.3.2"
-    lodash.countby "^4.4.0"
-    lodash.flatten "^4.2.0"
-    lodash.forown "^4.1.0"
-    lodash.has "^4.3.1"
-    lodash.identity "^3.0.0"
-    lodash.includes "^4.1.2"
-    lodash.isboolean "^3.0.3"
-    lodash.isequal "^4.2.0"
-    lodash.isnull "^3.0.0"
-    lodash.isnumber "^3.0.3"
-    lodash.isobject "^3.0.2"
-    lodash.isstring "^4.0.1"
-    lodash.isundefined "^3.0.1"
-    lodash.mapvalues "^4.4.0"
-    lodash.merge "^4.6.0"
-    lodash.pick "^4.2.0"
-    lodash.uniq "^4.5.0"
+    graphql-anywhere "^1.0.0"
+    graphql-tag "^1.1.1"
+    lodash "^4.17.2"
     redux "^3.3.1"
     symbol-observable "^1.0.2"
     whatwg-fetch "^2.0.0"
   optionalDependencies:
     "@types/async" "^2.0.31"
+    "@types/chai" "^3.4.32"
     "@types/isomorphic-fetch" "0.0.30"
     "@types/lodash" "^4.14.34"
     "@types/node" "^6.0.38"
     "@types/promises-a-plus" "0.0.26"
     "@types/redux" "^3.5.29"
     "@types/sinon" "^1.16.29"
+    typed-graphql "1.0.2"
 
 append-field@^0.1.0:
   version "0.1.0"
@@ -2526,9 +2514,9 @@ graphql:
   dependencies:
     iterall "1.0.2"
 
-graphql-anywhere@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/graphql-anywhere/-/graphql-anywhere-0.3.0.tgz#7f8d6b421bbf0fb6322e2a921854c4f5ef357a17"
+graphql-anywhere@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/graphql-anywhere/-/graphql-anywhere-1.0.0.tgz#29735317192eb7c9040bf58a11aeeff484c8c18b"
   dependencies:
     lodash.assign "^4.0.8"
     lodash.clonedeep "^4.3.2"
@@ -2557,6 +2545,10 @@ graphql-date@^1.0.2:
 graphql-tag@^0.1.17:
   version "0.1.17"
   resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-0.1.17.tgz#1dfd6f2310d395b309a1077bc8cdc5d6604c5e89"
+
+graphql-tag@^1.1.1:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-1.1.2.tgz#3e9951d5664e73c1aceee0329f0152bf3020fbb7"
 
 gridfs-stream:
   version "1.1.1"
@@ -3243,10 +3235,6 @@ lodash.isarray@^3.0.0:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/lodash.isarray/-/lodash.isarray-3.0.4.tgz#79e4eb88c36a8122af86f844aa9bcd851b5fbb55"
 
-lodash.isboolean@^3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/lodash.isboolean/-/lodash.isboolean-3.0.3.tgz#6c2e171db2a257cd96802fd43b01b20d5f5870f6"
-
 lodash.isequal@^4.1.1, lodash.isequal@^4.2.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.4.0.tgz#6295768e98e14dc15ce8d362ef6340db82852031"
@@ -3295,13 +3283,13 @@ lodash.pickby@^4.0.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.pickby/-/lodash.pickby-4.6.0.tgz#7dea21d8c18d7703a27c704c15d3b84a67e33aff"
 
-lodash.uniq@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
-
 lodash@^4.0.0, lodash@^4.14.0, lodash@^4.16.2, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.6.1:
   version "4.16.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.16.4.tgz#01ce306b9bad1319f2a5528674f88297aeb70127"
+
+lodash@^4.17.2:
+  version "4.17.2"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.2.tgz#34a3055babe04ce42467b607d700072c7ff6bf42"
 
 lodash@~4.9.0:
   version "4.9.0"
@@ -5301,6 +5289,10 @@ type-is@^1.6.4, type-is@~1.6.13:
   dependencies:
     media-typer "0.3.0"
     mime-types "~2.1.11"
+
+typed-graphql@1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/typed-graphql/-/typed-graphql-1.0.2.tgz#4c0f788775d552df4d4ec3d73f25469252f40fb8"
 
 typedarray@~0.0.5:
   version "0.0.6"

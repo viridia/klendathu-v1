@@ -26,6 +26,10 @@ module.exports = new GraphQLInputObjectType({
       type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
       description: 'List of labels to display in the hotlist.',
     },
+    columns: {
+      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+      description: 'List of columns to display in the issue list.',
+    },
     addLabels: {
       type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
       description: 'List of labels to add to the add to the hotlist.',

@@ -32,6 +32,10 @@ module.exports = new GraphQLObjectType({
       type: GraphQLInt,
       description: 'Access level for the this user (indirect as organization member).',
     },
+    columns: {
+      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+      description: 'List of columns to display in the issue list.',
+    },
     labels: {
       type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
       description: 'List of label names to display in the issue summary list.',

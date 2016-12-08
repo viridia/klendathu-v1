@@ -10,6 +10,7 @@ import SettingsIcon from 'icons/ic_settings_black_24px.svg';
 import LocalOfferIcon from 'icons/ic_local_offer_black_24px.svg';
 import LeftNavDataQuery from '../../graphql/queries/leftNavData.graphql';
 import LabelName from './labelName.jsx';
+import { Role } from '../../lib/role';
 import './leftNav.scss';
 
 export function NavItem({ title, icon, pathname, query = undefined, onlyActiveOnIndex = false }) {
@@ -41,22 +42,23 @@ class LeftNav extends React.Component {
     const { projectMembership, projects } = this.props.data;
     const filters = projectMembership ? projectMembership.filters : [];
     const labels = projectMembership ? projectMembership.labelsData : [];
+    const isProjectMember = project.role >= Role.VIEWER;
     return (<nav className="kdt left-nav">
       <NavItem
           icon={<ListIcon />}
           title="All Issues"
           pathname={`/project/${project.name}/issues`}
           query={{ owner: undefined, label: undefined, type: undefined, state: undefined }} />
-      <NavItem
+      {isProjectMember && <NavItem
           icon={<PersonIcon />}
           title="My Open Issues"
           pathname={`/project/${project.name}/issues`}
-          query={{ owner: 'me', state: 'open' }} />
-      <NavItem
+          query={{ owner: 'me', state: 'open' }} />}
+      {isProjectMember && <NavItem
           icon={<LocalOfferIcon />}
           title="Labels"
-          pathname={`/project/${project.name}/labels`} />
-      {labels && labels.length > 0 && <ul className="label-list">
+          pathname={`/project/${project.name}/labels`} />}
+      {isProjectMember && labels && labels.length > 0 && <ul className="label-list">
         {labels.map(label => (
           <li className="label-item" key={label.id}>
             <Link to={{ pathname: `/project/${project.name}/issues`, query: { label: label.id } }}>
@@ -65,11 +67,11 @@ class LeftNav extends React.Component {
           </li>
         ))}
       </ul>}
-      <NavItem
+      {isProjectMember && <NavItem
           icon={<BookmarkIcon />}
           title="Saved Filters"
-          pathname={`/project/${project.name}/queries`} />
-      {filters && filters.length > 0 && <ul className="filter-list">
+          pathname={`/project/${project.name}/queries`} />}
+      {isProjectMember && filters && filters.length > 0 && <ul className="filter-list">
         {filters.map(filter => (
           <li className="filter-item" key={filter.name}>
             <Link
@@ -81,10 +83,10 @@ class LeftNav extends React.Component {
           </li>
         ))}
       </ul>}
-      <NavItem
+      {isProjectMember && <NavItem
           icon={<SettingsIcon />}
           title="Project Settings"
-          pathname={`/project/${project.name}/settings`} />
+          pathname={`/project/${project.name}/settings`} />}
       <NavItem icon={<AppsIcon />} title="Projects" onlyActiveOnIndex pathname="/" />
       {projects && projects.length > 0 && <ul className="project-list">
         {projects.map(p => (

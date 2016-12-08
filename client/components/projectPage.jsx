@@ -17,6 +17,7 @@ class ProjectPage extends React.Component {
     super(props);
     this.cachedProject = props.data.project;
     this.buildProjectMaps();
+    // React performance measurement
     // Perf.start();
   }
 

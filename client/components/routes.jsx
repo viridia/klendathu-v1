@@ -40,7 +40,7 @@ const Routes = (
             <Route component={IssueDetails} path="/project/:project/issues/:id" />
             <Route component={IssueSummaryView} path="/project/:project/issues" />
             <Route component={LabelList} path="/project/:project/labels" />
-            <Route component={ProjectSettings} path="/project/:project/settings" />
+            <Route component={ProjectSettings} path="/project/:project/settings(/:tab)" />
             <IndexRoute component={Dashboard} />
           </Route>
           <IndexRoute component={DashboardPage} />

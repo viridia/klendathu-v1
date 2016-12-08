@@ -4,7 +4,7 @@ import IssueQuery from '../../graphql/queries/issue.graphql';
 import { IssueContent } from '../../store/fragments';
 import './labelName.scss';
 
-/** Component that displays a label as a chip. */
+/** Component that displays an issue as a single-line summary. */
 class IssueSummary extends React.Component {
   render() {
     const issue = this.props.data.issue;
